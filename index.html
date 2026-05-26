@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nolan Kim — IT Engineer, Identity & SaaS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0d0d0f;
+      --bg2: #141417;
+      --bg3: #1c1c21;
+      --border: rgba(255,255,255,0.07);
+      --border2: rgba(255,255,255,0.12);
+      --text: #f0f0f0;
+      --muted: #888;
+      --subtle: #555;
+      --accent: #7b6ef6;
+      --accent2: #5eead4;
+      --accent3: #f472b6;
+      --mono: 'DM Mono', monospace;
+      --sans: 'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 15px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 40px;
+      background: rgba(13,13,15,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-family: var(--mono); font-size: 14px; color: var(--accent); letter-spacing: 0.04em; }
+    .nav-links { display: flex; gap: 28px; }
+    .nav-links a { font-size: 13px; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      font-size: 13px; font-family: var(--mono);
+      color: var(--accent); background: transparent;
+      border: 1px solid rgba(123,110,246,0.4);
+      border-radius: 6px; padding: 7px 16px;
+      text-decoration: none; transition: all 0.2s;
+    }
+    .nav-cta:hover { background: rgba(123,110,246,0.1); border-color: var(--accent); }
+
+    /* HERO */
+    .hero {
+      padding: 100px 40px 80px;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    .hero-eyebrow {
+      font-family: var(--mono); font-size: 12px; color: var(--accent2);
+      letter-spacing: 0.12em; text-transform: uppercase;
+      margin-bottom: 20px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .hero-eyebrow::before { content: ''; display: block; width: 28px; height: 1px; background: var(--accent2); }
+    h1 {
+      font-size: clamp(38px, 6vw, 64px);
+      font-weight: 300;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+      color: var(--text);
+    }
+    h1 em { font-style: normal; color: var(--accent); }
+    .hero-sub {
+      font-size: 17px; color: var(--muted); max-width: 520px;
+      line-height: 1.7; margin-bottom: 40px;
+    }
+    .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--mono); font-size: 13px;
+      padding: 10px 20px; border-radius: 6px;
+      text-decoration: none; transition: all 0.2s; cursor: pointer;
+      border: none;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #9080ff; }
+    .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border2); }
+    .btn-ghost:hover { color: var(--text); border-color: var(--subtle); }
+
+    /* METRICS */
+    .metrics {
+      max-width: 860px; margin: 0 auto 80px;
+      padding: 0 40px;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+      border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+    }
+    .metric {
+      background: var(--bg2);
+      padding: 28px 24px;
+      position: relative;
+    }
+    .metric:not(:last-child)::after {
+      content: ''; position: absolute; right: 0; top: 20%; bottom: 20%;
+      width: 1px; background: var(--border);
+    }
+    .metric-val { font-size: 30px; font-weight: 300; color: var(--text); letter-spacing: -0.02em; }
+    .metric-val span { font-size: 18px; color: var(--accent); }
+    .metric-label { font-size: 12px; color: var(--muted); margin-top: 4px; font-family: var(--mono); }
+
+    /* SECTIONS */
+    section { max-width: 860px; margin: 0 auto 80px; padding: 0 40px; }
+    .section-label {
+      font-family: var(--mono); font-size: 11px; color: var(--subtle);
+      letter-spacing: 0.14em; text-transform: uppercase;
+      margin-bottom: 32px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* SKILLS */
+    .skill-groups { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .skill-group {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 18px 20px;
+    }
+    .skill-group-label { font-size: 11px; font-family: var(--mono); color: var(--accent2); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+    .pills { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pill {
+      font-size: 12px; color: var(--muted);
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 4px; padding: 3px 9px;
+      font-family: var(--mono);
+    }
+    .pill.hi { color: var(--accent); border-color: rgba(123,110,246,0.25); background: rgba(123,110,246,0.08); }
+
+    /* EXPERIENCE */
+    .exp-list { display: flex; flex-direction: column; gap: 12px; }
+    .exp-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 22px 24px;
+      transition: border-color 0.2s;
+    }
+    .exp-card:hover { border-color: var(--border2); }
+    .exp-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; gap: 16px; }
+    .exp-title { font-size: 15px; font-weight: 500; color: var(--text); }
+    .exp-date { font-size: 12px; font-family: var(--mono); color: var(--subtle); white-space: nowrap; }
+    .exp-company { font-size: 13px; color: var(--accent2); font-family: var(--mono); margin-bottom: 10px; }
+    .exp-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .exp-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 12px; }
+    .exp-tag { font-size: 11px; font-family: var(--mono); color: var(--subtle); background: var(--bg3); border: 1px solid var(--border); border-radius: 3px; padding: 2px 7px; }
+
+    /* PROJECTS */
+    .project-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .project-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 22px 24px;
+      transition: border-color 0.2s;
+    }
+    .project-card:hover { border-color: var(--border2); }
+    .project-type { font-size: 11px; font-family: var(--mono); color: var(--accent3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+    .project-title { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 8px; }
+    .project-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .project-result { margin-top: 12px; font-size: 13px; font-family: var(--mono); color: var(--accent2); }
+
+    /* AI AGENT */
+    .agent-wrap {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+    }
+    .agent-header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+    }
+    .agent-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: rgba(123,110,246,0.15); border: 1px solid rgba(123,110,246,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--mono); font-size: 12px; color: var(--accent);
+    }
+    .agent-name { font-size: 14px; font-weight: 500; color: var(--text); }
+    .agent-status { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+    .online-dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; }
+    .chat-area { padding: 20px; display: flex; flex-direction: column; gap: 14px; min-height: 200px; }
+    .msg { display: flex; gap: 10px; align-items: flex-start; }
+    .msg.user { flex-direction: row-reverse; }
+    .msg-av { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-family: var(--mono); flex-shrink: 0; margin-top: 1px; }
+    .msg.agent .msg-av { background: rgba(123,110,246,0.15); color: var(--accent); border: 1px solid rgba(123,110,246,0.3); }
+    .msg.user .msg-av { background: var(--bg3); color: var(--muted); border: 1px solid var(--border); }
+    .msg-bubble { font-size: 13px; line-height: 1.6; padding: 10px 14px; border-radius: 8px; max-width: 78%; }
+    .msg.agent .msg-bubble { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
+    .msg.user .msg-bubble { background: rgba(123,110,246,0.15); color: #c4bcff; border: 1px solid rgba(123,110,246,0.25); }
+    .suggestions { padding: 0 20px 16px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .sug { font-size: 12px; font-family: var(--mono); color: var(--muted); background: var(--bg3); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; cursor: pointer; transition: all 0.15s; }
+    .sug:hover { color: var(--text); border-color: var(--border2); }
+    .input-row { display: flex; gap: 8px; padding: 12px 20px; border-top: 1px solid var(--border); }
+    .chat-input {
+      flex: 1; background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 6px; padding: 9px 14px; font-size: 13px;
+      font-family: var(--sans); color: var(--text); outline: none;
+      transition: border-color 0.2s;
+    }
+    .chat-input:focus { border-color: rgba(123,110,246,0.4); }
+    .chat-input::placeholder { color: var(--subtle); }
+    .send-btn {
+      background: var(--accent); color: #fff; border: none;
+      border-radius: 6px; padding: 0 16px; font-size: 13px;
+      font-family: var(--mono); cursor: pointer; transition: background 0.2s;
+    }
+    .send-btn:hover { background: #9080ff; }
+    .send-btn:disabled { background: var(--bg3); color: var(--subtle); cursor: not-allowed; }
+    .typing-dots { display: flex; gap: 4px; align-items: center; padding: 10px 14px; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; width: fit-content; }
+    .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--subtle); animation: blink 1.2s infinite; }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes blink { 0%,60%,100% { opacity: 0.3; } 30% { opacity: 1; } }
+
+    /* FOOTER */
+    footer {
+      max-width: 860px; margin: 0 auto; padding: 40px 40px 60px;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    footer .logo { font-family: var(--mono); font-size: 13px; color: var(--subtle); }
+    footer .links { display: flex; gap: 20px; }
+    footer .links a { font-size: 13px; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    footer .links a:hover { color: var(--text); }
+
+    /* FADE IN */
+    .fade-in { opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease, transform 0.5s ease; }
+    .fade-in.visible { opacity: 1; transform: none; }
+
+    @media (max-width: 640px) {
+      nav { padding: 14px 20px; }
+      .nav-links { display: none; }
+      .hero { padding: 60px 20px 50px; }
+      .metrics { margin: 0 20px 60px; padding: 0; grid-template-columns: 1fr 1fr; }
+      .metric:nth-child(2)::after { display: none; }
+      section { padding: 0 20px; }
+      .skill-groups, .project-grid { grid-template-columns: 1fr; }
+      footer { padding: 30px 20px 40px; flex-direction: column; gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo">nolan.kim</span>
+  <div class="nav-links">
+    <a href="#skills">Skills</a>
+    <a href="#experience">Experience</a>
+    <a href="#projects">Projects</a>
+    <a href="#ask">Ask AI</a>
+  </div>
+  <a class="nav-cta" href="mailto:noki21@protonmail.com">Get in touch</a>
+</nav>
+
+<div class="hero fade-in">
+  <div class="hero-eyebrow">IT Support Engineer</div>
+  <h1>Identity, SaaS &amp;<br><em>infrastructure</em><br>engineering.</h1>
+  <p class="hero-sub">5+ years owning identity, endpoint, and SaaS operations across education, healthcare, and consulting — from Okta automation to AI-powered helpdesk tools.</p>
+  <div class="hero-btns">
+    <a class="btn btn-primary" href="Nolan_Kim_Resume.pdf" download>↓ Download resume</a>
+    <a class="btn btn-ghost" href="https://linkedin.com/in/no-ki/" target="_blank">LinkedIn ↗</a>
+    <a class="btn btn-ghost" href="#ask">Ask the AI agent</a>
+  </div>
+</div>
+
+<div class="metrics fade-in">
+  <div class="metric">
+    <div class="metric-val">9,000<span>+</span></div>
+    <div class="metric-label">users supported</div>
+  </div>
+  <div class="metric">
+    <div class="metric-val">~50<span>%</span></div>
+    <div class="metric-label">ticket reduction</div>
+  </div>
+  <div class="metric">
+    <div class="metric-val">7<span>+ yrs</span></div>
+    <div class="metric-label">SaaS IT ops</div>
+  </div>
+  <div class="metric">
+    <div class="metric-val">3</div>
+    <div class="metric-label">industries</div>
+  </div>
+</div>
+
+<section id="skills" class="fade-in">
+  <div class="section-label">Core skills</div>
+  <div class="skill-groups">
+    <div class="skill-group">
+      <div class="skill-group-label">Identity &amp; access</div>
+      <div class="pills">
+        <span class="pill hi">Okta</span>
+        <span class="pill hi">Okta Workflows</span>
+        <span class="pill hi">SAML</span>
+        <span class="pill hi">OAuth/OIDC</span>
+        <span class="pill hi">SCIM</span>
+        <span class="pill">Azure AD / Entra</span>
+        <span class="pill">Active Directory</span>
+        <span class="pill">RBAC · MFA</span>
+        <span class="pill">Google Admin</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-label">Endpoint &amp; device</div>
+      <div class="pills">
+        <span class="pill">Kandji</span>
+        <span class="pill">Intune / UEM</span>
+        <span class="pill">Sophos</span>
+        <span class="pill">macOS</span>
+        <span class="pill">Windows</span>
+        <span class="pill">Linux</span>
+        <span class="pill">iOS · Android</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-label">Cloud &amp; SaaS</div>
+      <div class="pills">
+        <span class="pill">Google Workspace</span>
+        <span class="pill">Microsoft 365</span>
+        <span class="pill">Azure</span>
+        <span class="pill">AWS</span>
+        <span class="pill">Citrix</span>
+        <span class="pill">Splunk Cloud</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-label">Scripting &amp; dev</div>
+      <div class="pills">
+        <span class="pill hi">PowerShell</span>
+        <span class="pill hi">Python</span>
+        <span class="pill hi">Bash</span>
+        <span class="pill">JavaScript</span>
+        <span class="pill">Node.js</span>
+        <span class="pill">React</span>
+        <span class="pill">SQL</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="experience" class="fade-in">
+  <div class="section-label">Experience</div>
+  <div class="exp-list">
+    <div class="exp-card">
+      <div class="exp-top">
+        <div class="exp-title">IT Support Engineer — Devices, Identity &amp; SaaS</div>
+        <div class="exp-date">Jul 2024 – Present</div>
+      </div>
+      <div class="exp-company">Calbright College · Remote</div>
+      <div class="exp-desc">Owned L2 support and SSO integrations for 100+ staff and 9,000+ students. Built Okta Workflows and API scripts to automate identity lifecycle across a growing SaaS environment. Led a full organization domain migration across email, SSO, and SaaS platforms.</div>
+      <div class="exp-tags">
+        <span class="exp-tag">Okta</span><span class="exp-tag">SCIM</span><span class="exp-tag">Google Workspace</span><span class="exp-tag">Azure</span><span class="exp-tag">Kandji</span><span class="exp-tag">Slack</span>
+      </div>
+    </div>
+    <div class="exp-card">
+      <div class="exp-top">
+        <div class="exp-title">IT Support Engineer &amp; Sysadmin Consultant</div>
+        <div class="exp-date">Aug 2018 – Dec 2025</div>
+      </div>
+      <div class="exp-company">DRI Inc. · Fresno, CA (Contract)</div>
+      <div class="exp-desc">Sole IT administrator for 120+ users across 3 branches over a 7+ year contract. Modernized infrastructure from physical systems to cloud/SaaS. Built an AI support agent that cut basic ticket volume by ~50%.</div>
+      <div class="exp-tags">
+        <span class="exp-tag">Entra ID</span><span class="exp-tag">Jira</span><span class="exp-tag">OpenVPN</span><span class="exp-tag">PowerShell</span><span class="exp-tag">AWS</span><span class="exp-tag">OpenAI</span>
+      </div>
+    </div>
+    <div class="exp-card">
+      <div class="exp-top">
+        <div class="exp-title">IT Helpdesk Analyst II</div>
+        <div class="exp-date">May 2021 – Jul 2023</div>
+      </div>
+      <div class="exp-company">Keck Medical Center of USC · Remote</div>
+      <div class="exp-desc">First point of contact for 10,000+ staff in a large-scale healthcare environment. Handled P2/P3 escalations via ServiceNow, managed AD provisioning, and maintained HIPAA-compliant workflows across Cerner, Citrix, and Azure Intune.</div>
+      <div class="exp-tags">
+        <span class="exp-tag">ServiceNow</span><span class="exp-tag">Active Directory</span><span class="exp-tag">Cerner</span><span class="exp-tag">Citrix</span><span class="exp-tag">HIPAA</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="projects" class="fade-in">
+  <div class="section-label">Featured projects</div>
+  <div class="project-grid">
+    <div class="project-card">
+      <div class="project-type">AI automation</div>
+      <div class="project-title">AI-powered helpdesk agent</div>
+      <div class="project-desc">Built with OpenAI low-code workflows to automate Jira ticket creation and surface answers from internal knowledge base content.</div>
+      <div class="project-result">→ ~50% reduction in basic ticket volume</div>
+    </div>
+    <div class="project-card">
+      <div class="project-type">Identity automation</div>
+      <div class="project-title">Okta lifecycle automation</div>
+      <div class="project-desc">SCIM provisioning, Okta Workflow automations, and API scripts handling onboarding, offboarding, license audits, and least-privilege access.</div>
+      <div class="project-result">→ 9,000+ user org, fully automated</div>
+    </div>
+    <div class="project-card">
+      <div class="project-type">Infrastructure modernization</div>
+      <div class="project-title">Physical → cloud migration</div>
+      <div class="project-desc">Led migration of 3-branch organization from on-prem physical servers to cloud/SaaS using Entra ID as the central identity provider.</div>
+      <div class="project-result">→ Reliable remote work across all branches</div>
+    </div>
+    <div class="project-card">
+      <div class="project-type">Domain migration</div>
+      <div class="project-title">Org-wide domain migration</div>
+      <div class="project-desc">Coordinated full domain migration across email, SSO authentication, and SaaS integrations in Okta, Azure, and Google Workspace with minimal login disruption.</div>
+      <div class="project-result">→ Zero major outages during cutover</div>
+    </div>
+  </div>
+</section>
+
+<section id="ask" class="fade-in">
+  <div class="section-label">Ask about Nolan</div>
+  <div class="agent-wrap">
+    <div class="agent-header">
+      <div class="agent-avatar">NK</div>
+      <div>
+        <div class="agent-name">Resume assistant</div>
+        <div class="agent-status"><span class="online-dot"></span>Answers from Nolan's resume</div>
+      </div>
+    </div>
+    <div class="chat-area" id="chat">
+      <div class="msg agent">
+        <div class="msg-av">NK</div>
+        <div class="msg-bubble">Hi! I'm Nolan's resume assistant. Ask me anything about his experience, skills, or background — I'll give you straight answers based on his actual resume.</div>
+      </div>
+    </div>
+    <div class="suggestions" id="sugs">
+      <button class="sug" onclick="ask('Does he have deep Okta experience?')">Okta experience?</button>
+      <button class="sug" onclick="ask('What industries has he worked in?')">Industries?</button>
+      <button class="sug" onclick="ask('Can he automate identity workflows?')">Automation skills?</button>
+      <button class="sug" onclick="ask('Is he open to remote work?')">Remote work?</button>
+      <button class="sug" onclick="ask('What is his education background?')">Education?</button>
+    </div>
+    <div class="input-row">
+      <input class="chat-input" id="q" type="text" placeholder="Ask a question about Nolan..." onkeydown="if(event.key==='Enter')send()" />
+      <button class="send-btn" id="sendbtn" onclick="send()">Send</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span class="logo">nolan.kim · (669) 246-6167</span>
+  <div class="links">
+    <a href="mailto:noki21@protonmail.com">Email</a>
+    <a href="https://linkedin.com/in/no-ki/" target="_blank">LinkedIn</a>
+    <a href="Nolan_Kim_Resume.pdf" download>Resume</a>
+  </div>
+</footer>
+
+<script>
+  const RESUME = `
+Nolan Kim — IT Support Engineer, Identity & SaaS
+Location: Clovis, CA | Open to remote
+Contact: (669) 246-6167 | noki21@protonmail.com | linkedin.com/in/no-ki/
+
+SUMMARY:
+IT Support Engineer with 5+ years supporting SaaS IT operations, identity, endpoint, and infrastructure across education, healthcare, and consulting. Owned workflows for 100+ staff and 9,000+ users across onboarding/offboarding, Okta SSO, Google Workspace, endpoint lifecycle, device provisioning, migrations, escalated troubleshooting, automation, AI workflows, and documentation.
+
+SKILLS:
+Identity & Access: Okta, Okta Automation Workflows, Active Directory, Microsoft Entra ID / Azure AD, Google Admin Console, RBAC, MFA
+SSO & Provisioning: SAML, OAuth/OIDC, SCIM, identity lifecycle automation
+Identity Diagnostics: Splunk Cloud, SAML tracer, authentication logs, API logs
+Endpoint & Device: Kandji, Iru, Microsoft Intune, Sophos Endpoint, MDM/UEM, asset tracking, fleet management
+OS & Platforms: macOS, Windows, Windows Server, Linux, iOS, Android
+SaaS & Cloud: Google Workspace, Microsoft 365, Azure, AWS, Citrix
+ITSM & Ticketing: ServiceNow, Salesforce, Zendesk, Atlassian Jira
+Collaboration: Slack, Zoom, Asana, GitHub, Confluence
+Scripting & Dev: PowerShell, Bash, Python, SQL, MySQL, JavaScript, Node.js, React, C#
+
+EXPERIENCE:
+
+Calbright College | Remote | IT Support Engineer, Devices, Identity & SaaS | July 2024 - Present
+- Owned primary IT support and L2 escalation for 100+ staff and 9,000+ students
+- Built and maintained SSO integrations using SAML, OAuth/OIDC, SCIM
+- Developed API scripts and Okta Workflows for identity lifecycle automation
+- Managed full device lifecycle across Kandji, Intune, Google Admin, Sophos
+- Led organization domain migration across email, SSO, and SaaS integrations
+- Used Okta as central IdP for IAM and IGA workflows
+
+DRI Inc. | Fresno, CA | IT Support Engineer & Sysadmin Consultant (Contract) | August 2018 - December 2025
+- Sole administrator for 120+ users across 3 branches over 7+ year contract
+- Modernized infrastructure from physical to cloud/SaaS using Microsoft Entra ID
+- Built an AI support agent (OpenAI) that reduced basic ticket volume by ~50%
+- Automated Active Directory provisioning with PowerShell + HR workflow integration
+- Deployed Linux/Windows servers with AWS cloud backups using Python, Bash, AWS APIs
+- Implemented Jira as ticketing system; reduced onboarding time by 30%
+- Implemented OpenVPN for secure remote access
+
+Keck Medical Center of USC | Remote | IT Helpdesk Analyst II | May 2021 - July 2023
+- First point of contact for 10,000+ staff in large-scale healthcare environment
+- Resolved issues across Windows, macOS, SSO, Google Workspace, AD, Office 365, Citrix, Cerner, Azure Intune, Tailscale VPN
+- HIPAA-compliant handling of user and system information
+- Managed incidents in ServiceNow; handled P2/P3 escalations
+- Provisioned and managed user accounts in Active Directory
+
+Freelance Web Developer | 2014–2016
+- Built websites using HTML, CSS, JavaScript, SQL, Node.js, React, WordPress
+
+EDUCATION & CERTIFICATIONS:
+- CompTIA A+
+- ITIL Foundation
+- École 42 Silicon Valley | BASc Computer Science equivalent (RNCP Level 6) | 2018–2022
+  ~1.1% acceptance rate; projects in C, JavaScript, Python, C#; systems programming, algorithms, networking, OS, OOP
+
+AWARDS:
+- 2016 FIRST Robotics Competition — 3rd place out of 50+ teams
+`;
+
+  const SYSTEM = `You are an AI assistant embedded on Nolan Kim's personal portfolio website. Recruiters and hiring managers ask you questions about Nolan. Answer only based on the resume information provided. Be concise, direct, and confident. If something isn't in the resume, say so honestly. Keep answers to 2-4 sentences. Speak in third person about Nolan.
+
+Resume:
+${RESUME}`;
+
+  let history = [];
+
+  function ask(q) {
+    document.getElementById('q').value = q;
+    send();
+  }
+
+  async function send() {
+    const input = document.getElementById('q');
+    const btn = document.getElementById('sendbtn');
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    btn.disabled = true;
+    document.getElementById('sugs').style.display = 'none';
+    addMsg('user', text);
+    history.push({ role: 'user', content: text });
+    const tid = addTyping();
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: history, system: SYSTEM })
+      });
+      const data = await res.json();
+      removeTyping(tid);
+      const reply = data.reply || 'Sorry, something went wrong.';
+      history.push({ role: 'assistant', content: reply });
+      addMsg('agent', reply);
+    } catch(e) {
+      removeTyping(tid);
+      addMsg('agent', 'Could not reach the server. Make sure the API proxy is running.');
+    }
+    btn.disabled = false;
+  }
+
+  function addMsg(role, text) {
+    const chat = document.getElementById('chat');
+    const div = document.createElement('div');
+    div.className = `msg ${role}`;
+    const av = document.createElement('div');
+    av.className = 'msg-av';
+    av.textContent = role === 'agent' ? 'NK' : 'You';
+    const bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+    bubble.textContent = text;
+    div.appendChild(av);
+    div.appendChild(bubble);
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  let tc = 0;
+  function addTyping() {
+    const id = ++tc;
+    const chat = document.getElementById('chat');
+    const div = document.createElement('div');
+    div.className = 'msg agent'; div.id = 'typing-' + id;
+    const av = document.createElement('div'); av.className = 'msg-av'; av.textContent = 'NK';
+    const t = document.createElement('div'); t.className = 'typing-dots';
+    t.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+    div.appendChild(av); div.appendChild(t);
+    chat.appendChild(div); chat.scrollTop = chat.scrollHeight;
+    return id;
+  }
+  function removeTyping(id) { const el = document.getElementById('typing-' + id); if (el) el.remove(); }
+
+  // Fade-in on scroll
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
