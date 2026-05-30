@@ -96,7 +96,7 @@ module.exports = async function handler(req, res) {
         model: 'gpt-5.4',
         response_format: { type: 'json_object' },
         messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
-        max_completion_tokens: 1000,
+        max_completion_tokens: 2000,
         temperature: 0.7
       })
     });
