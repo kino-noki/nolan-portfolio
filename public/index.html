@@ -1039,7 +1039,7 @@ So what brings you here today?`;
   // Goal: log EVERY conversation, cheaply, on the free Zapier plan. The split of
   // event vs type is deliberate — event ('log') is what Zapier routes on, type
   // ('support'/'recruitment'/'general') is context that rides along, so a log
-  // never overwrites a chat's real nature. The debounce (log only after 15s of
+  // never overwrites a chat's real nature. The debounce (log only after 45s of
   // quiet, and only if messageCount changed) is what keeps one busy chat from
   // burning dozens of Zapier tasks.
   function logConversation(status) {
@@ -1056,12 +1056,12 @@ So what brings you here today?`;
     lastLoggedCount = messageCount;
   }
 
-  // 15s idle debounce — fires one log if the conversation changed since the last log.
+  // 45s idle debounce — fires one log if the conversation changed since the last log.
   function armIdleLog() {
     cancelIdleLog();
     idleTimer = setTimeout(() => {
       if (messageCount !== lastLoggedCount) logConversation('ongoing');
-    }, 15000);
+    }, 45000);
   }
   function cancelIdleLog() {
     if (idleTimer) { clearTimeout(idleTimer); idleTimer = null; }
@@ -1093,7 +1093,7 @@ So what brings you here today?`;
   // The orchestrator. The model's "label" is the decision signal:
   //   intake_complete → recruiter gave everything → fire recruiter_lead + final log
   //   human (only after 2 failed support attempts) → fire ticket + final log
-  //   anything else → just reply, and arm the 15s idle log
+  //   anything else → just reply, and arm the 45s idle log
   // The terminal branches fire their event AND a final log, so an escalated or
   // completed chat is still captured in full — logging is never either/or.
   async function sendMessage() {
@@ -1130,6 +1130,7 @@ So what brings you here today?`;
           session_id: config.sessionId,
           user_name: config.name,
           user_email: result.user_email || config.email || '',
+          message_count: messageCount,
           conversation: buildTranscript(),
           ...result.recruiter_data
         }, true);
@@ -1139,7 +1140,7 @@ So what brings you here today?`;
           addBotMessage("I had trouble passing your details through just now. Could you email the real Nolan directly at noki21@protonmail.com so nothing gets lost? Sorry about that.", 'ticket', '⚠ send failed');
         }
         logConversation('final');
-      } else if (label === 'human' && mode === 'support' && attempt >= 2) {
+      } else if (label === 'human') {
         addBotMessage(reply);
         cancelIdleLog();
         // Critical send — verify the ticket actually reached Zapier.
@@ -1152,6 +1153,7 @@ So what brings you here today?`;
           user_email: result.user_email || config.email || '',
           message: text,
           attempt: attempt,
+          message_count: messageCount,
           conversation: buildTranscript()
         }, true);
         if (sent) {
@@ -1163,7 +1165,7 @@ So what brings you here today?`;
       } else {
         addBotMessage(reply);
         if (mode === 'support' && label === 'basic') attempt++;
-        // Arm a 15s idle timer; logs once if no further activity, only if changed
+        // Arm a 45s idle timer; logs once if no further activity, only if changed
         armIdleLog();
       }
 
