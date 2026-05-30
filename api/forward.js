@@ -54,14 +54,27 @@ module.exports = async function handler(req, res) {
     for (const [k, v] of Object.entries(payload)) {
       params.append(k, v == null ? '' : String(v));
     }
-    await fetch(`${webhook}?${params.toString()}`, { method: 'POST' });
+
+    // --- Verify Zapier actually accepted it ---------------------------------
+    // Previously we ignored the response, so a failing webhook looked identical
+    // to a working one. Now we check the HTTP status AND Zapier's own body
+    // (it returns {"status":"success"} on a good Catch Hook) and report the
+    // real outcome back to the browser so it can show a fallback when it matters.
+    const zapResp = await fetch(`${webhook}?${params.toString()}`, { method: 'POST' });
+    let zapBody = {};
+    try { zapBody = await zapResp.json(); } catch (e) { /* Zapier may return no body */ }
+
+    const accepted = zapResp.ok && (zapBody.status === undefined || zapBody.status === 'success');
+    if (!accepted) {
+      return res.status(502).json({ ok: false, error: `Zapier rejected the request (status ${zapResp.status})` });
+    }
 
     return res.status(200).json({ ok: true });
   } catch (e) {
-    // --- Fail soft ----------------------------------------------------------
-    // Logging/forwarding is a background nicety, not something the visitor is
-    // waiting on. If Zapier is down or slow we still return 200 so the chat UI
-    // never shows an error for what is effectively a fire-and-forget call.
-    return res.status(200).json({ ok: false, error: e.message });
+    // --- Network / unexpected failure ---------------------------------------
+    // Report it as not-ok with a 502 so the browser knows the send didn't land.
+    // The browser decides whether that failure is worth showing the visitor
+    // (yes for tickets/leads, no for background logs).
+    return res.status(502).json({ ok: false, error: e.message });
   }
 }

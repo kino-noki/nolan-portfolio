@@ -724,33 +724,66 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
 </footer>
 
 <script>
+  // ==========================================================================
+  //  AI NOLAN CHATBOT — front-end controller
+  // --------------------------------------------------------------------------
+  //  Talks to two serverless endpoints, never to OpenAI or Zapier directly:
+  //    /api/chat     → sends the conversation, gets AI Nolan's JSON reply
+  //    /api/forward  → relays event payloads (ticket / recruiter_lead / log) to Zapier
+  //  No secrets live in this file. Sections below: state → events → UI helpers
+  //  → networking → parsing → logging → main send loop.
+  // ==========================================================================
+
+  // --- Conversation state ---------------------------------------------------
+  // All chat state lives in plain variables (no framework needed for one widget).
+  //  config            visitor identity from the gate; reused in every payload so
+  //                    Nolan always knows who to follow up with.
+  //  conversationMessages  full history — resent every call because the model is
+  //                    stateless and this is the only way it keeps context.
+  //  attempt           failed support turns. Starts at -1 so the FIRST reply
+  //                    counts as attempt 0; we escalate at >=2 (i.e. the 3rd
+  //                    unsolved turn) rather than giving up too early.
+  //  currentMode       support/recruitment/general — decides the log's "type"
+  //                    and whether the attempt counter should climb.
+  //  idleTimer + lastLoggedCount  power the debounce: only log after a pause,
+  //                    and only if the conversation actually changed.
   let config = { name: '', email: '', sessionId: '' };
   let conversationMessages = [];
   let attempt = -1;
   let messageCount = 0;
   let currentMode = '';
-  let conversationLogged = false;
+  let idleTimer = null;
+  let lastLoggedCount = 0;  // message_count at last successful log
 
+  // --- Tab-close logging ----------------------------------------------------
+  // The 15s idle timer might not have fired yet when someone closes the tab, so
+  // this is the safety net that guarantees every conversation gets logged. We
+  // skip it if nothing changed since the last log (no point sending a duplicate),
+  // and logConversation uses sendBeacon precisely because a normal fetch would be
+  // killed mid-flight by the browser as the page unloads.
   // Fire full conversation log on tab close if not already sent
   window.addEventListener('beforeunload', () => {
-    if (!conversationLogged && conversationMessages.length > 2) {
-      conversationLogged = true;
-      const isSupport = currentMode === 'support';
-      fireZapier(config.webhook, {
-        type: isSupport ? 'support' : 'conversation_log',
-        resolved: isSupport ? true : undefined,
-        session_id: config.sessionId,
-        user_name: config.name,
-        user_email: config.email || '',
-        conversation: conversationMessages.map(m => `${m.role === 'user' ? config.name : 'AI Nolan'}: ${m.content}`).join('\n')
-      });
+    cancelIdleLog();
+    // Final snapshot on close — only if something changed since the last log
+    if (conversationMessages.length > 2 && messageCount !== lastLoggedCount) {
+      logConversation('final');
     }
   });
 
+  // --- Session id -----------------------------------------------------------
+  // One id per conversation (timestamp + random). It tags every payload so Zapier
+  // can treat all logs from one chat as the same record — without it, an updating
+  // log would create a brand-new Jira issue on every fire.
   function generateSessionId() {
     return 'sess-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
   }
 
+  // --- Gate: capture name + email before chatting ---------------------------
+  // We collect identity up front rather than letting the bot ask, for two reasons:
+  // it guarantees we always have follow-up contact details (even if the visitor
+  // bails after one message), and it keeps the conversation itself focused on
+  // their actual question. Email is regex-checked so a typo'd address doesn't
+  // silently make replies undeliverable.
   function submitGate() {
     const nameEl = document.getElementById('gateName');
     const emailEl = document.getElementById('gateEmail');
@@ -781,11 +814,15 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
     document.getElementById('msgInput').focus();
   }
 
+  // --- Start the conversation -----------------------------------------------
+  // Resets state and shows the greeting. The key trick: we push a hidden system
+  // note carrying the visitor's name/email into the history, so the model treats
+  // those as already-known and never re-asks. That note is internal plumbing, so
+  // buildTranscript strips it before anything is logged or emailed.
   function startChat() {
     config.sessionId = generateSessionId();
     attempt = -1; messageCount = 0;
     conversationMessages = [];
-    conversationLogged = false;
     const firstName = config.name.split(' ')[0];
     const greeting = `Hey ${firstName}! Before we dive in, here's how I actually work. I'm running on OpenAI's GPT-5.4 and wired into Nolan's automation stack through Zapier. If you're a recruiter, I'll capture the role and send it straight to his inbox. If you've got a tech issue, I'll troubleshoot it with you — and if I can't crack it, Zapier opens a ticket in his personal Jira so he can jump in within 3 business days, on the house. Anything else, I'm happy to talk through his experience, projects, hobbies, or whatever you're curious about. Every chat gets logged so the real Nolan can review it himself.
 
@@ -797,6 +834,10 @@ So what brings you here today?`;
     conversationMessages.push({ role: 'assistant', content: 'Understood.' });
   }
 
+  // --- Small UI helpers -----------------------------------------------------
+  // Enter-to-send (Shift+Enter for newline) matches chat-app muscle memory;
+  // auto-grow keeps long messages readable; escHtml prevents user text from being
+  // interpreted as markup (basic XSS hygiene since we set innerHTML).
   function handleKey(e) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
   }
@@ -810,6 +851,12 @@ So what brings you here today?`;
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
+  // --- Render messages ------------------------------------------------------
+  // addBotMessage/addUserMessage append bubbles. The optional badge ("ticket
+  // submitted", "details sent") gives the visitor visible confirmation that the
+  // automation actually fired. The typing dots exist to mask model latency — a
+  // few seconds of silence reads as "broken", a few seconds of dots reads as
+  // "thinking".
   function addBotMessage(text, type = 'normal', badge = null) {
     const msgs = document.getElementById('messages');
     const row = document.createElement('div');
@@ -851,23 +898,179 @@ So what brings you here today?`;
     if (t) t.remove();
   }
 
+  // --- Track conversation mode ----------------------------------------------
+  // The model tells us the mode each turn. We reset the attempt counter when
+  // leaving support so that, e.g., a recruiter chat that later turns into a
+  // support question doesn't inherit stale "attempts" and escalate immediately.
   function setMode(mode) {
     if (currentMode === 'support' && mode !== 'support') attempt = -1;
     currentMode = mode;
   }
 
-  async function fireZapier(_unused, payload) {
+  // --- Send an event to Zapier (via /api/forward) ---------------------------
+  // One sender for all three event types. sendBeacon is tried first because it's
+  // the only reliable way to send during tab-close (the browser guarantees
+  // delivery of a beacon even as the page dies); keepalive fetch is the fallback
+  // for normal sends. It's fire-and-forget on purpose — the visitor should never
+  // wait on, or see an error from, background logging.
+  // Sends a payload to Zapier via /api/forward.
+  //  critical=false (logs): fire-and-forget. Uses sendBeacon when possible so it
+  //    survives tab close; we don't care about the result. Always resolves true.
+  //  critical=true (ticket / recruiter_lead): we MUST know if it landed, so we
+  //    use a real fetch, await the result, and return true/false. A beacon can't
+  //    report success, so it's never used for critical events.
+  async function fireZapier(_unused, payload, critical = false) {
+    const body = JSON.stringify(payload);
+
+    if (!critical) {
+      try {
+        if (navigator.sendBeacon) {
+          const blob = new Blob([body], { type: 'application/json' });
+          if (navigator.sendBeacon('/api/forward', blob)) {
+            console.log('Forwarded to Zapier (beacon):', payload.event);
+            return true;
+          }
+        }
+        await fetch('/api/forward', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body,
+          keepalive: true
+        });
+        console.log('Forwarded to Zapier (fetch):', payload.event);
+        return true;
+      } catch (e) {
+        console.warn('Background forward failed (non-critical):', e.message);
+        return false;
+      }
+    }
+
+    // Critical path: verify it actually reached Zapier.
     try {
-      await fetch('/api/forward', {
+      const res = await fetch('/api/forward', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body
       });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.ok) {
+        console.log('Forwarded to Zapier (verified):', payload.event);
+        return true;
+      }
+      console.error('Zapier forward rejected:', data.error || res.status);
+      return false;
     } catch (e) {
-      console.warn('Forward failed (non-critical):', e.message);
+      console.error('Zapier forward failed:', e.message);
+      return false;
     }
   }
 
+  // Robustly turn the model's response into {mode,label,reply,...}.
+  // Falls back to extracting just the reply text if JSON is malformed or truncated,
+  // so raw JSON never leaks into the chat.
+  // --- Robustly parse the model's JSON --------------------------------------
+  // Even with JSON mode, a reply can occasionally arrive malformed or truncated.
+  // A naive JSON.parse would throw and we'd dump raw braces into the chat (a real
+  // bug we hit). So this degrades gracefully: strict parse → regex-extract just
+  // the reply text → friendly fallback message. The visitor always sees prose.
+  function parseModelResponse(raw) {
+    // Try strict JSON first
+    try {
+      const p = JSON.parse(raw);
+      if (p && typeof p === 'object' && typeof p.reply === 'string') return normalizeParsed(p);
+    } catch (e) {}
+
+    // Try to recover JSON if there's surrounding text or a code fence
+    const fenced = raw.match(/\{[\s\S]*\}/);
+    if (fenced) {
+      try {
+        const p = JSON.parse(fenced[0]);
+        if (p && typeof p === 'object' && typeof p.reply === 'string') return normalizeParsed(p);
+      } catch (e) {}
+    }
+
+    // Last resort: pull just the "reply" field value out of a (possibly truncated) JSON string
+    const m = raw.match(/"reply"\s*:\s*"((?:[^"\\]|\\.)*)/);
+    if (m) {
+      let txt = m[1];
+      // Unescape common sequences
+      txt = txt.replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+      return { mode: 'general', label: 'basic', reply: txt, user_email: '', user_full_name: '', recruiter_data: {} };
+    }
+
+    // Nothing parseable — show a friendly message, never the raw JSON
+    return { mode: 'general', label: 'basic', reply: "Sorry, I had a hiccup generating that. Could you say that again?", user_email: '', user_full_name: '', recruiter_data: {} };
+  }
+
+  function normalizeParsed(p) {
+    return {
+      mode: p.mode || 'general',
+      label: p.label || 'basic',
+      reply: p.reply || '',
+      user_email: p.user_email || '',
+      user_full_name: p.user_full_name || '',
+      recruiter_data: p.recruiter_data || {}
+    };
+  }
+
+  // Logs/updates the running conversation to Zapier. Same session_id every time so
+  // your Zap can dedupe on it and UPDATE one Jira issue per session instead of creating many.
+  // Build a clean transcript — strips the hidden system note and the model's 'Understood.' ack
+  // --- Build a clean transcript ---------------------------------------------
+  // Logs should read like a real conversation, so we strip two pieces of internal
+  // plumbing: the hidden identity system-note (it's not something the visitor
+  // "said") and the model's 'Understood.' ack to it. Centralising this in one
+  // function means the ticket, recruiter, and log payloads can never drift and
+  // start leaking the note again (which is exactly what happened before).
+  function buildTranscript() {
+    return conversationMessages
+      .filter(m => {
+        if (typeof m.content !== 'string') return false;
+        if (m.content.startsWith('[system note')) return false;
+        if (m.content === 'Understood.') return false;
+        return true;
+      })
+      .map(m => `${m.role === 'user' ? config.name : 'AI Nolan'}: ${m.content}`)
+      .join('\n');
+  }
+
+  // Always-fires conversation log. event = 'log'; type carries the conversation kind.
+  // --- Conversation logging -------------------------------------------------
+  // Goal: log EVERY conversation, cheaply, on the free Zapier plan. The split of
+  // event vs type is deliberate — event ('log') is what Zapier routes on, type
+  // ('support'/'recruitment'/'general') is context that rides along, so a log
+  // never overwrites a chat's real nature. The debounce (log only after 15s of
+  // quiet, and only if messageCount changed) is what keeps one busy chat from
+  // burning dozens of Zapier tasks.
+  function logConversation(status) {
+    fireZapier(null, {
+      event: 'log',
+      type: currentMode || 'general',
+      status: status || 'ongoing',
+      session_id: config.sessionId,
+      user_name: config.name,
+      user_email: config.email || '',
+      message_count: messageCount,
+      conversation: buildTranscript()
+    });
+    lastLoggedCount = messageCount;
+  }
+
+  // 15s idle debounce — fires one log if the conversation changed since the last log.
+  function armIdleLog() {
+    cancelIdleLog();
+    idleTimer = setTimeout(() => {
+      if (messageCount !== lastLoggedCount) logConversation('ongoing');
+    }, 15000);
+  }
+  function cancelIdleLog() {
+    if (idleTimer) { clearTimeout(idleTimer); idleTimer = null; }
+  }
+
+  // --- Call the model (via /api/chat) ---------------------------------------
+  // Sends the whole history (the model is stateless, so this is how it remembers).
+  // We push the user's text BEFORE sending and the assistant's reply AFTER, so the
+  // array always mirrors the real exchange and the next turn has full context.
   async function callOpenAI(userText) {
     conversationMessages.push({ role: 'user', content: userText });
     const res = await fetch('/api/chat', {
@@ -881,12 +1084,18 @@ So what brings you here today?`;
     }
     const data = await res.json();
     const raw = data.raw || '{}';
-    let parsed;
-    try { parsed = JSON.parse(raw); } catch { parsed = { label: 'basic', mode: 'general', reply: raw }; }
-    conversationMessages.push({ role: 'assistant', content: parsed.reply || raw });
+    const parsed = parseModelResponse(raw);
+    conversationMessages.push({ role: 'assistant', content: parsed.reply });
     return parsed;
   }
 
+  // --- Main send loop -------------------------------------------------------
+  // The orchestrator. The model's "label" is the decision signal:
+  //   intake_complete → recruiter gave everything → fire recruiter_lead + final log
+  //   human (only after 2 failed support attempts) → fire ticket + final log
+  //   anything else → just reply, and arm the 15s idle log
+  // The terminal branches fire their event AND a final log, so an escalated or
+  // completed chat is still captured in full — logging is never either/or.
   async function sendMessage() {
 
     const input = document.getElementById('msgInput');
@@ -896,6 +1105,7 @@ So what brings you here today?`;
     input.value = '';
     input.style.height = 'auto';
     document.getElementById('sendBtn').disabled = true;
+    cancelIdleLog();
     addUserMessage(text);
     showTyping();
     messageCount++;
@@ -911,19 +1121,30 @@ So what brings you here today?`;
       setMode(mode);
 
       if (label === 'intake_complete') {
-        addBotMessage(reply, 'recruited', '✓ details sent');
-        conversationLogged = true;
-        fireZapier(config.webhook, {
+        addBotMessage(reply);
+        cancelIdleLog();
+        // Critical send — verify it reached Zapier before confirming to the visitor.
+        const sent = await fireZapier(config.webhook, {
+          event: 'recruiter_lead',
           type: 'recruitment',
           session_id: config.sessionId,
           user_name: config.name,
-          conversation: conversationMessages.map(m => `${m.role === 'user' ? config.name : 'AI Nolan'}: ${m.content}`).join('\n'),
+          user_email: result.user_email || config.email || '',
+          conversation: buildTranscript(),
           ...result.recruiter_data
-        });
+        }, true);
+        if (sent) {
+          addBotMessage("Your details are on their way to the real Nolan — he'll follow up if it's a good fit.", 'recruited', '✓ details sent');
+        } else {
+          addBotMessage("I had trouble passing your details through just now. Could you email the real Nolan directly at noki21@protonmail.com so nothing gets lost? Sorry about that.", 'ticket', '⚠ send failed');
+        }
+        logConversation('final');
       } else if (label === 'human' && mode === 'support' && attempt >= 2) {
-        addBotMessage(reply, 'ticket', '↗ ticket submitted');
-        conversationLogged = true;
-        fireZapier(config.webhook, {
+        addBotMessage(reply);
+        cancelIdleLog();
+        // Critical send — verify the ticket actually reached Zapier.
+        const sent = await fireZapier(config.webhook, {
+          event: 'ticket',
           type: 'support',
           resolved: false,
           session_id: config.sessionId,
@@ -931,11 +1152,19 @@ So what brings you here today?`;
           user_email: result.user_email || config.email || '',
           message: text,
           attempt: attempt,
-          conversation: conversationMessages.map(m => `${m.role === 'user' ? config.name : 'AI Nolan'}: ${m.content}`).join('\n')
-        });
+          conversation: buildTranscript()
+        }, true);
+        if (sent) {
+          addBotMessage("I've logged a ticket for the real Nolan — keep an eye on your inbox for a confirmation with your ticket number.", 'ticket', '↗ ticket submitted');
+        } else {
+          addBotMessage("I couldn't file your ticket just now. Please email the real Nolan directly at noki21@protonmail.com and he'll pick it up. Sorry about that.", 'ticket', '⚠ send failed');
+        }
+        logConversation('final');
       } else {
         addBotMessage(reply);
         if (mode === 'support' && label === 'basic') attempt++;
+        // Arm a 15s idle timer; logs once if no further activity, only if changed
+        armIdleLog();
       }
 
       document.getElementById('sendBtn').disabled = false;
@@ -949,6 +1178,10 @@ So what brings you here today?`;
     }
   }
   // Show gate on load
+  // --- Boot -----------------------------------------------------------------
+  // Just focus the gate's name field on load so the visitor can type immediately.
+  // Nothing else runs until they submit the gate — that's what gates the whole
+  // chat behind having a name + email.
   window.addEventListener("DOMContentLoaded", function() {
     const n = document.getElementById("gateName");
     if (n) n.focus();
