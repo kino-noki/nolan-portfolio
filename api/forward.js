@@ -13,7 +13,11 @@ module.exports = async function handler(req, res) {
   if (!webhook) return res.status(500).json({ error: 'Server not configured: ZAPIER_WEBHOOK missing' });
 
   try {
-    const payload = req.body || {};
+    let payload = req.body || {};
+    // sendBeacon may deliver the body as a raw string; parse if needed
+    if (typeof payload === 'string') {
+      try { payload = JSON.parse(payload); } catch (e) { payload = {}; }
+    }
     // Forward as query params (Zapier Catch Hook reads these reliably)
     const params = new URLSearchParams();
     for (const [k, v] of Object.entries(payload)) {

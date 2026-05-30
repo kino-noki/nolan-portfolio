@@ -858,11 +858,20 @@ So what brings you here today?`;
 
   async function fireZapier(_unused, payload) {
     try {
+      const body = JSON.stringify(payload);
+      // Prefer sendBeacon for unload-safe delivery; fall back to keepalive fetch.
+      if (navigator.sendBeacon) {
+        const blob = new Blob([body], { type: 'application/json' });
+        const ok = navigator.sendBeacon('/api/forward', blob);
+        if (ok) { console.log('Forwarded to Zapier (beacon):', payload.type); return; }
+      }
       await fetch('/api/forward', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body,
+        keepalive: true
       });
+      console.log('Forwarded to Zapier (fetch):', payload.type);
     } catch (e) {
       console.warn('Forward failed (non-critical):', e.message);
     }
