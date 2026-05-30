@@ -8,7 +8,7 @@ exposed to visitors' browsers.**
 ## Project structure
 
 ```
-nolan-site/
+your-repo/              ← these files go at the ROOT of your repo
 ├── api/
 │   ├── chat.js        ← serverless function: calls OpenAI (holds the system prompt + key)
 │   └── forward.js     ← serverless function: forwards payloads to your Zapier webhook
@@ -17,6 +17,11 @@ nolan-site/
 ├── vercel.json
 └── package.json
 ```
+
+IMPORTANT: api/ and public/ must sit at the ROOT of your repository, not inside a
+subfolder. If they're nested (e.g. inside nolan-site/), Vercel will not find /api and
+the chat will return 404. Either keep them at the root as shown, or set the Vercel
+project's Root Directory (Settings → General) to the subfolder name.
 
 ## Why this is secure
 
@@ -28,8 +33,7 @@ Vercel **Environment Variables** at runtime — the secrets are never sent to th
 ## Deploy to Vercel
 
 1. Push this folder to a GitHub repo (or use the Vercel CLI / drag-and-drop).
-2. In Vercel, import the project. Framework preset: **Other**. Root directory: the
-   `nolan-site` folder.
+2. In Vercel, import the project. Framework preset: **Other**. Root directory: leave as the repo root (these files are already at the root).
 3. Go to **Project → Settings → Environment Variables** and add:
 
    | Name             | Value                                             |
