@@ -755,6 +755,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
   let idleTimer = null;
   let lastLoggedCount = 0;  // message_count at last successful log
   let terminalFired = false; // true once a ticket or recruiter_lead has fired — prevents duplicates
+  let sending = false;       // true while a send is in flight — blocks double-submits
 
   // --- Tab-close logging ----------------------------------------------------
   // The 15s idle timer might not have fired yet when someone closes the tab, so
@@ -765,8 +766,9 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
   // Fire full conversation log on tab close if not already sent
   window.addEventListener('beforeunload', () => {
     cancelIdleLog();
-    // Final snapshot on close — only if something changed since the last log
-    if (conversationMessages.length > 2 && messageCount !== lastLoggedCount) {
+    // Final snapshot on close — skip if the chat already escalated (Zapier logs
+    // from the ticket/recruiter event), and only if something changed since the last log.
+    if (!terminalFired && conversationMessages.length > 2 && messageCount !== lastLoggedCount) {
       logConversation('final');
     }
   });
@@ -1062,7 +1064,8 @@ So what brings you here today?`;
   function armIdleLog() {
     cancelIdleLog();
     idleTimer = setTimeout(() => {
-      if (messageCount !== lastLoggedCount) logConversation('ongoing');
+      // Don't log if the chat already escalated (Zapier logs from that event instead)
+      if (!terminalFired && messageCount !== lastLoggedCount) logConversation('ongoing');
     }, 45000);
   }
   function cancelIdleLog() {
@@ -1099,11 +1102,15 @@ So what brings you here today?`;
   // The terminal branches fire their event AND a final log, so an escalated or
   // completed chat is still captured in full — logging is never either/or.
   async function sendMessage() {
+    // Re-entry guard: if a send is already in flight, ignore extra triggers
+    // (double Enter, Enter + button tap, etc.) so we never fire an event twice.
+    if (sending) return;
 
     const input = document.getElementById('msgInput');
     const text = input.value.trim();
     if (!text) return;
 
+    sending = true;
     input.value = '';
     input.style.height = 'auto';
     document.getElementById('sendBtn').disabled = true;
@@ -1142,7 +1149,7 @@ So what brings you here today?`;
         } else {
           addBotMessage("I had trouble passing your details through just now. Could you email the real Nolan directly at noki21@protonmail.com so nothing gets lost? Sorry about that.", 'ticket', '⚠ send failed');
         }
-        logConversation('final');
+        // No separate log fire — Zapier creates the log from the recruiter_lead event.
       } else if (label === 'human' && !terminalFired) {
         terminalFired = true;
         addBotMessage(reply);
@@ -1165,7 +1172,7 @@ So what brings you here today?`;
         } else {
           addBotMessage("I couldn't file your ticket just now. Please email the real Nolan directly at noki21@protonmail.com and he'll pick it up. Sorry about that.", 'ticket', '⚠ send failed');
         }
-        logConversation('final');
+        // No separate log fire — Zapier creates the log from the ticket event.
       } else {
         addBotMessage(reply);
         if (mode === 'support' && label === 'basic') attempt++;
@@ -1173,12 +1180,14 @@ So what brings you here today?`;
         armIdleLog();
       }
 
+      sending = false;
       document.getElementById('sendBtn').disabled = false;
       input.focus();
 
     } catch (err) {
       removeTyping();
       addBotMessage(`Something went wrong: ${err.message}`);
+      sending = false;
       document.getElementById('sendBtn').disabled = false;
       input.focus();
     }
