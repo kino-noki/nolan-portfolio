@@ -754,6 +754,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
   let currentMode = '';
   let idleTimer = null;
   let lastLoggedCount = 0;  // message_count at last successful log
+  let terminalFired = false; // true once a ticket or recruiter_lead has fired — prevents duplicates
 
   // --- Tab-close logging ----------------------------------------------------
   // The 15s idle timer might not have fired yet when someone closes the tab, so
@@ -822,6 +823,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
   function startChat() {
     config.sessionId = generateSessionId();
     attempt = -1; messageCount = 0;
+    terminalFired = false;
     conversationMessages = [];
     const firstName = config.name.split(' ')[0];
     const greeting = `Hey ${firstName}! Before we dive in, here's how I actually work. I'm running on OpenAI's GPT-5.4 and wired into Nolan's automation stack through Zapier. If you're a recruiter, I'll capture the role and send it straight to his inbox. If you've got a tech issue, I'll troubleshoot it with you — and if I can't crack it, Zapier opens a ticket in his personal Jira so he can jump in within 3 business days, on the house. Anything else, I'm happy to talk through his experience, projects, hobbies, or whatever you're curious about. Every chat gets logged so the real Nolan can review it himself.
@@ -1120,7 +1122,8 @@ So what brings you here today?`;
 
       setMode(mode);
 
-      if (label === 'intake_complete') {
+      if (label === 'intake_complete' && !terminalFired) {
+        terminalFired = true;
         addBotMessage(reply);
         cancelIdleLog();
         // Critical send — verify it reached Zapier before confirming to the visitor.
@@ -1140,7 +1143,8 @@ So what brings you here today?`;
           addBotMessage("I had trouble passing your details through just now. Could you email the real Nolan directly at noki21@protonmail.com so nothing gets lost? Sorry about that.", 'ticket', '⚠ send failed');
         }
         logConversation('final');
-      } else if (label === 'human') {
+      } else if (label === 'human' && !terminalFired) {
+        terminalFired = true;
         addBotMessage(reply);
         cancelIdleLog();
         // Critical send — verify the ticket actually reached Zapier.
