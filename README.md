@@ -1,62 +1,65 @@
-# Nolan Kim — Portfolio Site
+# Nolan Kim — Resume site + AI Nolan chatbot
 
-Personal portfolio with an AI resume assistant powered by the Anthropic API.
+A dark-technical resume site with an embedded AI chatbot ("AI Nolan") that answers
+questions, triages support issues into Jira, and captures recruiter leads — all wired
+through OpenAI and Zapier. **Your API key and webhook are kept server-side and are never
+exposed to visitors' browsers.**
 
 ## Project structure
 
 ```
-nolan-portfolio/
-├── index.html        # Main portfolio page
+nolan-site/
 ├── api/
-│   └── chat.js       # Vercel Edge Function (API proxy)
-├── vercel.json       # Vercel routing config
-└── README.md
+│   ├── chat.js        ← serverless function: calls OpenAI (holds the system prompt + key)
+│   └── forward.js     ← serverless function: forwards payloads to your Zapier webhook
+├── public/
+│   └── index.html     ← the website + chatbot UI (no secrets inside)
+├── vercel.json
+└── package.json
 ```
 
-## Deploy to Vercel (5 minutes)
+## Why this is secure
 
-### 1. Push to GitHub
-```bash
-git init
-git add .
-git commit -m "Initial portfolio"
-git remote add origin https://github.com/YOUR_USERNAME/nolan-portfolio.git
-git push -u origin main
+In the old single-file version, the OpenAI key and Zapier webhook lived in the HTML, so
+anyone could open DevTools and steal them. Here, the browser only ever talks to
+`/api/chat` and `/api/forward` on your own domain. Those functions read the secrets from
+Vercel **Environment Variables** at runtime — the secrets are never sent to the browser.
+
+## Deploy to Vercel
+
+1. Push this folder to a GitHub repo (or use the Vercel CLI / drag-and-drop).
+2. In Vercel, import the project. Framework preset: **Other**. Root directory: the
+   `nolan-site` folder.
+3. Go to **Project → Settings → Environment Variables** and add:
+
+   | Name             | Value                                             |
+   |------------------|---------------------------------------------------|
+   | `OPENAI_API_KEY` | your OpenAI API key (starts with `sk-`)           |
+   | `ZAPIER_WEBHOOK` | your Zapier Catch Hook URL                        |
+
+4. Deploy. Visit your domain — the resume loads, and the chat box shows the name/email
+   gate. Fill it in and the bot starts.
+
+## Local testing
+
 ```
-
-### 2. Connect to Vercel
-1. Go to [vercel.com](https://vercel.com) and sign in with GitHub
-2. Click **Add New Project** → import your repo
-3. Framework preset: **Other**
-4. Click **Deploy**
-
-### 3. Add your Anthropic API key
-1. In your Vercel project, go to **Settings → Environment Variables**
-2. Add: `ANTHROPIC_API_KEY` = `sk-ant-...your key...`
-3. Redeploy (Settings → Deployments → Redeploy)
-
-### 4. (Optional) Add your resume PDF
-Drop `Nolan_Kim_Resume.pdf` into the project root so the download button works.
-
-## Local development
-
-Since this is a static HTML file with a Vercel Edge Function, the easiest way to test locally:
-
-```bash
 npm i -g vercel
 vercel dev
 ```
 
-Then open `http://localhost:3000`.
+`vercel dev` runs the serverless functions locally. Add the same two env vars to a
+`.env.local` file (do NOT commit it):
 
-## AI agent cost
+```
+OPENAI_API_KEY=sk-...
+ZAPIER_WEBHOOK=https://hooks.zapier.com/hooks/catch/...
+```
 
-The agent uses `claude-haiku-4-5` (the fastest, cheapest model) with `max_tokens: 400`.
-At typical job-search usage (~50–100 recruiter sessions), expect costs well under $1.
+## Model
 
-## Customization
+The chatbot uses `gpt-5.4`. To change it, edit the `model` field in `api/chat.js`.
 
-- **Colors / fonts**: Edit the `:root` CSS variables and font imports in `index.html`
-- **Resume content**: Update the `RESUME` constant in the `<script>` block at the bottom of `index.html`
-- **Suggested questions**: Edit the `.sug` buttons in the `#ask` section
-- **Agent personality**: Edit the `SYSTEM` constant in the `<script>` block
+## Editing the chatbot's knowledge/persona
+
+The system prompt lives at the top of `api/chat.js` (kept server-side so visitors can't
+read it). Edit it there and redeploy.

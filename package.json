@@ -1,0 +1,9 @@
+{
+  "name": "nolan-kim-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Nolan Kim resume site with AI Nolan chatbot (secure serverless setup)",
+  "engines": {
+    "node": ">=18"
+  }
+}
