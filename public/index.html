@@ -754,7 +754,8 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
   let currentMode = '';
   let idleTimer = null;
   let lastLoggedCount = 0;  // message_count at last successful log
-  let terminalFired = false; // true once a ticket or recruiter_lead has fired — prevents duplicates
+  let terminalFired = false; // true once a ticket or recruiter_lead has fired — prevents duplicate CREATES
+  let ticketFired = false;   // true once a support ticket exists — later logs become comments (Path 15)
   let sending = false;       // true while a send is in flight — blocks double-submits
 
   // --- Tab-close logging ----------------------------------------------------
@@ -766,10 +767,10 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
   // Fire full conversation log on tab close if not already sent
   window.addEventListener('beforeunload', () => {
     cancelIdleLog();
-    // Final snapshot on close — skip if the chat already escalated (Zapier logs
-    // from the ticket/recruiter event), and only if something changed since the last log.
-    if (!terminalFired && conversationMessages.length > 2 && messageCount !== lastLoggedCount) {
-      logConversation('final');
+    // On close: send a final log if no terminal event fired, OR if a support ticket
+    // exists (a closing comment on the issue). Recruiter completion fully stops logging.
+    if ((!terminalFired || ticketFired) && conversationMessages.length > 2 && messageCount !== lastLoggedCount) {
+      logConversation(ticketFired ? 'ongoing' : 'final');
     }
   });
 
@@ -826,6 +827,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
     config.sessionId = generateSessionId();
     attempt = -1; messageCount = 0;
     terminalFired = false;
+    ticketFired = false;
     conversationMessages = [];
     const firstName = config.name.split(' ')[0];
     const greeting = `Hey ${firstName}! Before we dive in, here's how I actually work. I'm running on OpenAI's GPT-5.4 and wired into Nolan's automation stack through Zapier. If you're a recruiter, I'll capture the role and send it straight to his inbox. If you've got a tech issue, I'll troubleshoot it with you — and if I can't crack it, Zapier opens a ticket in his personal Jira so he can jump in within 3 business days, on the house. Anything else, I'm happy to talk through his experience, projects, hobbies, or whatever you're curious about. Every chat gets logged so the real Nolan can review it himself.
@@ -1064,8 +1066,9 @@ So what brings you here today?`;
   function armIdleLog() {
     cancelIdleLog();
     idleTimer = setTimeout(() => {
-      // Don't log if the chat already escalated (Zapier logs from that event instead)
-      if (!terminalFired && messageCount !== lastLoggedCount) logConversation('ongoing');
+      // Log follow-ups: allowed when no terminal event fired, OR when a support
+      // ticket exists (those logs become 'ongoing' comments on the issue via Path 15).
+      if ((!terminalFired || ticketFired) && messageCount !== lastLoggedCount) logConversation('ongoing');
     }, 45000);
   }
   function cancelIdleLog() {
@@ -1151,14 +1154,14 @@ So what brings you here today?`;
         }
         // No separate log fire — Zapier creates the log from the recruiter_lead event.
       } else if (label === 'human' && !terminalFired) {
-        terminalFired = true;
+        // First (and only) support ticket for this session. No 'status' field is
+        // sent, so Path 4 (status != ongoing && != resolved) CREATES the issue.
+        terminalFired = true;  // blocks a second ticket from ever being created
         addBotMessage(reply);
         cancelIdleLog();
-        // Critical send — verify the ticket actually reached Zapier.
         const sent = await fireZapier(config.webhook, {
           event: 'ticket',
           type: 'support',
-          resolved: false,
           session_id: config.sessionId,
           user_name: result.user_full_name || config.name,
           user_email: result.user_email || config.email || '',
@@ -1168,11 +1171,14 @@ So what brings you here today?`;
           conversation: buildTranscript()
         }, true);
         if (sent) {
+          ticketFired = true;  // an issue now exists → later logs become comments
           addBotMessage("I've logged a ticket for the real Nolan — keep an eye on your inbox for a confirmation with your ticket number.", 'ticket', '↗ ticket submitted');
         } else {
           addBotMessage("I couldn't file your ticket just now. Please email the real Nolan directly at noki21@protonmail.com and he'll pick it up. Sorry about that.", 'ticket', '⚠ send failed');
         }
-        // No separate log fire — Zapier creates the log from the ticket event.
+        // If the visitor keeps chatting, follow-up messages should be logged as
+        // 'ongoing' (Path 15 → find issue + add comment), so re-arm idle logging.
+        if (sent) armIdleLog();
       } else {
         addBotMessage(reply);
         if (mode === 'support' && label === 'basic') attempt++;
