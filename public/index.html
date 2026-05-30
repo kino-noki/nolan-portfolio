@@ -754,8 +754,9 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
   let currentMode = '';
   let idleTimer = null;
   let lastLoggedCount = 0;  // message_count at last successful log
-  let terminalFired = false; // true once a ticket or recruiter_lead has fired — prevents duplicate CREATES
-  let ticketFired = false;   // true once a support ticket exists — later logs become comments (Path 15)
+  let recruiterFired = false; // true once a recruiter_lead has fired — prevents duplicate leads
+  let recruiterSessionId = ''; // separate id for recruiter records so they never mix with a support ticket
+  let ticketFired = false;    // true once a support ticket exists — prevents dup tickets; later logs become comments (Path 15)
   let sending = false;       // true while a send is in flight — blocks double-submits
 
   // --- Tab-close logging ----------------------------------------------------
@@ -769,7 +770,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
     cancelIdleLog();
     // On close: send a final log if no terminal event fired, OR if a support ticket
     // exists (a closing comment on the issue). Recruiter completion fully stops logging.
-    if ((!terminalFired || ticketFired) && conversationMessages.length > 2 && messageCount !== lastLoggedCount) {
+    if (!recruiterFired && conversationMessages.length > 2 && messageCount !== lastLoggedCount) {
       logConversation(ticketFired ? 'ongoing' : 'final');
     }
   });
@@ -826,8 +827,9 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
   function startChat() {
     config.sessionId = generateSessionId();
     attempt = -1; messageCount = 0;
-    terminalFired = false;
+    recruiterFired = false;
     ticketFired = false;
+    recruiterSessionId = '';
     conversationMessages = [];
     const firstName = config.name.split(' ')[0];
     const greeting = `Hey ${firstName}! Before we dive in, here's how I actually work. I'm running on OpenAI's GPT-5.4 and wired into Nolan's automation stack through Zapier. If you're a recruiter, I'll capture the role and send it straight to his inbox. If you've got a tech issue, I'll troubleshoot it with you — and if I can't crack it, Zapier opens a ticket in his personal Jira so he can jump in within 3 business days, on the house. Anything else, I'm happy to talk through his experience, projects, hobbies, or whatever you're curious about. Every chat gets logged so the real Nolan can review it himself.
@@ -1019,6 +1021,17 @@ So what brings you here today?`;
     };
   }
 
+  // Returns the session id to tag a record with. Recruitment records get their own
+  // id so a recruiter lead/log never lands as a comment on a support ticket that
+  // shares the original session — lets one person be both a support case and a recruiter.
+  function sessionIdForMode() {
+    if (currentMode === 'recruitment') {
+      if (!recruiterSessionId) recruiterSessionId = 'rec-' + generateSessionId();
+      return recruiterSessionId;
+    }
+    return config.sessionId;
+  }
+
   // Logs/updates the running conversation to Zapier. Same session_id every time so
   // your Zap can dedupe on it and UPDATE one Jira issue per session instead of creating many.
   // Build a clean transcript — strips the hidden system note and the model's 'Understood.' ack
@@ -1053,7 +1066,7 @@ So what brings you here today?`;
       event: 'log',
       type: currentMode || 'general',
       status: status || 'ongoing',
-      session_id: config.sessionId,
+      session_id: sessionIdForMode(),
       user_name: config.name,
       user_email: config.email || '',
       message_count: messageCount,
@@ -1068,7 +1081,7 @@ So what brings you here today?`;
     idleTimer = setTimeout(() => {
       // Log follow-ups: allowed when no terminal event fired, OR when a support
       // ticket exists (those logs become 'ongoing' comments on the issue via Path 15).
-      if ((!terminalFired || ticketFired) && messageCount !== lastLoggedCount) logConversation('ongoing');
+      if (!recruiterFired && messageCount !== lastLoggedCount) logConversation('ongoing');
     }, 45000);
   }
   function cancelIdleLog() {
@@ -1132,15 +1145,14 @@ So what brings you here today?`;
 
       setMode(mode);
 
-      if (label === 'intake_complete' && !terminalFired) {
-        terminalFired = true;
+      if (label === 'intake_complete' && !recruiterFired) {
         addBotMessage(reply);
         cancelIdleLog();
         // Critical send — verify it reached Zapier before confirming to the visitor.
         const sent = await fireZapier(config.webhook, {
           event: 'recruiter_lead',
           type: 'recruitment',
-          session_id: config.sessionId,
+          session_id: sessionIdForMode(),
           user_name: config.name,
           user_email: result.user_email || config.email || '',
           message_count: messageCount,
@@ -1148,15 +1160,15 @@ So what brings you here today?`;
           ...result.recruiter_data
         }, true);
         if (sent) {
+          recruiterFired = true;  // latch only on success, so a failed send can retry
           addBotMessage("Your details are on their way to the real Nolan — he'll follow up if it's a good fit.", 'recruited', '✓ details sent');
         } else {
           addBotMessage("I had trouble passing your details through just now. Could you email the real Nolan directly at noki21@protonmail.com so nothing gets lost? Sorry about that.", 'ticket', '⚠ send failed');
         }
         // No separate log fire — Zapier creates the log from the recruiter_lead event.
-      } else if (label === 'human' && !terminalFired) {
+      } else if (label === 'human' && !ticketFired) {
         // First (and only) support ticket for this session. No 'status' field is
         // sent, so Path 4 (status != ongoing && != resolved) CREATES the issue.
-        terminalFired = true;  // blocks a second ticket from ever being created
         addBotMessage(reply);
         cancelIdleLog();
         const sent = await fireZapier(config.webhook, {
@@ -1171,7 +1183,7 @@ So what brings you here today?`;
           conversation: buildTranscript()
         }, true);
         if (sent) {
-          ticketFired = true;  // an issue now exists → later logs become comments
+          ticketFired = true;  // latch only on success, so a failed send can retry
           addBotMessage("I've logged a ticket for the real Nolan — keep an eye on your inbox for a confirmation with your ticket number.", 'ticket', '↗ ticket submitted');
         } else {
           addBotMessage("I couldn't file your ticket just now. Please email the real Nolan directly at noki21@protonmail.com and he'll pick it up. Sorry about that.", 'ticket', '⚠ send failed');
