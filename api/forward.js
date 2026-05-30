@@ -12,6 +12,22 @@
 //  never leaves the server. The browser only ever sees "/api/forward".
 // ============================================================================
 
+// Short-lived in-memory dedupe. Survives only while the serverless instance is warm,
+// which is exactly the window in which accidental double-fires arrive. Keyed on the
+// fields that make a fire unique; a repeat within the TTL is dropped.
+const recentFires = new Map();
+const DEDUPE_TTL_MS = 10000;
+
+function isDuplicate(payload) {
+  const key = [payload.event, payload.session_id, payload.message_count, payload.status].join('|');
+  const now = Date.now();
+  // prune old entries
+  for (const [k, t] of recentFires) { if (now - t > DEDUPE_TTL_MS) recentFires.delete(k); }
+  if (recentFires.has(key)) return true;
+  recentFires.set(key, now);
+  return false;
+}
+
 module.exports = async function handler(req, res) {
 
   // --- CORS / preflight -----------------------------------------------------
@@ -45,14 +61,30 @@ module.exports = async function handler(req, res) {
       try { payload = JSON.parse(payload); } catch (e) { payload = {}; }
     }
 
-    // --- Forward to Zapier as query-string params ---------------------------
-    // Zapier's free Catch Hook parses query params reliably but is finicky about
-    // JSON request bodies (it often shows them as an empty "querystring" object).
-    // Flattening every field into ?key=value sidesteps that entirely, which is
-    // why earlier JSON-body attempts showed up blank in Zapier.
+    // --- Idempotency guard --------------------------------------------------
+    // Drop an identical fire that arrives within the dedupe window (e.g. a
+    // double-submit that slipped past the browser guard). Return ok so the
+    // browser doesn't treat the drop as a failure.
+    if (isDuplicate(payload)) {
+      return res.status(200).json({ ok: true, deduped: true });
+    }
+
+    // --- Split fields: small ones in the query string, large ones in the body --
+    // Query strings have a hard URL-length limit (~8KB). The full conversation
+    // transcript and a pasted job description can blow past that on their own,
+    // which made long recruiter sends fail. So the big free-text fields go in the
+    // JSON POST body (no practical size limit) while every short field stays in
+    // the query string — keeping the existing querystring_* Zapier mappings intact.
+    // Body fields appear in Zapier's Catch Hook at the top level (not querystring_).
+    const BODY_FIELDS = ['conversation', 'role_description'];
     const params = new URLSearchParams();
+    const bodyData = {};
     for (const [k, v] of Object.entries(payload)) {
-      params.append(k, v == null ? '' : String(v));
+      if (BODY_FIELDS.includes(k)) {
+        bodyData[k] = v == null ? '' : String(v);
+      } else {
+        params.append(k, v == null ? '' : String(v));
+      }
     }
 
     // --- Verify Zapier actually accepted it ---------------------------------
@@ -60,7 +92,11 @@ module.exports = async function handler(req, res) {
     // to a working one. Now we check the HTTP status AND Zapier's own body
     // (it returns {"status":"success"} on a good Catch Hook) and report the
     // real outcome back to the browser so it can show a fallback when it matters.
-    const zapResp = await fetch(`${webhook}?${params.toString()}`, { method: 'POST' });
+    const zapResp = await fetch(`${webhook}?${params.toString()}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(bodyData)
+    });
     let zapBody = {};
     try { zapBody = await zapResp.json(); } catch (e) { /* Zapier may return no body */ }
 
