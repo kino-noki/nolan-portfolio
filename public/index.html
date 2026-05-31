@@ -1052,7 +1052,30 @@ So what brings you here today?`;
   // identical schema regardless of event. Missing values are empty strings.
   // NOTE: empty string counts as "exists" in Zapier — path conditions that test
   // these fields must use "is not empty", not "exists".
-  function buildPayload(overrides) {
+  // Returns the most recent exchange as a single string: the bot's previous reply
+  // followed by the user's newest message. This is what feeds Jira comment updates
+  // on an existing chat log (Path 15), so each comment shows the latest back-and-forth.
+  // Skips the hidden system note / 'Understood.' ack so they never leak into comments.
+  function lastExchange() {
+    const visible = conversationMessages.filter(m => {
+      if (typeof m.content !== 'string') return false;
+      if (m.content.startsWith('[system note')) return false;
+      if (m.content === 'Understood.') return false;
+      return true;
+    });
+    // Walk from the end: grab the last user message, and the last assistant message before it.
+    let userMsg = '', botMsg = '';
+    for (let i = visible.length - 1; i >= 0; i--) {
+      if (!userMsg && visible[i].role === 'user') { userMsg = visible[i].content; continue; }
+      if (userMsg && visible[i].role === 'assistant') { botMsg = visible[i].content; break; }
+    }
+    const parts = [];
+    if (botMsg)  parts.push(`AI Nolan: ${botMsg}`);
+    if (userMsg) parts.push(`${config.name}: ${userMsg}`);
+    return parts.join('\n');
+  }
+
+    function buildPayload(overrides) {
     const base = {
       event: '',            // log | ticket | recruiter_lead
       type: currentMode || 'general',
@@ -1060,7 +1083,7 @@ So what brings you here today?`;
       session_id: config.sessionId,
       user_name: config.name,
       user_email: config.email || '',
-      message: '',          // last user message (ticket only, else blank)
+      message: lastExchange(),  // bot's previous reply + user's newest message (feeds Jira comments)
       attempt: '',          // support attempt count (ticket only, else blank)
       message_count: messageCount,
       conversation: buildTranscript(),
@@ -1180,7 +1203,6 @@ So what brings you here today?`;
           type: 'support',
           user_name: result.user_full_name || config.name,
           user_email: result.user_email || config.email || '',
-          message: text,
           attempt: attempt
         }), true);
         if (sent) {
