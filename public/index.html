@@ -1012,6 +1012,8 @@ So what brings you here today?`;
     return {
       mode: p.mode || 'general',
       label: p.label || 'basic',
+      support_phase: p.support_phase || '',
+      recruiter_phase: p.recruiter_phase || '',
       reply: p.reply || '',
       user_email: p.user_email || '',
       user_full_name: p.user_full_name || '',
@@ -1170,14 +1172,17 @@ So what brings you here today?`;
 
       const label  = result.label  || 'basic';
       const mode   = result.mode   || 'general';
+      const phase  = result.support_phase || '';  // 'gathering' | 'attempt' (support only)
+      const recPhase = result.recruiter_phase || ''; // 'gathering' | 'ready' (recruitment only)
       const reply  = result.reply  || "Thanks, I've received your message.";
 
       setMode(mode);
 
-      // === RECRUITER — fire ticket + email the moment recruiter intent is detected.
-      // Deterministic: triggers on mode === 'recruitment', not on the model finishing
-      // an intake. Any role details given afterwards flow in as ongoing comments.
-      if (mode === 'recruitment' && !recruiterFired) {
+      // === RECRUITER — fire ticket + email once the bot has the bare minimum
+      // (company + role title), signalled by recruiter_phase === 'ready'. While the
+      // model is still gathering those, it stays in recruitment mode but doesn't fire.
+      // Anything the recruiter adds after 'ready' flows in as ongoing comments.
+      if (mode === 'recruitment' && recPhase === 'ready' && !recruiterFired) {
         addBotMessage(reply);
         cancelIdleLog();
         const sent = await fireZapier(config.webhook, buildPayload({
@@ -1215,7 +1220,7 @@ So what brings you here today?`;
         }), true);
         if (sent) {
           ticketFired = true;  // latch on success so a failed send can retry
-          addBotMessage("I've tried a couple of fixes without luck, so I've logged a ticket for the real Nolan — keep an eye on your inbox for a confirmation with your ticket number. In the meantime, is there anything else I can help you with?", 'ticket', '↗ ticket submitted');
+          addBotMessage("I wasn't able to resolve this one myself, so I've created a ticket for the real Nolan to take over — you'll get an email confirmation with your ticket number shortly. In the meantime, is there anything else I can help you with?", 'ticket', '↗ ticket submitted');
           // Tell the model the issue is now in the real Nolan's hands so it stops
           // troubleshooting the same problem and instead offers other help.
           conversationMessages.push({ role: 'user', content: '[system note: a support ticket has been filed for this issue and the real Nolan will follow up by email. Do NOT keep troubleshooting this same problem or claim you can fix it now. Acknowledge it is with Nolan and offer to help with anything else.]' });
@@ -1230,7 +1235,9 @@ So what brings you here today?`;
       // these idle/close logs become 'ongoing' comments on it.
       } else {
         addBotMessage(reply);
-        if (mode === 'support' && label === 'basic' && !ticketFired) attempt++;
+        // Only a genuine fix attempt counts toward escalation — info-gathering turns
+        // (support_phase = 'gathering') do not. Two real attempts triggers the ticket.
+        if (mode === 'support' && phase === 'attempt' && !ticketFired) attempt++;
         armIdleLog();
       }
 
