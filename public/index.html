@@ -749,7 +749,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
   //                    and only if the conversation actually changed.
   let config = { name: '', email: '', sessionId: '' };
   let conversationMessages = [];
-  let attempt = -1;
+  let attempt = 0;   // genuine troubleshooting attempts the bot has made (support)
   let messageCount = 0;
   let currentMode = '';
   let idleTimer = null;
@@ -767,9 +767,9 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
   // Fire full conversation log on tab close if not already sent
   window.addEventListener('beforeunload', () => {
     cancelIdleLog();
-    // On close: send a final log if no terminal event fired, OR if a support ticket
-    // exists (a closing comment on the issue). Recruiter completion fully stops logging.
-    if (!recruiterFired && conversationMessages.length > 2 && messageCount !== lastLoggedCount) {
+    // On close: always log the final state to the chat-log case. If a ticket exists,
+    // send 'ongoing' so it also comments on the ticket; otherwise 'final'.
+    if (conversationMessages.length > 2 && messageCount !== lastLoggedCount) {
       logConversation(ticketFired ? 'ongoing' : 'final');
     }
   });
@@ -825,7 +825,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
   // buildTranscript strips it before anything is logged or emailed.
   function startChat() {
     config.sessionId = generateSessionId();
-    attempt = -1; messageCount = 0;
+    attempt = 0; messageCount = 0;
     recruiterFired = false;
     ticketFired = false;
     conversationMessages = [];
@@ -909,7 +909,7 @@ So what brings you here today?`;
   // leaving support so that, e.g., a recruiter chat that later turns into a
   // support question doesn't inherit stale "attempts" and escalate immediately.
   function setMode(mode) {
-    if (currentMode === 'support' && mode !== 'support') attempt = -1;
+    if (currentMode === 'support' && mode !== 'support') attempt = 0;
     currentMode = mode;
   }
 
@@ -1107,9 +1107,9 @@ So what brings you here today?`;
   function armIdleLog() {
     cancelIdleLog();
     idleTimer = setTimeout(() => {
-      // Log follow-ups: allowed when no recruiter lead fired (a support ticket's
-      // follow-ups become 'ongoing' comments on the issue via Path 15).
-      if (!recruiterFired && messageCount !== lastLoggedCount) logConversation('ongoing');
+      // Every conversation is always logged to the chat-log case. If a ticket exists,
+      // this 'ongoing' log also comments on the ticket (Zapier ticket-update path).
+      if (messageCount !== lastLoggedCount) logConversation('ongoing');
     }, 45000);
   }
   function cancelIdleLog() {
@@ -1173,13 +1173,16 @@ So what brings you here today?`;
 
       setMode(mode);
 
-      if (label === 'intake_complete' && !recruiterFired) {
+      // === RECRUITER — fire ticket + email the moment recruiter intent is detected.
+      // Deterministic: triggers on mode === 'recruitment', not on the model finishing
+      // an intake. Any role details given afterwards flow in as ongoing comments.
+      if (mode === 'recruitment' && !recruiterFired) {
         addBotMessage(reply);
         cancelIdleLog();
-        // Critical send — verify it reached Zapier before confirming to the visitor.
         const sent = await fireZapier(config.webhook, buildPayload({
           event: 'recruiter_lead',
           type: 'recruitment',
+          user_name: result.user_full_name || config.name,
           user_email: result.user_email || config.email || '',
           company: result.recruiter_data?.company || '',
           role_title: result.recruiter_data?.role_title || '',
@@ -1187,16 +1190,20 @@ So what brings you here today?`;
           contact: result.recruiter_data?.contact || ''
         }), true);
         if (sent) {
-          recruiterFired = true;  // latch only on success, so a failed send can retry
-          addBotMessage("Your details are on their way to the real Nolan — he'll follow up if it's a good fit.", 'recruited', '✓ details sent');
+          recruiterFired = true;  // latch on success so a failed send can retry
+          ticketFired = true;     // a recruiter ticket now exists → later messages comment on it
+          addBotMessage("Passed to the real Nolan and logged for him — anything else you share, I'll add to it. He'll follow up if it's a good fit.", 'recruited', '✓ sent to Nolan');
         } else {
           addBotMessage("I had trouble passing your details through just now. Could you email the real Nolan directly at noki21@protonmail.com so nothing gets lost? Sorry about that.", 'ticket', '⚠ send failed');
         }
-        // No separate log fire — Zapier creates the log from the recruiter_lead event.
-      } else if (label === 'human' && !ticketFired) {
-        // First (and only) support ticket for this session. No 'status' field is
-        // sent, so Path 4 (status != ongoing && != resolved) CREATES the issue.
-        addBotMessage(reply);
+        if (sent) armIdleLog();
+
+      // === SUPPORT — escalate deterministically after two genuine troubleshooting
+      // attempts. The attempt counter is the trigger; the model's label is not used.
+      // We deliberately DON'T show the model's reply here — that would be a third
+      // troubleshooting attempt. The bot stops trying, confirms the ticket, and
+      // offers to help with anything else in the meantime.
+      } else if (mode === 'support' && attempt >= 2 && !ticketFired) {
         cancelIdleLog();
         const sent = await fireZapier(config.webhook, buildPayload({
           event: 'ticket',
@@ -1206,18 +1213,23 @@ So what brings you here today?`;
           attempt: attempt
         }), true);
         if (sent) {
-          ticketFired = true;  // latch only on success, so a failed send can retry
-          addBotMessage("I've logged a ticket for the real Nolan — keep an eye on your inbox for a confirmation with your ticket number.", 'ticket', '↗ ticket submitted');
+          ticketFired = true;  // latch on success so a failed send can retry
+          addBotMessage("I've tried a couple of fixes without luck, so I've logged a ticket for the real Nolan — keep an eye on your inbox for a confirmation with your ticket number. In the meantime, is there anything else I can help you with?", 'ticket', '↗ ticket submitted');
+          // Tell the model the issue is now in the real Nolan's hands so it stops
+          // troubleshooting the same problem and instead offers other help.
+          conversationMessages.push({ role: 'user', content: '[system note: a support ticket has been filed for this issue and the real Nolan will follow up by email. Do NOT keep troubleshooting this same problem or claim you can fix it now. Acknowledge it is with Nolan and offer to help with anything else.]' });
+          conversationMessages.push({ role: 'assistant', content: 'Understood.' });
         } else {
           addBotMessage("I couldn't file your ticket just now. Please email the real Nolan directly at noki21@protonmail.com and he'll pick it up. Sorry about that.", 'ticket', '⚠ send failed');
         }
-        // If the visitor keeps chatting, follow-up messages should be logged as
-        // 'ongoing' (Path 15 → find issue + add comment), so re-arm idle logging.
         if (sent) armIdleLog();
+
+      // === NORMAL — reply, count a troubleshooting attempt if this was a support
+      // turn (and no ticket exists yet), and arm the idle log. Once a ticket exists,
+      // these idle/close logs become 'ongoing' comments on it.
       } else {
         addBotMessage(reply);
-        if (mode === 'support' && label === 'basic') attempt++;
-        // Arm a 45s idle timer; logs once if no further activity, only if changed
+        if (mode === 'support' && label === 'basic' && !ticketFired) attempt++;
         armIdleLog();
       }
 
