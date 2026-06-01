@@ -1233,6 +1233,13 @@ So what brings you here today?`;
         armIdleLog();
       }
 
+      // Create the chat log immediately on the first user message so it exists right
+      // away (message_count = 1 → Zapier "create new chat log" path). Without this the
+      // log isn't created until the 45s idle/close fire, and a fast follow-up could
+      // hit the "find + comment" path before any log exists. Subsequent messages are
+      // handled by the idle/close debounce as comments.
+      if (messageCount === 1) logConversation('ongoing');
+
       sending = false;
       document.getElementById('sendBtn').disabled = false;
       input.focus();
