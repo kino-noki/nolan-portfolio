@@ -756,7 +756,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
   let lastLoggedCount = 0;  // message_count at last successful log
   let lastSentIndex = 0;    // index into conversationMessages already sent in a comment
   let recruiterFired = false; // true once a recruiter_lead has fired — prevents duplicate leads
-  let ticketFired = false;    // true once a support ticket exists — prevents dup tickets; later logs become comments (Path 15)
+  let supportFired = false;   // true once a SUPPORT ticket exists — prevents dup support tickets; later support logs comment on it
   let sending = false;       // true while a send is in flight — blocks double-submits
 
   // --- Tab-close logging ----------------------------------------------------
@@ -771,7 +771,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
     // On close: always log the final state to the chat-log case. If a ticket exists,
     // send 'ongoing' so it also comments on the ticket; otherwise 'final'.
     if (conversationMessages.length > 2 && messageCount !== lastLoggedCount) {
-      logConversation(ticketFired ? 'ongoing' : 'final');
+      logConversation((supportFired || recruiterFired) ? 'ongoing' : 'final');
     }
   });
 
@@ -828,7 +828,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
     config.sessionId = generateSessionId();
     attempt = 0; messageCount = 0; lastSentIndex = 0;
     recruiterFired = false;
-    ticketFired = false;
+    supportFired = false;
     conversationMessages = [];
     const firstName = config.name.split(' ')[0];
     const greeting = `Hey ${firstName}! Before we dive in, here's how I actually work. I'm running on OpenAI's GPT-5.4 and wired into Nolan's automation stack through Zapier. If you're a recruiter, I'll capture the role and send it straight to his inbox. If you've got a tech issue, I'll troubleshoot it with you — and if I can't crack it, Zapier opens a ticket in his personal Jira so he can jump in within 3 business days, on the house. Anything else, I'm happy to talk through his experience, projects, hobbies, or whatever you're curious about. Every chat gets logged so the real Nolan can review it himself.
@@ -1216,8 +1216,7 @@ So what brings you here today?`;
           contact: result.recruiter_data?.contact || ''
         }), true);
         if (sent) {
-          recruiterFired = true;  // latch on success so a failed send can retry
-          ticketFired = true;     // a recruiter ticket now exists → later messages comment on it
+          recruiterFired = true;  // latch on success — a recruiter ticket now exists; later recruitment logs comment on it
           addBotMessage("Passed to the real Nolan and logged for him — anything else you share, I'll add to it. He'll follow up if it's a good fit.", 'recruited', '✓ sent to Nolan');
         } else {
           addBotMessage("I had trouble passing your details through just now. Could you email the real Nolan directly at noki21@protonmail.com so nothing gets lost? Sorry about that.", 'ticket', '⚠ send failed');
@@ -1228,7 +1227,7 @@ So what brings you here today?`;
       // attempts have failed, or (2) the model signals it needs a human now
       // (support_phase = 'escalate') — but only after at least one prior turn, so it
       // confirms the situation rather than escalating on the literal first message.
-      } else if (mode === 'support' && !ticketFired &&
+      } else if (mode === 'support' && !supportFired &&
                  (attempt >= 2 || (phase === 'escalate' && messageCount > 1))) {
         cancelIdleLog();
         const sent = await fireZapier(config.webhook, buildPayload({
@@ -1239,7 +1238,7 @@ So what brings you here today?`;
           attempt: attempt
         }), true);
         if (sent) {
-          ticketFired = true;  // latch on success so a failed send can retry
+          supportFired = true;  // latch on success so a failed send can retry
           // The confirmation message is written by the model. If it set phase='escalate'
           // it already wrote a handoff reply (use it). Otherwise (attempt-exhaustion,
           // a code decision) its last reply was a troubleshooting attempt, so we ask
@@ -1271,7 +1270,7 @@ So what brings you here today?`;
         addBotMessage(reply);
         // Only a genuine fix attempt counts toward escalation — info-gathering turns
         // (support_phase = 'gathering') do not. Two real attempts triggers the ticket.
-        if (mode === 'support' && phase === 'attempt' && !ticketFired) attempt++;
+        if (mode === 'support' && phase === 'attempt' && !supportFired) attempt++;
         armIdleLog();
       }
 
