@@ -1063,15 +1063,16 @@ So what brings you here today?`;
       if (m.content === 'Understood.') return false;
       return true;
     });
-    // Walk from the end: grab the last user message, and the last assistant message before it.
+    // Walk from the end: grab the bot's newest reply, and the user message before it
+    // (the message that reply was responding to). Order: user first, then the response.
     let userMsg = '', botMsg = '';
     for (let i = visible.length - 1; i >= 0; i--) {
-      if (!userMsg && visible[i].role === 'user') { userMsg = visible[i].content; continue; }
-      if (userMsg && visible[i].role === 'assistant') { botMsg = visible[i].content; break; }
+      if (!botMsg && visible[i].role === 'assistant') { botMsg = visible[i].content; continue; }
+      if (botMsg && visible[i].role === 'user') { userMsg = visible[i].content; break; }
     }
     const parts = [];
-    if (botMsg)  parts.push(`AI Nolan: ${botMsg}`);
     if (userMsg) parts.push(`${config.name}: ${userMsg}`);
+    if (botMsg)  parts.push(`AI Nolan: ${botMsg}`);
     return parts.join('\n');
   }
 
