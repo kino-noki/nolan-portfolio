@@ -754,6 +754,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
   let currentMode = '';
   let idleTimer = null;
   let lastLoggedCount = 0;  // message_count at last successful log
+  let lastSentIndex = 0;    // index into conversationMessages already sent in a comment
   let recruiterFired = false; // true once a recruiter_lead has fired — prevents duplicate leads
   let ticketFired = false;    // true once a support ticket exists — prevents dup tickets; later logs become comments (Path 15)
   let sending = false;       // true while a send is in flight — blocks double-submits
@@ -825,7 +826,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
   // buildTranscript strips it before anything is logged or emailed.
   function startChat() {
     config.sessionId = generateSessionId();
-    attempt = 0; messageCount = 0;
+    attempt = 0; messageCount = 0; lastSentIndex = 0;
     recruiterFired = false;
     ticketFired = false;
     conversationMessages = [];
@@ -1058,23 +1059,20 @@ So what brings you here today?`;
   // followed by the user's newest message. This is what feeds Jira comment updates
   // on an existing chat log (Path 15), so each comment shows the latest back-and-forth.
   // Skips the hidden system note / 'Understood.' ack so they never leak into comments.
-  function lastExchange() {
-    const visible = conversationMessages.filter(m => {
-      if (typeof m.content !== 'string') return false;
-      if (m.content.startsWith('[system note')) return false;
-      if (m.content === 'Understood.') return false;
-      return true;
-    });
-    // Walk from the end: grab the bot's newest reply, and the user message before it
-    // (the message that reply was responding to). Order: user first, then the response.
-    let userMsg = '', botMsg = '';
-    for (let i = visible.length - 1; i >= 0; i--) {
-      if (!botMsg && visible[i].role === 'assistant') { botMsg = visible[i].content; continue; }
-      if (botMsg && visible[i].role === 'user') { userMsg = visible[i].content; break; }
-    }
+  // Returns every visible message AFTER lastSentIndex — i.e. the batch of exchanges
+  // not yet sent in a comment — formatted oldest-first. This lets one debounced fire
+  // capture all messages since the last fire (nothing dropped) at the cost of a single
+  // task. The hidden system note / 'Understood.' ack are skipped. logConversation
+  // advances lastSentIndex on a successful send so content is never sent twice.
+  function unsentExchanges() {
     const parts = [];
-    if (userMsg) parts.push(`${config.name}: ${userMsg}`);
-    if (botMsg)  parts.push(`AI Nolan: ${botMsg}`);
+    for (let i = lastSentIndex; i < conversationMessages.length; i++) {
+      const m = conversationMessages[i];
+      if (typeof m.content !== 'string') continue;
+      if (m.content.startsWith('[system note')) continue;
+      if (m.content === 'Understood.') continue;
+      parts.push(`${m.role === 'user' ? config.name : 'AI Nolan'}: ${m.content}`);
+    }
     return parts.join('\n');
   }
 
@@ -1086,7 +1084,7 @@ So what brings you here today?`;
       session_id: config.sessionId,
       user_name: config.name,
       user_email: config.email || '',
-      message: lastExchange(),  // bot's previous reply + user's newest message (feeds Jira comments)
+      message: unsentExchanges(),  // all exchanges since the last fire (the unsent batch)
       attempt: '',          // support attempt count (ticket only, else blank)
       message_count: messageCount,
       conversation: buildTranscript(),
@@ -1104,6 +1102,7 @@ So what brings you here today?`;
       status: status || 'ongoing'
     }));
     lastLoggedCount = messageCount;
+    lastSentIndex = conversationMessages.length;  // everything up to here has now been sent
   }
 
   // 45s idle debounce — fires one log if the conversation changed since the last log.

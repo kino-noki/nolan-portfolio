@@ -76,7 +76,7 @@ module.exports = async function handler(req, res) {
     // JSON POST body (no practical size limit) while every short field stays in
     // the query string — keeping the existing querystring_* Zapier mappings intact.
     // Body fields appear in Zapier's Catch Hook at the top level (not querystring_).
-    const BODY_FIELDS = ['conversation', 'role_description'];
+    const BODY_FIELDS = ['conversation', 'role_description', 'message'];
     const params = new URLSearchParams();
     const bodyData = {};
     for (const [k, v] of Object.entries(payload)) {
