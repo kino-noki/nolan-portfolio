@@ -1123,6 +1123,27 @@ So what brings you here today?`;
   // Sends the whole history (the model is stateless, so this is how it remembers).
   // We push the user's text BEFORE sending and the assistant's reply AFTER, so the
   // array always mirrors the real exchange and the next turn has full context.
+  // Asks the model to write the ticket-confirmation message, informing it that the
+  // escalation conditions have been met and a ticket was just created. Used when the
+  // code decides to escalate (e.g. two failed attempts) and the model's last reply
+  // was a troubleshooting attempt rather than a handoff. Returns '' on any failure so
+  // the caller can fall back to a hard-coded confirmation.
+  async function requestTicketConfirmation() {
+    const note = '[system note: the support conditions to escalate have been met and a ticket has just been created for the real Nolan. Reply with a brief, warm message telling the user you could not resolve it yourself so you have created a ticket, the real Nolan will follow up by email with the ticket number, and ask if there is anything else you can help with. Do not troubleshoot further.]';
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [...conversationMessages, { role: 'user', content: note }] })
+      });
+      if (!res.ok) return '';
+      const data = await res.json();
+      return parseModelResponse(data.raw || '{}').reply || '';
+    } catch (e) {
+      return '';
+    }
+  }
+
   async function callOpenAI(userText) {
     conversationMessages.push({ role: 'user', content: userText });
     const res = await fetch('/api/chat', {
@@ -1204,12 +1225,12 @@ So what brings you here today?`;
         }
         if (sent) armIdleLog();
 
-      // === SUPPORT — escalate deterministically after two genuine troubleshooting
-      // attempts. The attempt counter is the trigger; the model's label is not used.
-      // We deliberately DON'T show the model's reply here — that would be a third
-      // troubleshooting attempt. The bot stops trying, confirms the ticket, and
-      // offers to help with anything else in the meantime.
-      } else if (mode === 'support' && attempt >= 2 && !ticketFired) {
+      // === SUPPORT — escalate on EITHER condition: (1) two genuine troubleshooting
+      // attempts have failed, or (2) the model signals it needs a human now
+      // (support_phase = 'escalate') — but only after at least one prior turn, so it
+      // confirms the situation rather than escalating on the literal first message.
+      } else if (mode === 'support' && !ticketFired &&
+                 (attempt >= 2 || (phase === 'escalate' && messageCount > 1))) {
         cancelIdleLog();
         const sent = await fireZapier(config.webhook, buildPayload({
           event: 'ticket',
@@ -1220,7 +1241,21 @@ So what brings you here today?`;
         }), true);
         if (sent) {
           ticketFired = true;  // latch on success so a failed send can retry
-          addBotMessage("I wasn't able to resolve this one myself, so I've created a ticket for the real Nolan to take over — you'll get an email confirmation with your ticket number shortly. In the meantime, is there anything else I can help you with?", 'ticket', '↗ ticket submitted');
+          // The confirmation message is written by the model. If it set phase='escalate'
+          // it already wrote a handoff reply (use it). Otherwise (attempt-exhaustion,
+          // a code decision) its last reply was a troubleshooting attempt, so we ask
+          // the model for a confirmation now that conditions are met. Fall back to a
+          // fixed message if the model returns nothing.
+          let ticketMsg = (phase === 'escalate' && reply) ? reply : '';
+          if (!ticketMsg) {
+            showTyping();
+            ticketMsg = await requestTicketConfirmation();
+            removeTyping();
+          }
+          if (!ticketMsg) {
+            ticketMsg = "I wasn't able to resolve this one myself, so I've created a ticket for the real Nolan to take over — you'll get an email confirmation with your ticket number shortly. In the meantime, is there anything else I can help you with?";
+          }
+          addBotMessage(ticketMsg, 'ticket', '↗ ticket submitted');
           // Tell the model the issue is now in the real Nolan's hands so it stops
           // troubleshooting the same problem and instead offers other help.
           conversationMessages.push({ role: 'user', content: '[system note: a support ticket has been filed for this issue and the real Nolan will follow up by email. Do NOT keep troubleshooting this same problem or claim you can fix it now. Acknowledge it is with Nolan and offer to help with anything else.]' });
