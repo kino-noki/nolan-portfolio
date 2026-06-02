@@ -17,6 +17,86 @@
 // fields that make a fire unique; a repeat within the TTL is dropped.
 const recentFires = new Map();
 const DEDUPE_TTL_MS = 10000;
+const ALLOWED_EVENTS = new Set(['log', 'ticket', 'recruiter_lead']);
+const ALLOWED_TYPES = new Set(['general', 'support', 'recruitment']);
+const ALLOWED_STATUSES = new Set(['', 'ongoing', 'final']);
+const BODY_FIELDS = ['conversation', 'role_description', 'message'];
+const FIELD_LIMITS = {
+  event: 20,
+  type: 20,
+  status: 20,
+  session_id: 120,
+  user_name: 120,
+  user_email: 160,
+  message: 12000,
+  attempt: 10,
+  message_count: 10,
+  conversation: 50000,
+  company: 160,
+  role_title: 200,
+  role_description: 30000,
+  contact: 300
+};
+
+function getAllowedOrigins() {
+  return [
+    process.env.SITE_ORIGIN,
+    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '',
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:5173'
+  ].filter(Boolean);
+}
+
+function applyCors(req, res) {
+  const origin = req.headers.origin;
+  if (!origin) return true;
+
+  let isSameHost = false;
+  try {
+    isSameHost = new URL(origin).host === req.headers.host;
+  } catch (e) {}
+
+  if (!isSameHost && !getAllowedOrigins().includes(origin)) {
+    return false;
+  }
+
+  res.setHeader('Access-Control-Allow-Origin', origin);
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  return true;
+}
+
+function normalizePayload(payload) {
+  const normalized = {};
+  for (const key of Object.keys(FIELD_LIMITS)) {
+    normalized[key] = payload[key] == null ? '' : String(payload[key]).trim();
+  }
+  return normalized;
+}
+
+function validatePayload(payload) {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return 'payload must be an object';
+  if (!ALLOWED_EVENTS.has(payload.event)) return 'event must be log, ticket, or recruiter_lead';
+  if (!ALLOWED_TYPES.has(payload.type)) return 'type must be general, support, or recruitment';
+  if (!ALLOWED_STATUSES.has(payload.status)) return 'status must be blank, ongoing, or final';
+  if (!payload.session_id) return 'session_id is required';
+  if (!payload.user_name) return 'user_name is required';
+  if (!payload.user_email) return 'user_email is required';
+
+  for (const [key, limit] of Object.entries(FIELD_LIMITS)) {
+    if (payload[key].length > limit) return `${key} cannot exceed ${limit} characters`;
+  }
+
+  if (payload.event === 'ticket' && payload.type !== 'support') return 'ticket events must use support type';
+  if (payload.event === 'recruiter_lead' && payload.type !== 'recruitment') return 'recruiter_lead events must use recruitment type';
+  if (payload.event === 'recruiter_lead' && (!payload.company || !payload.role_title)) {
+    return 'recruiter leads require company and role_title';
+  }
+
+  return '';
+}
 
 function isDuplicate(payload) {
   const key = [payload.event, payload.session_id, payload.message_count, payload.status].join('|');
@@ -36,9 +116,7 @@ module.exports = async function handler(req, res) {
   // that POST is permitted. Without this, the real POST would be blocked by the
   // browser before it ever reached us. We also hard-reject any non-POST method
   // so the endpoint can't be probed with GET/PUT etc.
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (!applyCors(req, res)) return res.status(403).json({ error: 'Origin not allowed' });
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
@@ -60,6 +138,9 @@ module.exports = async function handler(req, res) {
     if (typeof payload === 'string') {
       try { payload = JSON.parse(payload); } catch (e) { payload = {}; }
     }
+    payload = normalizePayload(payload);
+    const validationError = validatePayload(payload);
+    if (validationError) return res.status(400).json({ ok: false, error: validationError });
 
     // --- Idempotency guard --------------------------------------------------
     // Drop an identical fire that arrives within the dedupe window (e.g. a
@@ -76,7 +157,6 @@ module.exports = async function handler(req, res) {
     // JSON POST body (no practical size limit) while every short field stays in
     // the query string — keeping the existing querystring_* Zapier mappings intact.
     // Body fields appear in Zapier's Catch Hook at the top level (not querystring_).
-    const BODY_FIELDS = ['conversation', 'role_description', 'message'];
     const params = new URLSearchParams();
     const bodyData = {};
     for (const [k, v] of Object.entries(payload)) {
