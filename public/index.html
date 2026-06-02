@@ -1213,9 +1213,16 @@ So what brings you here today?`;
 
   function formatTicketStatus(ticket) {
     const status = ticket.status || 'unknown';
+    const isRecruiterLead = /^REC-\d+$/i.test(ticket.key || '');
     const lines = [`I found ${ticket.key}. It's currently ${status}${ticket.resolution ? ` (${ticket.resolution})` : ''}.`];
 
-    if (/to do|open|new/i.test(status)) {
+    if (isRecruiterLead && /to do|open|new/i.test(status)) {
+      lines.push("This looks like a recruiter lead. Nolan has the details and will take a look, then respond soon if it looks like a fit.");
+    } else if (isRecruiterLead && /progress|review|triage/i.test(status)) {
+      lines.push("This recruiter lead looks like it's under review. Nolan is taking a look at the role details.");
+    } else if (isRecruiterLead && /done|resolved|closed/i.test(status)) {
+      lines.push("This recruiter lead looks like it has already been reviewed.");
+    } else if (/to do|open|new/i.test(status)) {
       lines.push("It looks like it has been created and is waiting for Nolan to pick it up.");
     } else if (/progress|review|triage/i.test(status)) {
       lines.push("It looks like Nolan has started working through it.");
@@ -1226,7 +1233,7 @@ So what brings you here today?`;
     if (ticket.updated) {
       lines.push(`Last updated: ${new Date(ticket.updated).toLocaleString()}.`);
     }
-    if (ticket.latest_comment?.body) {
+    if (!isRecruiterLead && ticket.latest_comment?.body) {
       lines.push(`Latest note from ${ticket.latest_comment.author}: ${ticket.latest_comment.body}`);
     }
     return lines.join('\n');
