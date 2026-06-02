@@ -861,8 +861,11 @@ So what brings you here today?`;
   }
 
   function extractTicketKey(text) {
-    const match = String(text || '').toUpperCase().match(/\b[A-Z][A-Z0-9]+-\d+\b/);
-    return match ? match[0] : '';
+    const s = String(text || '').toUpperCase();
+    const dashed = s.match(/\b[A-Z][A-Z0-9]+-\d+\b/);
+    if (dashed) return dashed[0];
+    const compact = s.match(/\b([A-Z][A-Z0-9]+)(\d+)\b/);
+    return compact ? `${compact[1]}-${compact[2]}` : '';
   }
 
   function isTicketLookup(text) {
@@ -1194,7 +1197,7 @@ So what brings you here today?`;
 
   function formatTicketLookupError(errorMessage) {
     if (!lookupTicketKey) {
-      return "I don't have a ticket number for this chat yet. Send me the Jira key, something like NAI-31, and I can check it.";
+      return "I don't have a ticket number for this chat yet. It should be in the Jira confirmation email sent when the ticket was created. Send me the key, something like NAI-31, and I can check it.";
     }
     if (/Jira returned 404/i.test(errorMessage)) {
       return `${lookupTicketKey} exists in Jira, but this site can't read it yet. Nolan needs to check the Jira env vars or make sure the API token account has Browse access to the NAI project.`;
@@ -1203,16 +1206,31 @@ So what brings you here today?`;
       return `I couldn't find ${lookupTicketKey}. Double-check the ticket number and send it again.`;
     }
     if (/no ticket for this chat/i.test(errorMessage)) {
-      return "I don't see a Jira ticket attached to this chat yet. If you have the ticket number, send it over and I'll check that directly.";
+      return "I don't see a Jira ticket attached to this chat yet. If you have the ticket number from the Jira confirmation email, send it over and I'll check that directly.";
     }
     return `I couldn't look up the ticket just now: ${errorMessage}`;
   }
 
   function formatTicketStatus(ticket) {
-    const lines = [
-      `I found ${ticket.key}: ${ticket.summary || 'support ticket'}.`,
-      `Status: ${ticket.status || 'unknown'}${ticket.resolution ? ` (${ticket.resolution})` : ''}.`
-    ];
+    const status = ticket.status || 'unknown';
+    const title = ticket.summary || 'support ticket';
+    const description = ticket.description || '';
+    const lines = [`I found ${ticket.key}. It's currently ${status}${ticket.resolution ? ` (${ticket.resolution})` : ''}.`];
+
+    if (description && description !== title) {
+      lines.push(`From the ticket details, this looks like: ${description}`);
+    } else {
+      lines.push(`The ticket summary is: ${title}`);
+    }
+
+    if (/to do|open|new/i.test(status)) {
+      lines.push("It looks like it has been created and is waiting for Nolan to pick it up.");
+    } else if (/progress|review|triage/i.test(status)) {
+      lines.push("It looks like Nolan has started working through it.");
+    } else if (/done|resolved|closed/i.test(status)) {
+      lines.push("It looks like the ticket has been completed.");
+    }
+
     if (ticket.updated) {
       lines.push(`Last updated: ${new Date(ticket.updated).toLocaleString()}.`);
     }

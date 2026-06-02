@@ -66,7 +66,9 @@ function authHeader(email, token) {
 }
 
 function validateInput(body) {
-  const ticketKey = String(body.ticket_key || '').trim().toUpperCase();
+  const rawTicketKey = String(body.ticket_key || '').trim().toUpperCase();
+  const compactKey = rawTicketKey.match(/^([A-Z][A-Z0-9]+)(\d+)$/);
+  const ticketKey = compactKey ? `${compactKey[1]}-${compactKey[2]}` : rawTicketKey;
   const sessionId = String(body.session_id || '').trim();
 
   if (ticketKey && !TICKET_KEY_RE.test(ticketKey)) return { error: 'ticket_key must look like ABC-123' };
@@ -84,7 +86,7 @@ function buildJql(sessionId) {
 }
 
 function issueFields() {
-  return ['summary', 'status', 'comment', 'created', 'updated', 'resolution'];
+  return ['summary', 'description', 'status', 'comment', 'created', 'updated', 'resolution'];
 }
 
 async function getIssueByKey({ baseUrl, auth, ticketKey }) {
@@ -109,7 +111,7 @@ async function getIssueByKey({ baseUrl, auth, ticketKey }) {
 }
 
 async function searchIssueBySession({ baseUrl, auth, sessionId }) {
-  const fields = ['summary', 'status', 'comment', 'created', 'updated', 'resolution'];
+  const fields = issueFields();
 
   const resp = await fetch(`${baseUrl}/rest/api/3/search/jql`, {
     method: 'POST',
@@ -140,6 +142,7 @@ function summarizeIssue(issue) {
   return {
     key: issue.key,
     summary: fields.summary || '',
+    description: truncate(textFromAdf(fields.description), 1200),
     status: fields.status?.name || '',
     resolution: fields.resolution?.name || '',
     created: fields.created || '',
