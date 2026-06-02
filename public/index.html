@@ -759,6 +759,8 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
   let recruiterFired = false; // true once a recruiter_lead has fired — prevents duplicate leads
   let supportFired = false;   // true once a SUPPORT ticket exists — prevents dup support tickets; later support logs comment on it
   let sending = false;       // true while a send is in flight — blocks double-submits
+  let lookupTicketKey = '';   // remembers the last ticket key a visitor mentioned
+  let lookupEmail = '';       // optional ticket-specific email if it differs from the gate email
 
   // --- Tab-close logging ----------------------------------------------------
   // The 15s idle timer might not have fired yet when someone closes the tab, so
@@ -864,9 +866,15 @@ So what brings you here today?`;
     return match ? match[0] : '';
   }
 
+  function extractEmail(text) {
+    const match = String(text || '').match(/[^\s@<>]+@[^\s@<>]+\.[^\s@<>.,!?]+/);
+    return match ? match[0].toLowerCase() : '';
+  }
+
   function isTicketLookup(text) {
     const s = String(text || '').toLowerCase();
     if (extractTicketKey(s)) return true;
+    if (extractEmail(s) && /\b(ticket|jira|case|issue)\b/.test(s)) return true;
     return /\b(ticket|jira|case|issue)\b/.test(s) &&
            /\b(status|update|check|look|lookup|progress|created|submitted)\b/.test(s);
   }
@@ -1175,19 +1183,36 @@ So what brings you here today?`;
   }
 
   async function lookupTicket(userText) {
-    const ticketKey = extractTicketKey(userText);
+    const ticketKey = extractTicketKey(userText) || lookupTicketKey;
+    const statedEmail = extractEmail(userText);
+    if (ticketKey) lookupTicketKey = ticketKey;
+    if (statedEmail) lookupEmail = statedEmail;
+
     const res = await fetch('/api/ticket-status', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         ticket_key: ticketKey,
         session_id: config.sessionId,
-        user_email: config.email
+        user_email: lookupEmail || config.email
       })
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || `Ticket lookup failed (${res.status})`);
     return data.ticket;
+  }
+
+  function formatTicketLookupError(errorMessage) {
+    if (!lookupTicketKey) {
+      return "I don't have a ticket number for this chat yet. Send me the Jira key, something like NAI-31, and I can check it.";
+    }
+    if (/matching ticket/i.test(errorMessage)) {
+      return `I found ${lookupTicketKey}, but I couldn't verify it against ${lookupEmail || config.email}. If the ticket was created with a different email, send it like: "ticket email is name@example.com".`;
+    }
+    if (/no ticket for this chat/i.test(errorMessage)) {
+      return "I don't see a Jira ticket attached to this chat yet. If you have the ticket number, send it over and I'll check that directly.";
+    }
+    return `I couldn't look up the ticket just now: ${errorMessage}`;
   }
 
   function formatTicketStatus(ticket) {
@@ -1231,12 +1256,19 @@ So what brings you here today?`;
 
     try {
       if (isTicketLookup(text)) {
-        const ticket = await lookupTicket(text);
-        const ticketReply = formatTicketStatus(ticket);
+        let ticketReply = '';
+        let ticketBadge = '↙ ticket lookup';
+        try {
+          const ticket = await lookupTicket(text);
+          ticketReply = formatTicketStatus(ticket);
+        } catch (lookupErr) {
+          ticketReply = formatTicketLookupError(lookupErr.message);
+          ticketBadge = 'ticket lookup';
+        }
         conversationMessages.push({ role: 'user', content: text });
         conversationMessages.push({ role: 'assistant', content: ticketReply });
         removeTyping();
-        addBotMessage(ticketReply, 'ticket', '↙ ticket lookup');
+        addBotMessage(ticketReply, 'ticket', ticketBadge);
         armIdleLog();
         if (messageCount === 1) logConversation('ongoing');
         sending = false;
