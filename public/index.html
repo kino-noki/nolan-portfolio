@@ -760,7 +760,6 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
   let supportFired = false;   // true once a SUPPORT ticket exists — prevents dup support tickets; later support logs comment on it
   let sending = false;       // true while a send is in flight — blocks double-submits
   let lookupTicketKey = '';   // remembers the last ticket key a visitor mentioned
-  let lookupEmail = '';       // optional ticket-specific email if it differs from the gate email
 
   // --- Tab-close logging ----------------------------------------------------
   // The 15s idle timer might not have fired yet when someone closes the tab, so
@@ -866,15 +865,9 @@ So what brings you here today?`;
     return match ? match[0] : '';
   }
 
-  function extractEmail(text) {
-    const match = String(text || '').match(/[^\s@<>]+@[^\s@<>]+\.[^\s@<>.,!?]+/);
-    return match ? match[0].toLowerCase() : '';
-  }
-
   function isTicketLookup(text) {
     const s = String(text || '').toLowerCase();
     if (extractTicketKey(s)) return true;
-    if (extractEmail(s) && /\b(ticket|jira|case|issue)\b/.test(s)) return true;
     return /\b(ticket|jira|case|issue)\b/.test(s) &&
            /\b(status|update|check|look|lookup|progress|created|submitted)\b/.test(s);
   }
@@ -1184,17 +1177,14 @@ So what brings you here today?`;
 
   async function lookupTicket(userText) {
     const ticketKey = extractTicketKey(userText) || lookupTicketKey;
-    const statedEmail = extractEmail(userText);
     if (ticketKey) lookupTicketKey = ticketKey;
-    if (statedEmail) lookupEmail = statedEmail;
 
     const res = await fetch('/api/ticket-status', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         ticket_key: ticketKey,
-        session_id: config.sessionId,
-        user_email: lookupEmail || config.email
+        session_id: config.sessionId
       })
     });
     const data = await res.json().catch(() => ({}));
@@ -1206,8 +1196,8 @@ So what brings you here today?`;
     if (!lookupTicketKey) {
       return "I don't have a ticket number for this chat yet. Send me the Jira key, something like NAI-31, and I can check it.";
     }
-    if (/matching ticket/i.test(errorMessage)) {
-      return `I found ${lookupTicketKey}, but I couldn't verify it against ${lookupEmail || config.email}. If the ticket was created with a different email, send it like: "ticket email is name@example.com".`;
+    if (/no ticket with that key/i.test(errorMessage)) {
+      return `I couldn't find ${lookupTicketKey}. Double-check the ticket number and send it again.`;
     }
     if (/no ticket for this chat/i.test(errorMessage)) {
       return "I don't see a Jira ticket attached to this chat yet. If you have the ticket number, send it over and I'll check that directly.";

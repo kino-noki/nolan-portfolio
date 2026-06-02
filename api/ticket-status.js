@@ -1,5 +1,4 @@
 const MAX_SESSION_ID_CHARS = 120;
-const MAX_EMAIL_CHARS = 160;
 const TICKET_KEY_RE = /^[A-Z][A-Z0-9]+-\d+$/;
 
 function getAllowedOrigins() {
@@ -66,24 +65,16 @@ function authHeader(email, token) {
   return `Basic ${Buffer.from(`${email}:${token}`).toString('base64')}`;
 }
 
-function getRequesterField() {
-  return String(process.env.JIRA_REQUESTER_EMAIL_FIELD || '').trim();
-}
-
 function validateInput(body) {
   const ticketKey = String(body.ticket_key || '').trim().toUpperCase();
   const sessionId = String(body.session_id || '').trim();
-  const userEmail = String(body.user_email || '').trim().toLowerCase();
 
-  if (!userEmail || userEmail.length > MAX_EMAIL_CHARS || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userEmail)) {
-    return { error: 'valid user_email is required' };
-  }
   if (ticketKey && !TICKET_KEY_RE.test(ticketKey)) return { error: 'ticket_key must look like ABC-123' };
   if (!ticketKey && (!sessionId || sessionId.length > MAX_SESSION_ID_CHARS)) {
     return { error: 'ticket_key or session_id is required' };
   }
 
-  return { ticketKey, sessionId, userEmail };
+  return { ticketKey, sessionId };
 }
 
 function buildJql(ticketKey, sessionId) {
@@ -94,9 +85,7 @@ function buildJql(ticketKey, sessionId) {
 }
 
 async function searchIssue({ baseUrl, auth, ticketKey, sessionId }) {
-  const requesterField = getRequesterField();
-  const fields = ['summary', 'status', 'description', 'comment', 'created', 'updated', 'reporter', 'resolution'];
-  if (requesterField) fields.push(requesterField);
+  const fields = ['summary', 'status', 'comment', 'created', 'updated', 'resolution'];
 
   const resp = await fetch(`${baseUrl}/rest/api/3/search/jql`, {
     method: 'POST',
@@ -117,18 +106,6 @@ async function searchIssue({ baseUrl, auth, ticketKey, sessionId }) {
     throw new Error(data.errorMessages?.[0] || data.message || `Jira search failed (${resp.status})`);
   }
   return data.issues || [];
-}
-
-function emailAppearsOnIssue(issue, userEmail) {
-  const fields = issue.fields || {};
-  const requesterField = getRequesterField();
-  const haystack = [
-    fields.reporter?.emailAddress,
-    requesterField ? textFromAdf(fields[requesterField]) : '',
-    textFromAdf(fields.description),
-    textFromAdf(fields.comment?.comments || [])
-  ].join(' ').toLowerCase();
-  return haystack.includes(userEmail);
 }
 
 function summarizeIssue(issue) {
@@ -174,11 +151,11 @@ module.exports = async function handler(req, res) {
       sessionId: input.sessionId
     });
 
-    const issue = issues.find(candidate => emailAppearsOnIssue(candidate, input.userEmail));
+    const issue = issues[0];
     if (!issue) {
       return res.status(404).json({
         error: input.ticketKey
-          ? 'I found no matching ticket for that email.'
+          ? 'I found no ticket with that key.'
           : 'I found no ticket for this chat yet.'
       });
     }
