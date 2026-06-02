@@ -1196,6 +1196,9 @@ So what brings you here today?`;
     if (!lookupTicketKey) {
       return "I don't have a ticket number for this chat yet. Send me the Jira key, something like NAI-31, and I can check it.";
     }
+    if (/Jira returned 404/i.test(errorMessage)) {
+      return `${lookupTicketKey} exists in Jira, but this site can't read it yet. Nolan needs to check the Jira env vars or make sure the API token account has Browse access to the NAI project.`;
+    }
     if (/no ticket with that key/i.test(errorMessage)) {
       return `I couldn't find ${lookupTicketKey}. Double-check the ticket number and send it again.`;
     }

@@ -77,14 +77,38 @@ function validateInput(body) {
   return { ticketKey, sessionId };
 }
 
-function buildJql(ticketKey, sessionId) {
+function buildJql(sessionId) {
   const projectKey = String(process.env.JIRA_PROJECT_KEY || '').trim().toUpperCase();
   const projectPrefix = projectKey ? `project = ${projectKey} AND ` : '';
-  if (ticketKey) return `${projectPrefix}key = ${ticketKey}`;
   return `${projectPrefix}text ~ "${escapeJqlString(sessionId)}" ORDER BY updated DESC`;
 }
 
-async function searchIssue({ baseUrl, auth, ticketKey, sessionId }) {
+function issueFields() {
+  return ['summary', 'status', 'comment', 'created', 'updated', 'resolution'];
+}
+
+async function getIssueByKey({ baseUrl, auth, ticketKey }) {
+  const resp = await fetch(`${baseUrl}/rest/api/3/issue/${encodeURIComponent(ticketKey)}?fields=${issueFields().join(',')}`, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+      'Authorization': auth
+    }
+  });
+
+  const data = await resp.json().catch(() => ({}));
+  if (resp.status === 404) {
+    const err = new Error(`Jira returned 404 for ${ticketKey}. Check JIRA_BASE_URL and whether the API token account can browse this project.`);
+    err.statusCode = 404;
+    throw err;
+  }
+  if (!resp.ok) {
+    throw new Error(data.errorMessages?.[0] || data.message || `Jira issue lookup failed (${resp.status})`);
+  }
+  return data;
+}
+
+async function searchIssueBySession({ baseUrl, auth, sessionId }) {
   const fields = ['summary', 'status', 'comment', 'created', 'updated', 'resolution'];
 
   const resp = await fetch(`${baseUrl}/rest/api/3/search/jql`, {
@@ -95,7 +119,7 @@ async function searchIssue({ baseUrl, auth, ticketKey, sessionId }) {
       'Authorization': auth
     },
     body: JSON.stringify({
-      jql: buildJql(ticketKey, sessionId),
+      jql: buildJql(sessionId),
       maxResults: 3,
       fields
     })
@@ -144,14 +168,11 @@ module.exports = async function handler(req, res) {
     const input = validateInput(req.body || {});
     if (input.error) return res.status(400).json({ error: input.error });
 
-    const issues = await searchIssue({
-      baseUrl,
-      auth: authHeader(jiraEmail, jiraToken),
-      ticketKey: input.ticketKey,
-      sessionId: input.sessionId
-    });
+    const auth = authHeader(jiraEmail, jiraToken);
+    const issue = input.ticketKey
+      ? await getIssueByKey({ baseUrl, auth, ticketKey: input.ticketKey })
+      : (await searchIssueBySession({ baseUrl, auth, sessionId: input.sessionId }))[0];
 
-    const issue = issues[0];
     if (!issue) {
       return res.status(404).json({
         error: input.ticketKey
@@ -162,6 +183,6 @@ module.exports = async function handler(req, res) {
 
     return res.status(200).json({ ok: true, ticket: summarizeIssue(issue) });
   } catch (e) {
-    return res.status(502).json({ error: e.message });
+    return res.status(e.statusCode || 502).json({ error: e.message });
   }
 };
