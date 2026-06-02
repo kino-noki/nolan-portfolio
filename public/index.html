@@ -728,8 +728,9 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
   //  AI NOLAN CHATBOT — front-end controller
   // --------------------------------------------------------------------------
   //  Talks to two serverless endpoints, never to OpenAI or Zapier directly:
-  //    /api/chat     → sends the conversation, gets AI Nolan's JSON reply
-  //    /api/forward  → relays event payloads (ticket / recruiter_lead / log) to Zapier
+  //    /api/chat           → sends the conversation, gets AI Nolan's JSON reply
+  //    /api/forward        → relays event payloads (ticket / recruiter_lead / log) to Zapier
+  //    /api/ticket-status  → reads a matching Jira ticket for status checks
   //  No secrets live in this file. Sections below: state → events → UI helpers
   //  → networking → parsing → logging → main send loop.
   // ==========================================================================
@@ -856,6 +857,18 @@ So what brings you here today?`;
 
   function escHtml(str) {
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function extractTicketKey(text) {
+    const match = String(text || '').toUpperCase().match(/\b[A-Z][A-Z0-9]+-\d+\b/);
+    return match ? match[0] : '';
+  }
+
+  function isTicketLookup(text) {
+    const s = String(text || '').toLowerCase();
+    if (extractTicketKey(s)) return true;
+    return /\b(ticket|jira|case|issue)\b/.test(s) &&
+           /\b(status|update|check|look|lookup|progress|created|submitted)\b/.test(s);
   }
 
   // --- Render messages ------------------------------------------------------
@@ -1161,6 +1174,36 @@ So what brings you here today?`;
     return parsed;
   }
 
+  async function lookupTicket(userText) {
+    const ticketKey = extractTicketKey(userText);
+    const res = await fetch('/api/ticket-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ticket_key: ticketKey,
+        session_id: config.sessionId,
+        user_email: config.email
+      })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || `Ticket lookup failed (${res.status})`);
+    return data.ticket;
+  }
+
+  function formatTicketStatus(ticket) {
+    const lines = [
+      `I found ${ticket.key}: ${ticket.summary || 'support ticket'}.`,
+      `Status: ${ticket.status || 'unknown'}${ticket.resolution ? ` (${ticket.resolution})` : ''}.`
+    ];
+    if (ticket.updated) {
+      lines.push(`Last updated: ${new Date(ticket.updated).toLocaleString()}.`);
+    }
+    if (ticket.latest_comment?.body) {
+      lines.push(`Latest note from ${ticket.latest_comment.author}: ${ticket.latest_comment.body}`);
+    }
+    return lines.join('\n');
+  }
+
   // --- Main send loop -------------------------------------------------------
   // The orchestrator. The model's "label" is the decision signal:
   //   intake_complete → recruiter gave everything → fire recruiter_lead + final log
@@ -1187,6 +1230,21 @@ So what brings you here today?`;
     messageCount++;
 
     try {
+      if (isTicketLookup(text)) {
+        const ticket = await lookupTicket(text);
+        const ticketReply = formatTicketStatus(ticket);
+        conversationMessages.push({ role: 'user', content: text });
+        conversationMessages.push({ role: 'assistant', content: ticketReply });
+        removeTyping();
+        addBotMessage(ticketReply, 'ticket', '↙ ticket lookup');
+        armIdleLog();
+        if (messageCount === 1) logConversation('ongoing');
+        sending = false;
+        document.getElementById('sendBtn').disabled = false;
+        input.focus();
+        return;
+      }
+
       const result = await callOpenAI(text);
       removeTyping();
 

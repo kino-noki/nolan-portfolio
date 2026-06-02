@@ -4,7 +4,7 @@
   "private": true,
   "description": "Nolan Kim resume site with AI Nolan chatbot (secure serverless setup)",
   "scripts": {
-    "check": "node --check api/chat.js && node --check api/forward.js"
+    "check": "node --check api/chat.js && node --check api/forward.js && node --check api/ticket-status.js"
   },
   "engines": {
     "node": "20.x"
