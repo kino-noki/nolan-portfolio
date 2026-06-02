@@ -864,7 +864,7 @@ So what brings you here today?`;
     const s = String(text || '').toUpperCase();
     const dashed = s.match(/\b[A-Z][A-Z0-9]+-\d+\b/);
     if (dashed) return dashed[0];
-    const compact = s.match(/\b([A-Z][A-Z0-9]+)(\d+)\b/);
+    const compact = s.match(/\b([A-Z][A-Z0-9]*?)(\d+)\b/);
     return compact ? `${compact[1]}-${compact[2]}` : '';
   }
 
@@ -1213,15 +1213,7 @@ So what brings you here today?`;
 
   function formatTicketStatus(ticket) {
     const status = ticket.status || 'unknown';
-    const title = ticket.summary || 'support ticket';
-    const description = ticket.description || '';
     const lines = [`I found ${ticket.key}. It's currently ${status}${ticket.resolution ? ` (${ticket.resolution})` : ''}.`];
-
-    if (description && description !== title) {
-      lines.push(`From the ticket details, this looks like: ${description}`);
-    } else {
-      lines.push(`The ticket summary is: ${title}`);
-    }
 
     if (/to do|open|new/i.test(status)) {
       lines.push("It looks like it has been created and is waiting for Nolan to pick it up.");

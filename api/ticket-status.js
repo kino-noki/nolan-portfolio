@@ -67,7 +67,7 @@ function authHeader(email, token) {
 
 function validateInput(body) {
   const rawTicketKey = String(body.ticket_key || '').trim().toUpperCase();
-  const compactKey = rawTicketKey.match(/^([A-Z][A-Z0-9]+)(\d+)$/);
+  const compactKey = rawTicketKey.match(/^([A-Z][A-Z0-9]*?)(\d+)$/);
   const ticketKey = compactKey ? `${compactKey[1]}-${compactKey[2]}` : rawTicketKey;
   const sessionId = String(body.session_id || '').trim();
 
@@ -86,7 +86,7 @@ function buildJql(sessionId) {
 }
 
 function issueFields() {
-  return ['summary', 'description', 'status', 'comment', 'created', 'updated', 'resolution'];
+  return ['summary', 'status', 'comment', 'created', 'updated', 'resolution'];
 }
 
 async function getIssueByKey({ baseUrl, auth, ticketKey }) {
@@ -142,7 +142,6 @@ function summarizeIssue(issue) {
   return {
     key: issue.key,
     summary: fields.summary || '',
-    description: truncate(textFromAdf(fields.description), 1200),
     status: fields.status?.name || '',
     resolution: fields.resolution?.name || '',
     created: fields.created || '',
