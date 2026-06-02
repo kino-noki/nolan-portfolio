@@ -482,6 +482,860 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
 }
 .gate-btn:hover { background: var(--green); color: var(--bg); }
 .gate-note { font-family: var(--font-mono); font-size: 11px; color: var(--text3); text-align: center; margin-top: 1rem; }
+
+/* ── REFINED PORTFOLIO REDESIGN ── */
+:root {
+  --bg: #f5f7fb;
+  --bg2: #ffffff;
+  --bg3: #f0f3f8;
+  --bg4: #e6edf5;
+  --border: #d8e0ea;
+  --border2: #bac7d6;
+  --text: #182230;
+  --text2: #526171;
+  --text3: #788596;
+  --green: #0a8f6a;
+  --green-dim: #e4f7f1;
+  --green-border: #93d8c0;
+  --blue: #2563eb;
+  --blue-dim: #e8efff;
+  --amber: #b7791f;
+  --amber-dim: #fff4dc;
+  --red: #c2413a;
+}
+
+body {
+  background:
+    linear-gradient(180deg, #ffffff 0%, #f5f7fb 38%, #eef3f8 100%);
+  color: var(--text);
+}
+
+::-webkit-scrollbar-track { background: #edf2f7; }
+::-webkit-scrollbar-thumb { background: #b7c3d0; }
+
+.site-header {
+  border-bottom: 1px solid rgba(216,224,234,0.9);
+  background: rgba(255,255,255,0.86);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.9), 0 12px 40px rgba(31,42,55,0.06);
+}
+
+.header-logo {
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.header-logo .cursor { height: 12px; border-radius: 1px; }
+.header-nav a { letter-spacing: 0.04em; color: #697586; }
+.header-nav a:hover { color: var(--blue); }
+
+.status-pill {
+  color: #095c48;
+  background: var(--green-dim);
+  border-color: var(--green-border);
+  border-radius: 999px;
+}
+
+.hero {
+  min-height: calc(100vh - 58px);
+  display: grid;
+  grid-template-columns: minmax(300px, 0.86fr) minmax(400px, 1.14fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: center;
+  justify-content: center;
+  padding: clamp(3rem, 7vw, 6rem) clamp(1.25rem, 5vw, 5rem);
+  overflow: visible;
+}
+
+.hero::before { display: none; }
+
+.hero-grid {
+  background-image:
+    linear-gradient(rgba(37,99,235,0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(10,143,106,0.055) 1px, transparent 1px);
+  background-size: 52px 52px;
+  opacity: 0.75;
+  mask-image: linear-gradient(to bottom, black 0%, transparent 88%);
+}
+
+.hero-content {
+  text-align: left;
+  margin: 0;
+  max-width: 620px;
+}
+
+.hero-eyebrow {
+  justify-content: flex-start;
+  color: var(--blue);
+  letter-spacing: 0.08em;
+  margin-bottom: 1rem;
+}
+
+.hero-eyebrow::before { display: none; }
+.hero-eyebrow::after { width: 56px; background: #b8c7dc; }
+
+.hero-name {
+  font-family: var(--font-body);
+  font-size: clamp(3rem, 6vw, 5.75rem);
+  letter-spacing: 0;
+  line-height: 0.96;
+  color: #101828;
+}
+
+.hero-name .accent { color: var(--blue); }
+
+.hero-title {
+  font-family: var(--font-body);
+  color: var(--text2);
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  max-width: 640px;
+  line-height: 1.55;
+}
+
+.hero-tags {
+  justify-content: flex-start;
+  gap: 10px;
+  margin-top: 1.75rem;
+}
+
+.tag {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #465568;
+  border-color: #d4deea;
+  padding: 6px 11px;
+  box-shadow: 0 8px 24px rgba(31,42,55,0.05);
+}
+
+.tag.green { color: #087154; background: var(--green-dim); }
+.tag.blue { color: #1d4ed8; background: var(--blue-dim); }
+.tag.amber { color: #8a5a13; background: var(--amber-dim); }
+
+.chat-wrapper { max-width: 780px; }
+
+.chat-window {
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(186,199,214,0.9);
+  border-radius: 18px;
+  box-shadow: 0 28px 90px rgba(24,34,48,0.14), 0 2px 0 rgba(255,255,255,0.85) inset;
+  backdrop-filter: blur(18px);
+}
+
+.chat-titlebar {
+  background: linear-gradient(180deg, #ffffff, #f4f7fb);
+  border-bottom-color: var(--border);
+  padding: 0.9rem 1rem;
+}
+
+.titlebar-dots span { width: 10px; height: 10px; }
+.titlebar-label { color: #536273; font-weight: 600; }
+.titlebar-right { color: var(--green); font-weight: 600; }
+
+.messages {
+  height: 430px;
+  padding: 1.25rem;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.78), rgba(244,247,251,0.86));
+}
+
+.msg-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  font-family: var(--font-body);
+}
+
+.msg-avatar.bot {
+  background: #e8efff;
+  border-color: #b8c7f4;
+  color: var(--blue);
+}
+
+.msg-avatar.user {
+  background: #eef3f8;
+  border-color: #d3dce7;
+  color: #526171;
+}
+
+.bubble {
+  max-width: min(560px, calc(100vw - 7rem));
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.62;
+  box-shadow: 0 10px 24px rgba(24,34,48,0.06);
+}
+
+.bubble.bot {
+  background: #ffffff;
+  border-color: #dce4ee;
+  border-bottom-left-radius: 5px;
+}
+
+.bubble.user {
+  background: #182230;
+  border-color: #182230;
+  border-bottom-right-radius: 5px;
+  color: #ffffff;
+  font-family: var(--font-body);
+}
+
+.bubble.ticket {
+  background: #fff8f0;
+  border-color: #f3cf98;
+  border-left-color: var(--amber);
+}
+
+.bubble.recruited {
+  background: var(--green-dim);
+  border-color: var(--green-border);
+}
+
+.ticket-id { color: var(--amber); }
+.recruit-id { color: var(--green); }
+
+.typing {
+  background: #ffffff;
+  border-color: #dce4ee;
+}
+
+.input-area {
+  background: #ffffff;
+  border-top-color: var(--border);
+  padding: 0.95rem 1rem;
+}
+
+.input-prefix { color: var(--blue); }
+.input-box { color: var(--text); font-family: var(--font-body); }
+
+.send-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background: var(--blue);
+  border-color: var(--blue);
+  box-shadow: 0 10px 24px rgba(37,99,235,0.22);
+}
+
+.send-btn svg { stroke: #ffffff; }
+.send-btn:hover { background: #1d4ed8; }
+.send-btn:hover svg { stroke: #ffffff; }
+
+.resume {
+  max-width: 1080px;
+  padding: 5rem clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.section {
+  margin-bottom: 4.5rem;
+}
+
+.section-header {
+  border-bottom-color: var(--border);
+}
+
+.section-label {
+  color: var(--blue);
+  letter-spacing: 0.08em;
+}
+
+.skill-card,
+.edu-card,
+.contact-link {
+  background: #ffffff;
+  border-color: #dce4ee;
+  box-shadow: 0 16px 40px rgba(24,34,48,0.06);
+}
+
+.skill-card:hover,
+.contact-link:hover {
+  border-color: #9db2ca;
+}
+
+.skill-card-label { color: var(--green); }
+
+.exp-item {
+  border-left-color: #cfd8e5;
+}
+
+.exp-item::before {
+  background: var(--blue);
+  border-color: var(--bg);
+}
+
+.exp-company { color: #101828; }
+
+.cert-badge {
+  background: #ffffff;
+  border-color: #d4deea;
+  color: #465568;
+}
+
+.site-footer {
+  border-top-color: var(--border);
+  background: #ffffff;
+}
+
+.gate-overlay {
+  background: rgba(245,247,251,0.92);
+}
+
+.gate-modal {
+  background: #ffffff;
+  border-color: #dce4ee;
+  border-radius: 16px;
+  padding: 1.15rem;
+  max-width: 380px;
+  max-height: none;
+  overflow-y: visible;
+  box-shadow: 0 28px 80px rgba(24,34,48,0.16);
+}
+
+.gate-logo { color: var(--text2); margin-bottom: 0.75rem; }
+.gate-prompt, .gate-cursor { color: var(--blue); background: var(--blue); }
+.gate-title { color: #101828; font-size: 18px; margin-bottom: 0.25rem; }
+.gate-sub { color: var(--text2); font-size: 12px; line-height: 1.45; margin-bottom: 0.8rem; }
+.gate-field { margin-bottom: 0.65rem; }
+.gate-field label { color: #697586; }
+.gate-field input {
+  padding: 0.58rem 0.75rem;
+  background: #f8fafc;
+  border-color: #dce4ee;
+  color: var(--text);
+}
+.gate-field input:focus { border-color: var(--blue); }
+.gate-error { min-height: 14px; margin-bottom: 0.25rem; }
+.gate-btn {
+  padding: 0.68rem;
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #ffffff;
+}
+.gate-btn:hover { background: #1d4ed8; color: #ffffff; }
+.gate-note { display: none; }
+
+@media (max-width: 980px) {
+  .hero {
+    grid-template-columns: 1fr;
+    padding-top: 3rem;
+  }
+
+  .hero-content {
+    text-align: center;
+    margin-inline: auto;
+  }
+
+  .hero-eyebrow,
+  .hero-tags {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 720px) {
+  .site-header {
+    padding: 0.85rem 1rem;
+    gap: 0.75rem;
+  }
+
+  .header-nav {
+    display: none;
+  }
+
+  .status-pill {
+    font-size: 10px;
+    padding: 4px 9px;
+  }
+
+  .hero {
+    gap: 1.15rem;
+    padding: 1.25rem 1rem 2rem;
+  }
+
+  .hero-name {
+    font-size: clamp(2.3rem, 13vw, 3.25rem);
+    margin-bottom: 0.45rem;
+  }
+
+  .hero-eyebrow {
+    margin-bottom: 0.75rem;
+  }
+
+  .hero-title {
+    line-height: 1.35;
+  }
+
+  .hero-tags {
+    gap: 7px;
+    margin-top: 1rem;
+  }
+
+  .tag {
+    padding: 5px 9px;
+  }
+
+  .messages {
+    height: 400px;
+    padding: 1rem;
+  }
+
+  .bubble {
+    max-width: calc(100vw - 5.5rem);
+  }
+
+  .gate-modal {
+    padding: 0.85rem;
+    max-width: calc(100vw - 2rem);
+  }
+
+  .gate-logo,
+  .gate-note {
+    display: none;
+  }
+
+  .gate-title {
+    font-size: 17px;
+  }
+
+  .gate-sub {
+    font-size: 11.5px;
+    line-height: 1.35;
+    margin-bottom: 0.65rem;
+  }
+
+  .gate-field {
+    margin-bottom: 0.55rem;
+  }
+
+  .gate-field input,
+  .gate-btn {
+    padding: 0.56rem 0.7rem;
+  }
+}
+
+/* ── LEFT-RAIL INTERACTIVE RESUME REDESIGN ── */
+:root {
+  --ink: #07131f;
+  --ink2: #0d1f33;
+  --paper: #f4efe6;
+  --paper2: #fffaf0;
+  --line: #d2c5af;
+  --cobalt: #3d6cf3;
+  --mint: #3dd6a0;
+  --coral: #e86f57;
+  --gold: #d79a2b;
+}
+
+body {
+  background: var(--ink);
+  color: #182230;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(7, 19, 31, 0.92);
+  border-bottom: 1px solid rgba(244, 239, 230, 0.14);
+  box-shadow: none;
+  color: #f7efe2;
+}
+
+.header-logo,
+.header-nav a {
+  color: #f7efe2;
+}
+
+.header-nav a:hover {
+  color: var(--mint);
+}
+
+.status-pill {
+  background: rgba(61, 214, 160, 0.12);
+  border-color: rgba(61, 214, 160, 0.36);
+  color: #a9f2d7;
+}
+
+.portfolio-shell {
+  display: grid;
+  grid-template-columns: minmax(390px, 38vw) minmax(0, 1fr);
+  min-height: calc(100vh - 58px);
+  background:
+    radial-gradient(circle at 7% 12%, rgba(61,108,243,0.22), transparent 28%),
+    linear-gradient(90deg, var(--ink) 0%, var(--ink2) 38%, var(--paper) 38%, var(--paper) 100%);
+}
+
+.chat-rail {
+  position: sticky;
+  top: 58px;
+  height: calc(100vh - 58px);
+  padding: clamp(1rem, 2vw, 1.6rem);
+  display: flex;
+  align-items: stretch;
+  border-right: 1px solid rgba(244, 239, 230, 0.16);
+}
+
+.chat-wrapper {
+  width: 100%;
+  max-width: none;
+}
+
+.chat-window {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: rgba(7, 19, 31, 0.86);
+  border: 1px solid rgba(244, 239, 230, 0.2);
+  border-radius: 0;
+  box-shadow: 0 28px 80px rgba(0,0,0,0.34);
+  backdrop-filter: blur(18px);
+}
+
+.chat-titlebar {
+  flex: 0 0 auto;
+  background: rgba(255, 250, 240, 0.06);
+  border-bottom-color: rgba(244, 239, 230, 0.14);
+}
+
+.titlebar-label,
+.titlebar-right {
+  color: #f7efe2;
+}
+
+.chat-body {
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.messages {
+  min-height: 0;
+  flex: 1;
+  height: auto;
+  background:
+    linear-gradient(180deg, rgba(13,31,51,0.82), rgba(7,19,31,0.94));
+}
+
+.input-area {
+  flex: 0 0 auto;
+  background: rgba(255, 250, 240, 0.06);
+  border-top-color: rgba(244, 239, 230, 0.14);
+}
+
+.input-box {
+  color: #f7efe2;
+}
+
+.input-box::placeholder {
+  color: rgba(247,239,226,0.5);
+}
+
+.bubble.bot {
+  background: #fffaf0;
+  border-color: rgba(255,250,240,0.2);
+  color: #172033;
+}
+
+.bubble.user {
+  background: var(--cobalt);
+  border-color: var(--cobalt);
+}
+
+.gate-overlay {
+  background:
+    linear-gradient(180deg, rgba(7,19,31,0.72), rgba(7,19,31,0.92));
+}
+
+.gate-modal {
+  background: #fffaf0;
+  border-color: rgba(255,250,240,0.22);
+  border-radius: 0;
+  max-width: 410px;
+}
+
+.gate-prompt,
+.gate-cursor,
+.input-prefix {
+  color: var(--coral);
+  background: var(--coral);
+}
+
+.gate-btn,
+.send-btn {
+  background: var(--coral);
+  border-color: var(--coral);
+  color: #fffaf0;
+}
+
+.send-btn:hover,
+.gate-btn:hover {
+  background: #c95742;
+  border-color: #c95742;
+}
+
+.resume-pane {
+  min-width: 0;
+  background:
+    linear-gradient(rgba(7,19,31,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(7,19,31,0.035) 1px, transparent 1px),
+    var(--paper);
+  background-size: 42px 42px;
+  padding: clamp(2rem, 5vw, 5rem);
+}
+
+.resume-pane .hero-content {
+  max-width: 980px;
+  margin: 0 0 3rem;
+  text-align: left;
+}
+
+.hero-eyebrow {
+  color: var(--coral);
+}
+
+.hero-eyebrow::after {
+  background: var(--line);
+}
+
+.hero-name {
+  color: var(--ink);
+  font-size: clamp(3.8rem, 7.2vw, 7rem);
+  line-height: 1.02;
+  max-width: 900px;
+}
+
+.hero-name .accent {
+  color: var(--cobalt);
+}
+
+.hero-title {
+  max-width: 760px;
+  color: #344154;
+  font-size: clamp(1.1rem, 2.2vw, 1.7rem);
+}
+
+.hero-summary {
+  max-width: 650px;
+  margin-top: 1rem;
+  color: #5d4d39;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.hero-tags {
+  justify-content: flex-start;
+}
+
+.tag {
+  appearance: none;
+  cursor: pointer;
+  border-radius: 0;
+  border-color: var(--line);
+  background: rgba(255,250,240,0.72);
+  color: #233143;
+  box-shadow: 4px 4px 0 rgba(7,19,31,0.12);
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+
+.tag:hover,
+.resume-ask:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0 rgba(7,19,31,0.18);
+  border-color: var(--coral);
+}
+
+.tag.green,
+.tag.blue,
+.tag.amber {
+  background: rgba(255,250,240,0.86);
+}
+
+.resume {
+  max-width: 980px;
+  margin: 0;
+  padding: 0;
+}
+
+.section {
+  margin-bottom: 5rem;
+}
+
+.section-header {
+  border-bottom: 2px solid var(--ink);
+  margin-bottom: 1.35rem;
+}
+
+.section-label {
+  color: var(--ink);
+  font-size: 12px;
+}
+
+.section-num {
+  color: var(--coral);
+}
+
+.section-line {
+  background: transparent;
+}
+
+.skills-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.skill-card,
+.edu-card {
+  border-radius: 0;
+  background: rgba(255,250,240,0.72);
+  border: 1px solid var(--line);
+  box-shadow: 7px 7px 0 rgba(7,19,31,0.1);
+}
+
+.skill-card,
+.exp-item,
+.edu-card,
+.cert-badge,
+.exp-bullets li {
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.skill-card:hover,
+.edu-card:hover,
+.exp-item:hover {
+  transform: translate(-3px, -3px);
+  border-color: var(--coral);
+  box-shadow: 11px 11px 0 rgba(7,19,31,0.16);
+}
+
+.skill-card-label,
+.edu-card-school,
+.exp-company {
+  color: var(--ink);
+}
+
+.skill-card-items,
+.edu-card-note,
+.edu-card-meta,
+.exp-bullets,
+.exp-meta,
+.exp-role {
+  color: #4b5870;
+}
+
+.exp-item {
+  padding: 1.2rem 1.3rem 1.2rem 1.6rem;
+  border-left: 4px solid var(--ink);
+  background: rgba(255,250,240,0.52);
+  box-shadow: 7px 7px 0 rgba(7,19,31,0.08);
+}
+
+.exp-item::before {
+  background: var(--coral);
+  border-color: var(--paper);
+  left: -8px;
+}
+
+.exp-bullets li:hover {
+  color: var(--ink);
+  background: rgba(232,111,87,0.12);
+}
+
+.exp-tag {
+  border-radius: 0;
+  border-color: var(--line);
+  background: rgba(255,250,240,0.72);
+}
+
+.cert-badge {
+  border-radius: 0;
+  background: rgba(255,250,240,0.72);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.cert-badge:hover {
+  transform: translate(-2px, -2px);
+  border-color: var(--coral);
+  box-shadow: 6px 6px 0 rgba(7,19,31,0.14);
+}
+
+.contact-link {
+  border-radius: 0;
+  background: rgba(255,250,240,0.72);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.site-footer {
+  display: none;
+}
+
+@media (max-width: 980px) {
+  .portfolio-shell {
+    display: block;
+    background: var(--paper);
+  }
+
+  .chat-rail {
+    position: relative;
+    top: auto;
+    height: min(760px, calc(100vh - 58px));
+    background: var(--ink);
+  }
+
+  .resume-pane {
+    padding: 2rem 1rem 4rem;
+  }
+
+  .resume-pane .hero-content {
+    text-align: center;
+    margin-inline: auto;
+  }
+
+  .hero-tags,
+  .hero-eyebrow {
+    justify-content: center;
+  }
+
+  .hero-name {
+    font-size: clamp(3rem, 16vw, 5.5rem);
+  }
+
+  .skills-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .chat-rail {
+    padding: 0.75rem;
+    height: calc(100vh - 54px);
+  }
+
+  .chat-window,
+  .gate-modal {
+    border-radius: 0;
+  }
+
+  .messages {
+    height: auto;
+  }
+
+  .resume-pane {
+    padding-top: 1.5rem;
+  }
+
+  .hero-summary {
+    font-size: 13px;
+  }
+
+  .section {
+    margin-bottom: 3rem;
+  }
+}
 </style>
 </head>
 <body>
@@ -503,31 +1357,10 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
   <div class="status-pill"><div class="dot"></div> open to opportunities</div>
 </header>
 
-<!-- Hero + Chat -->
-<section class="hero" id="chat">
-  <div class="hero-grid"></div>
-
-  <div class="hero-content">
-    <div class="hero-eyebrow">IT Support Engineer</div>
-    <h1 class="hero-name">Nolan <span class="accent">Kim</span></h1>
-    <p class="hero-title">Identity · Endpoint · SaaS · Automation · 6+ years</p>
-    <div class="hero-tags">
-      <span class="tag green">Okta</span>
-      <span class="tag green">Google Workspace</span>
-      <span class="tag green">Kandji</span>
-      <span class="tag blue">Python</span>
-      <span class="tag blue">Zapier</span>
-      <span class="tag blue">OpenAI API</span>
-      <span class="tag">Jira</span>
-      <span class="tag">Splunk</span>
-      <span class="tag">macOS</span>
-      <span class="tag amber">CompTIA A+</span>
-      <span class="tag amber">Okta Certified</span>
-      <span class="tag amber">ITIL</span>
-    </div>
-  </div>
-
-  <div class="chat-wrapper">
+<!-- Portfolio Workspace -->
+<main class="portfolio-shell">
+  <aside class="chat-rail" id="chat">
+    <div class="chat-wrapper">
     <div class="chat-window">
       <div class="chat-titlebar">
         <div class="titlebar-dots">
@@ -544,7 +1377,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
         <div class="gate-modal">
           <div class="gate-logo"><span class="gate-prompt">~</span> nolan@kim <span class="gate-cursor"></span></div>
           <h2 class="gate-title">Hey, let's talk</h2>
-          <p class="gate-sub">I'm AI Nolan, a virtual version of Nolan. If you're a recruiter, send me a role and I'll pass it straight to the real one — he takes a look at everything that comes through, and he's open to a role that fits. I can also tell you about his experience and skills, walk you through his projects, talk hobbies, or help troubleshoot a tech issue, and if I can't fix it, I'll open a Jira ticket so the real Nolan can jump in within 3 business days, on the house. Once we start, I'll show you exactly how I work under the hood.<br><br>What's your name and email? Just so the real Nolan knows who to get back to.</p>
+          <p class="gate-sub">I'm AI Nolan, Nolan's portfolio bot. I can answer questions about his experience, capture recruiter opportunities, help with basic tech issues, create Jira tickets, and check NAI or REC ticket status.<br><br>What's your name and email? That gives the real Nolan a way to follow up when the chat needs a human.</p>
           <div class="gate-field">
             <label>Name</label>
             <input type="text" id="gateName" placeholder="Jane Smith" autocomplete="name" onkeydown="if(event.key==='Enter')document.getElementById('gateEmail').focus()" />
@@ -569,7 +1402,29 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
       </div>
     </div>
   </div>
-</section>
+  </aside>
+
+  <section class="resume-pane">
+    <div class="hero-content">
+      <div class="hero-eyebrow">IT Support Engineer</div>
+      <h1 class="hero-name">Nolan <span class="accent">Kim</span></h1>
+      <p class="hero-title">Identity · Endpoint · SaaS · Automation · 6+ years</p>
+      <p class="hero-summary">This resume is interactive. Click a skill, role, bullet, school, or certification and AI Nolan will explain how it connects to Nolan's work.</p>
+      <div class="hero-tags">
+        <button class="tag green resume-ask" type="button" data-chat-prompt="Tell me about Nolan's Okta experience.">Okta</button>
+        <button class="tag green resume-ask" type="button" data-chat-prompt="Tell me about Nolan's Google Workspace administration experience.">Google Workspace</button>
+        <button class="tag green resume-ask" type="button" data-chat-prompt="Tell me about Nolan's Kandji and endpoint management experience.">Kandji</button>
+        <button class="tag blue resume-ask" type="button" data-chat-prompt="Tell me about Nolan's Python scripting and automation experience.">Python</button>
+        <button class="tag blue resume-ask" type="button" data-chat-prompt="Tell me about Nolan's Zapier automation work.">Zapier</button>
+        <button class="tag blue resume-ask" type="button" data-chat-prompt="Tell me about Nolan's OpenAI API projects.">OpenAI API</button>
+        <button class="tag resume-ask" type="button" data-chat-prompt="Tell me about Nolan's Jira and Jira Service Management experience.">Jira</button>
+        <button class="tag resume-ask" type="button" data-chat-prompt="Tell me about Nolan's Splunk diagnostic experience.">Splunk</button>
+        <button class="tag resume-ask" type="button" data-chat-prompt="Tell me about Nolan's macOS support and endpoint experience.">macOS</button>
+        <button class="tag amber resume-ask" type="button" data-chat-prompt="Tell me about Nolan's CompTIA A+ certification.">CompTIA A+</button>
+        <button class="tag amber resume-ask" type="button" data-chat-prompt="Tell me about Nolan's Okta certification.">Okta Certified</button>
+        <button class="tag amber resume-ask" type="button" data-chat-prompt="Tell me about Nolan's ITIL background.">ITIL</button>
+      </div>
+    </div>
 
 <!-- Skills -->
 <div class="resume">
@@ -710,14 +1565,16 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
       <div class="section-line"></div>
       <span class="section-num">04</span>
     </div>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:1rem">Feel free to reach out directly or chat with Aria above — she'll pass your message along.</p>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:1rem">Reach out directly or use AI Nolan on the left — he'll pass along recruiter leads, support tickets, and anything that needs the real Nolan.</p>
     <div class="contact-row">
       <a href="mailto:noki21@protonmail.com" class="contact-link">✉ noki21@protonmail.com</a>
       <a href="https://linkedin.com/in/no-ki/" target="_blank" class="contact-link">↗ linkedin.com/in/no-ki</a>
-      <a href="#chat" class="contact-link">⌘ chat with aria</a>
+      <a href="#chat" class="contact-link">⌘ chat with AI Nolan</a>
     </div>
   </section>
 </div>
+</section>
+</main>
 
 <footer class="site-footer">
   <span style="color:var(--green)">nolan kim</span> · fresno, ca · built with OpenAI + Zapier
@@ -760,6 +1617,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
   let supportFired = false;   // true once a SUPPORT ticket exists — prevents dup support tickets; later support logs comment on it
   let sending = false;       // true while a send is in flight — blocks double-submits
   let lookupTicketKey = '';   // remembers the last ticket key a visitor mentioned
+  let pendingResumePrompt = ''; // resume clicks before the gate opens are sent after sign-in
 
   // --- Tab-close logging ----------------------------------------------------
   // The 15s idle timer might not have fired yet when someone closes the tab, so
@@ -819,6 +1677,11 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
     document.getElementById('gateOverlay').style.display = 'none';
     startChat();
     document.getElementById('msgInput').focus();
+    if (pendingResumePrompt) {
+      const prompt = pendingResumePrompt;
+      pendingResumePrompt = '';
+      setTimeout(() => askChat(prompt), 250);
+    }
   }
 
   // --- Start the conversation -----------------------------------------------
@@ -833,13 +1696,13 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
     supportFired = false;
     conversationMessages = [];
     const firstName = config.name.split(' ')[0];
-    const greeting = `Hey ${firstName}! I'm AI Nolan, a working demo of Nolan's support automation stack and a quick way to get to know him.
+    const greeting = `Hey ${firstName}! I'm AI Nolan: a portfolio chatbot that shows how Nolan thinks about support, automation, and clean handoffs.
 
-I can answer questions about his IT support, IAM, SaaS admin, endpoint, automation, and systems work; talk through his projects, resume, interests, and contact info; collect recruiter opportunities and pass them to the real Nolan; troubleshoot basic tech issues; create a Jira ticket when something needs a human; and check ticket or recruiter-lead status if you give me a key like NAI-36 or REC-4 from the confirmation email.
+Ask me about his IT support, IAM, SaaS admin, endpoint, and automation experience. You can also hand me a recruiter lead, troubleshoot a basic tech issue, or check a NAI/REC ticket from your confirmation email.
 
-Under the hood, I'm running through a secure Vercel serverless layer with OpenAI, Zapier, and Jira. No API keys live in the browser, and every chat is logged so Nolan can review what came through.
+If something needs the real Nolan, I'll route the right details through Zapier and Jira so he can review it.
 
-So what brings you here today?`;
+What would you like to do?`;
     addBotMessage(greeting);
     conversationMessages.push({ role: 'assistant', content: greeting });
     // Seed the model with the visitor's identity so it never has to ask
@@ -858,6 +1721,63 @@ So what brings you here today?`;
   function autoResize(el) {
     el.style.height = 'auto';
     el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+  }
+
+  function isGateOpen() {
+    const gate = document.getElementById('gateOverlay');
+    return gate && gate.style.display !== 'none';
+  }
+
+  function askChat(prompt) {
+    const input = document.getElementById('msgInput');
+    if (!input || !prompt) return;
+    if (isGateOpen()) {
+      pendingResumePrompt = prompt;
+      const gate = document.getElementById('gateOverlay');
+      if (gate) gate.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const name = document.getElementById('gateName');
+      if (name) name.focus();
+      return;
+    }
+    input.value = prompt;
+    autoResize(input);
+    input.focus();
+    sendMessage();
+  }
+
+  function buildResumePrompt(target) {
+    const explicit = target.getAttribute('data-chat-prompt');
+    if (explicit) return explicit;
+
+    const skillCard = target.closest('.skill-card');
+    if (skillCard) {
+      const label = skillCard.querySelector('.skill-card-label')?.textContent?.trim() || 'this skill area';
+      return `Tell me how Nolan has used ${label} in real work.`;
+    }
+
+    const bullet = target.closest('.exp-bullets li');
+    if (bullet) {
+      const company = bullet.closest('.exp-item')?.querySelector('.exp-company')?.textContent?.trim() || 'this role';
+      return `Can you explain this resume bullet from ${company}: "${bullet.textContent.trim()}"`;
+    }
+
+    const expItem = target.closest('.exp-item');
+    if (expItem) {
+      const company = expItem.querySelector('.exp-company')?.textContent?.trim() || 'this role';
+      const role = expItem.querySelector('.exp-role')?.textContent?.trim() || '';
+      return `Tell me about Nolan's ${role} experience at ${company}.`;
+    }
+
+    const eduCard = target.closest('.edu-card');
+    if (eduCard) {
+      const school = eduCard.querySelector('.edu-card-school')?.textContent?.trim() || 'this education item';
+      return `Tell me about Nolan's ${school} background.`;
+    }
+
+    const cert = target.closest('.cert-badge');
+    if (cert) return `Tell me about Nolan's ${cert.textContent.trim()} certification.`;
+
+    return '';
   }
 
   function escHtml(str) {
@@ -1409,6 +2329,29 @@ So what brings you here today?`;
   window.addEventListener("DOMContentLoaded", function() {
     const n = document.getElementById("gateName");
     if (n) n.focus();
+
+    document.querySelectorAll('.skill-card, .exp-item, .edu-card, .cert-badge, .exp-bullets li').forEach(el => {
+      el.classList.add('resume-ask');
+      el.setAttribute('tabindex', '0');
+      el.setAttribute('role', 'button');
+      el.setAttribute('title', 'Ask AI Nolan about this');
+    });
+
+    document.addEventListener('click', (event) => {
+      const target = event.target.closest('.resume-ask, .skill-card, .exp-item, .edu-card, .cert-badge, .exp-bullets li');
+      if (!target) return;
+      const prompt = buildResumePrompt(target);
+      if (prompt) askChat(prompt);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      const target = event.target.closest('.resume-ask, .skill-card, .exp-item, .edu-card, .cert-badge, .exp-bullets li');
+      if (!target) return;
+      event.preventDefault();
+      const prompt = buildResumePrompt(target);
+      if (prompt) askChat(prompt);
+    });
   });
 </script>
 </body>
