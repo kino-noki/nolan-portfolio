@@ -1,5 +1,5 @@
 const MAX_SESSION_ID_CHARS = 120;
-const TICKET_KEY_RE = /^[A-Z][A-Z0-9]+-\d+$/;
+const TICKET_KEY_RE = /^(NAI|REC)-\d+$/;
 
 function getAllowedOrigins() {
   return [
@@ -35,28 +35,6 @@ function cleanBaseUrl(url) {
   return String(url || '').replace(/\/+$/, '');
 }
 
-function textFromAdf(value) {
-  if (value == null) return '';
-  if (typeof value === 'string') return value;
-  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
-  if (Array.isArray(value)) return value.map(textFromAdf).filter(Boolean).join(' ');
-  if (typeof value === 'object') {
-    const parts = [];
-    if (typeof value.text === 'string') parts.push(value.text);
-    if (typeof value.emailAddress === 'string') parts.push(value.emailAddress);
-    if (typeof value.displayName === 'string') parts.push(value.displayName);
-    if (value.content) parts.push(textFromAdf(value.content));
-    if (value.value) parts.push(textFromAdf(value.value));
-    return parts.filter(Boolean).join(' ');
-  }
-  return '';
-}
-
-function truncate(text, max) {
-  const s = String(text || '').replace(/\s+/g, ' ').trim();
-  return s.length > max ? `${s.slice(0, max - 1)}...` : s;
-}
-
 function escapeJqlString(value) {
   return String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }
@@ -67,11 +45,11 @@ function authHeader(email, token) {
 
 function validateInput(body) {
   const rawTicketKey = String(body.ticket_key || '').trim().toUpperCase();
-  const compactKey = rawTicketKey.match(/^([A-Z][A-Z0-9]*?)(\d+)$/);
+  const compactKey = rawTicketKey.match(/^(NAI|REC)(\d+)$/);
   const ticketKey = compactKey ? `${compactKey[1]}-${compactKey[2]}` : rawTicketKey;
   const sessionId = String(body.session_id || '').trim();
 
-  if (ticketKey && !TICKET_KEY_RE.test(ticketKey)) return { error: 'ticket_key must look like ABC-123' };
+  if (ticketKey && !TICKET_KEY_RE.test(ticketKey)) return { error: 'ticket_key must look like NAI-123 or REC-123' };
   if (!ticketKey && (!sessionId || sessionId.length > MAX_SESSION_ID_CHARS)) {
     return { error: 'ticket_key or session_id is required' };
   }
@@ -86,7 +64,7 @@ function buildJql(sessionId) {
 }
 
 function issueFields() {
-  return ['summary', 'status', 'comment', 'created', 'updated', 'resolution'];
+  return ['summary', 'status', 'created', 'updated', 'resolution', 'project', 'issuetype'];
 }
 
 async function getIssueByKey({ baseUrl, auth, ticketKey }) {
@@ -136,21 +114,16 @@ async function searchIssueBySession({ baseUrl, auth, sessionId }) {
 
 function summarizeIssue(issue) {
   const fields = issue.fields || {};
-  const comments = fields.comment?.comments || [];
-  const latestComment = comments.length ? comments[comments.length - 1] : null;
 
   return {
     key: issue.key,
+    project_key: fields.project?.key || '',
+    issue_type: fields.issuetype?.name || '',
     summary: fields.summary || '',
     status: fields.status?.name || '',
     resolution: fields.resolution?.name || '',
     created: fields.created || '',
-    updated: fields.updated || '',
-    latest_comment: latestComment ? {
-      author: latestComment.author?.displayName || 'Nolan',
-      created: latestComment.created || '',
-      body: truncate(textFromAdf(latestComment.body), 600)
-    } : null
+    updated: fields.updated || ''
   };
 }
 

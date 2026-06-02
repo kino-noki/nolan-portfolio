@@ -833,7 +833,11 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
     supportFired = false;
     conversationMessages = [];
     const firstName = config.name.split(' ')[0];
-    const greeting = `Hey ${firstName}! Before we dive in, here's how I actually work. I'm running on OpenAI's GPT-5.4 and wired into Nolan's automation stack through Zapier. If you're a recruiter, I'll capture the role and send it straight to his inbox. If you've got a tech issue, I'll troubleshoot it with you — and if I can't crack it, Zapier opens a ticket in his personal Jira so he can jump in within 3 business days, on the house. Anything else, I'm happy to talk through his experience, projects, hobbies, or whatever you're curious about. Every chat gets logged so the real Nolan can review it himself.
+    const greeting = `Hey ${firstName}! I'm AI Nolan, a working demo of Nolan's support automation stack and a quick way to get to know him.
+
+I can answer questions about his IT support, IAM, SaaS admin, endpoint, automation, and systems work; talk through his projects, resume, interests, and contact info; collect recruiter opportunities and pass them to the real Nolan; troubleshoot basic tech issues; create a Jira ticket when something needs a human; and check ticket or recruiter-lead status if you give me a key like NAI-36 or REC-4 from the confirmation email.
+
+Under the hood, I'm running through a secure Vercel serverless layer with OpenAI, Zapier, and Jira. No API keys live in the browser, and every chat is logged so Nolan can review what came through.
 
 So what brings you here today?`;
     addBotMessage(greeting);
@@ -860,17 +864,24 @@ So what brings you here today?`;
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
-  function extractTicketKey(text) {
+  function hasTicketLookupIntent(text) {
+    const s = String(text || '').toLowerCase();
+    return /\b(ticket|jira|case|issue|status|update|check|lookup|look up|progress|created|submitted)\b/.test(s);
+  }
+
+  function extractTicketKey(text, allowCompact = false) {
     const s = String(text || '').toUpperCase();
-    const dashed = s.match(/\b[A-Z][A-Z0-9]+-\d+\b/);
+    const dashed = s.match(/\b(?:NAI|REC)-\d+\b/);
     if (dashed) return dashed[0];
-    const compact = s.match(/\b([A-Z][A-Z0-9]*?)(\d+)\b/);
+    if (!allowCompact) return '';
+    const compact = s.match(/\b(NAI|REC)(\d+)\b/);
     return compact ? `${compact[1]}-${compact[2]}` : '';
   }
 
   function isTicketLookup(text) {
     const s = String(text || '').toLowerCase();
-    if (extractTicketKey(s)) return true;
+    const hasIntent = hasTicketLookupIntent(s);
+    if (extractTicketKey(s, hasIntent)) return true;
     return /\b(ticket|jira|case|issue)\b/.test(s) &&
            /\b(status|update|check|look|lookup|progress|created|submitted)\b/.test(s);
   }
@@ -1179,7 +1190,7 @@ So what brings you here today?`;
   }
 
   async function lookupTicket(userText) {
-    const ticketKey = extractTicketKey(userText) || lookupTicketKey;
+    const ticketKey = extractTicketKey(userText, hasTicketLookupIntent(userText)) || lookupTicketKey;
     if (ticketKey) lookupTicketKey = ticketKey;
 
     const res = await fetch('/api/ticket-status', {
@@ -1232,9 +1243,6 @@ So what brings you here today?`;
 
     if (ticket.updated) {
       lines.push(`Last updated: ${new Date(ticket.updated).toLocaleString()}.`);
-    }
-    if (!isRecruiterLead && ticket.latest_comment?.body) {
-      lines.push(`Latest note from ${ticket.latest_comment.author}: ${ticket.latest_comment.body}`);
     }
     return lines.join('\n');
   }
