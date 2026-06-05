@@ -131,7 +131,7 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
 /* ── PORTFOLIO SHELL: sticky chat rail + interactive resume ── */
 .portfolio-shell {
   display: grid;
-  grid-template-columns: clamp(340px, 31vw, 440px) minmax(0, 1fr);
+  grid-template-columns: clamp(380px, 34vw, 500px) minmax(0, 1fr);
   min-height: calc(100vh - 58px);
   position: relative;
   overflow: visible;
@@ -140,9 +140,10 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
 
 .chat-rail {
   position: relative;
-  align-self: start;
-  height: min(760px, calc(100vh - 58px));
-  padding: clamp(1rem, 2vw, 1.6rem);
+  align-self: stretch;
+  min-height: calc(100vh - 58px);
+  height: auto;
+  padding: 0 clamp(1rem, 2vw, 1.6rem);
   display: flex;
   align-items: stretch;
   background: var(--ink);
@@ -240,7 +241,7 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
 }
 
 /* ── CHAT WIDGET ── */
-.chat-wrapper { position: relative; z-index: 1; width: 100%; max-width: 410px; margin: 0 auto; }
+.chat-wrapper { position: relative; z-index: 1; width: 100%; max-width: 460px; height: calc(100vh - 58px); margin: 0 auto; }
 
 .chat-window {
   display: flex;
