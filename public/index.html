@@ -1404,8 +1404,8 @@ leads, support tickets, and anything that needs the real Nolan.</p>
   function settleMesh() {
     let moving = false;
     const speedBoost = Math.min(1, pointer.speed * 28);
-    const followEase = reduceMotion ? 1 : 0.14 + speedBoost * 0.14;
-    const ease = reduceMotion ? 1 : 0.12 + speedBoost * 0.08;
+    const followEase = reduceMotion ? 1 : 0.2 + speedBoost * 0.2;
+    const ease = reduceMotion ? 1 : 0.17 + speedBoost * 0.11;
     const colorEase = reduceMotion ? 1 : 0.075;
 
     if (pointer.active) {
