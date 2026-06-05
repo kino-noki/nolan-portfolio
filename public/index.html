@@ -689,16 +689,16 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
     position: fixed;
     z-index: 70;
     right: 0.75rem;
-    bottom: 0.75rem;
+    top: calc(58px + 0.5rem);
     width: min(430px, calc(100vw - 1.5rem));
-    height: min(680px, calc(100dvh - 6.5rem));
+    height: min(680px, calc(100dvh - 5rem));
     padding: 0;
     border: 0;
     background: transparent;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transform: translateY(18px) scale(0.98);
+    transform: translateY(-18px) scale(0.98);
     transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
   }
 
@@ -825,9 +825,9 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
   }
 
   .chat-rail {
-    inset: auto 0.65rem 0.65rem 0.65rem;
+    inset: calc(54px + 0.5rem) 0.65rem auto 0.65rem;
     width: auto;
-    height: min(680px, calc(100dvh - 5.2rem));
+    height: min(680px, calc(100dvh - 4.5rem));
   }
 
   .chat-window,
