@@ -271,6 +271,10 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
 /* ── CHAT WIDGET ── */
 .chat-wrapper { position: relative; z-index: 1; width: 100%; max-width: none; }
 
+.mobile-resume-cue {
+  display: none;
+}
+
 .chat-window {
   display: flex;
   flex-direction: column;
@@ -473,8 +477,21 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
   transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s, background 0.15s;
 }
 
-.skill-card-label { font-family: var(--font-mono); font-size: 10px; color: var(--heading); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; }
-.skill-card-items { font-size: 13px; color: #4f493f; line-height: 1.7; }
+.skill-card-label {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--heading);
+  letter-spacing: 0;
+  line-height: 1.2;
+  margin-bottom: 0.55rem;
+}
+.skill-card-items {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: #4f493f;
+  line-height: 1.65;
+}
 
 /* Experience */
 .exp-item {
@@ -657,6 +674,37 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
     top: auto;
     height: min(760px, calc(100vh - 58px));
     background: var(--ink);
+    padding-bottom: 4.2rem;
+  }
+
+  .mobile-resume-cue {
+    position: absolute;
+    left: clamp(1rem, 2vw, 1.6rem);
+    right: clamp(1rem, 2vw, 1.6rem);
+    bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.7rem 0.85rem;
+    color: #eee7d8;
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border: 1px solid rgba(120,148,130,0.45);
+    background: rgba(24,37,31,0.9);
+    box-shadow: 5px 5px 0 rgba(7,12,9,0.22);
+  }
+
+  .mobile-resume-cue span {
+    color: #b9c9b9;
+  }
+
+  .mobile-resume-cue strong {
+    color: var(--accent);
+    font-weight: 700;
   }
 
   .resume-pane {
@@ -716,6 +764,13 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
   .chat-rail {
     padding: 0.75rem;
     height: calc(100vh - 54px);
+    padding-bottom: 4rem;
+  }
+
+  .mobile-resume-cue {
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: 0.65rem;
   }
 
   .chat-window,
@@ -851,11 +906,15 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
       </div>
       </div>
     </div>
+    <a class="mobile-resume-cue" href="#resume">
+      <span>Resume continues below</span>
+      <strong>Scroll ↓</strong>
+    </a>
   </div>
   </aside>
 
-  <section class="resume-pane">
-    <canvas class="mesh-canvas" data-mesh-bg="" aria-hidden="true" width="1049" height="3435" style="width: 1049px; height: 3435px;"></canvas>
+  <section class="resume-pane" id="resume">
+    <canvas class="mesh-canvas" data-mesh-bg aria-hidden="true"></canvas>
     <div class="hero-content">
       <div class="hero-eyebrow">IT Support Engineer</div>
       <h1 class="hero-name">Nolan <span class="accent">Kim</span></h1>
