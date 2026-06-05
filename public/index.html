@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nolan Kim — IT Engineer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,600;6..72,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/index.css">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -26,6 +28,7 @@
   --red: #a2514b;
   --font-mono: 'JetBrains Mono', monospace;
   --font-body: 'Inter', sans-serif;
+  --font-display: var(--font-body);
   /* Mushroom + spruce ops theme */
   --ink: #18251f;
   --ink2: #223429;
@@ -40,6 +43,36 @@
   --mint: #789482;
   --coral: #b79a94;
   --shell: #332f28;
+}
+
+body[data-font-theme="plex"] {
+  --font-body: 'IBM Plex Sans', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-display: 'IBM Plex Sans', sans-serif;
+}
+
+body[data-font-theme="atkinson"] {
+  --font-body: 'Atkinson Hyperlegible', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-display: 'Atkinson Hyperlegible', sans-serif;
+}
+
+body[data-font-theme="space"] {
+  --font-body: 'Space Grotesk', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-display: 'Space Grotesk', sans-serif;
+}
+
+body[data-font-theme="editorial"] {
+  --font-body: 'IBM Plex Sans', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-display: 'Newsreader', serif;
+}
+
+body[data-font-theme="home"] {
+  --font-body: 'Atkinson Hyperlegible', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-display: 'Fraunces', serif;
 }
 
 html { scroll-behavior: smooth; }
@@ -137,7 +170,7 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
 .hero-eyebrow::after { content: ''; width: 56px; height: 1px; background: var(--line); }
 
 .hero-name {
-  font-family: var(--font-body);
+  font-family: var(--font-display);
   font-size: clamp(3.8rem, 7.2vw, 7rem);
   font-weight: 700;
   letter-spacing: 0;
@@ -150,7 +183,7 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
 .hero-name .accent { color: var(--accent); }
 
 .hero-title {
-  font-family: var(--font-body);
+  font-family: var(--font-display);
   font-size: clamp(1.1rem, 2.2vw, 1.7rem);
   color: #423f36;
   max-width: 760px;
@@ -1018,6 +1051,14 @@ leads, support tickets, and anything that needs the real Nolan.</p>
 </footer>
 
 <script>
+(() => {
+  const allowedFonts = new Set(['default', 'plex', 'atkinson', 'space', 'editorial', 'home']);
+  const font = new URLSearchParams(window.location.search).get('font') || 'default';
+  if (allowedFonts.has(font)) {
+    document.body.dataset.fontTheme = font;
+  }
+})();
+
 (() => {
   const canvas = document.querySelector('[data-mesh-bg]');
   const resume = canvas?.closest('.resume-pane');
