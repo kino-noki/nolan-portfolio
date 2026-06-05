@@ -766,23 +766,23 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
     z-index: 65;
     display: flex;
     align-items: center;
-    gap: 0.55rem;
-    padding: 0.55rem 0.8rem 0.55rem 0.55rem;
+    gap: 0.4rem;
+    padding: 0.38rem 0.62rem 0.38rem 0.42rem;
     border: 1px solid rgba(238,231,216,0.28);
     border-radius: 999px;
     background: rgba(24,37,31,0.96);
     color: #eee7d8;
     box-shadow: 0 14px 36px rgba(7,12,9,0.34);
     font-family: var(--font-mono);
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.02em;
     cursor: pointer;
   }
 
   .mobile-chat-launcher img {
-    width: 54px;
-    height: 58px;
+    width: 34px;
+    height: 38px;
     border-radius: 0;
     object-fit: contain;
     object-position: center;
@@ -1722,7 +1722,7 @@ What should we look at first?`;
   }
 
   function isMobileChatLayout() {
-    return window.matchMedia('(max-width: 720px)').matches;
+    return window.matchMedia('(max-width: 960px)').matches;
   }
 
   function openMobileChat() {
