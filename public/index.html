@@ -826,7 +826,7 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
         <div class="gate-modal">
           <div class="gate-logo"><span class="gate-prompt">~</span> nolan@kim <span class="gate-cursor"></span></div>
           <h2 class="gate-title" id="gateTitle">Hey, let's talk</h2>
-          <p class="gate-sub" id="gateSub">I'm AI Nolan, Nolan's portfolio bot. Ask about his support background, IAM/SaaS work, endpoint tooling, automation projects, ticket systems, or how he approaches messy IT problems.<br><br>You can start with your name and email, or skip for now and chat anonymously. If I need to create a support ticket, I'll ask for contact details then.</p>
+          <p class="gate-sub" id="gateSub">I'm AI Nolan, a public recreation of Nolan's DRI triage chatbot, adapted for recruiters and hiring managers. This version does not include the internal knowledge base, but it can talk through his support background, IAM/SaaS work, endpoint tooling, automation projects, ticket systems, and how he approaches messy IT problems.<br><br>You can start with your name and email, or skip for now and chat anonymously. If I need to create a support ticket, I'll ask for contact details then.</p>
           <div class="gate-field">
             <label>Name</label>
             <input type="text" id="gateName" placeholder="Jane Smith" autocomplete="name" onkeydown="if(event.key==='Enter')document.getElementById('gateEmail').focus()">
@@ -1469,7 +1469,7 @@ leads, support tickets, and anything that needs the real Nolan.</p>
       skip.style.display = 'none';
     } else {
       title.textContent = "Hey, let's talk";
-      sub.innerHTML = "I'm AI Nolan, Nolan's portfolio bot. Ask about his support background, IAM/SaaS work, endpoint tooling, automation projects, ticket systems, or how he approaches messy IT problems.<br><br>You can start with your name and email, or skip for now and chat anonymously. If I need to create a support ticket, I'll ask for contact details then.";
+      sub.innerHTML = "I'm AI Nolan, a public recreation of Nolan's DRI triage chatbot, adapted for recruiters and hiring managers. This version does not include the internal knowledge base, but it can talk through his support background, IAM/SaaS work, endpoint tooling, automation projects, ticket systems, and how he approaches messy IT problems.<br><br>You can start with your name and email, or skip for now and chat anonymously. If I need to create a support ticket, I'll ask for contact details then.";
       btn.textContent = 'Start chatting →';
       skip.style.display = '';
     }
@@ -1562,7 +1562,7 @@ leads, support tickets, and anything that needs the real Nolan.</p>
     chatStarted = true;
     conversationMessages = [];
     const firstName = config.name && config.name !== 'Anonymous' ? config.name.split(' ')[0] : 'there';
-    const greeting = `Hey ${firstName}! I'm AI Nolan: Nolan's portfolio chatbot for IT support, IAM, SaaS administration, endpoint tooling, automation, and practical troubleshooting.
+    const greeting = `Hey ${firstName}! I'm AI Nolan: a public recreation of Nolan's DRI triage chatbot, adapted for recruiters and hiring managers. This version does not include DRI's internal knowledge base, but it shows the same support automation idea in a public resume-friendly way.
 
 Here are a few useful things I can do:
 
