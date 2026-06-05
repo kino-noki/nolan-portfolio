@@ -1,0 +1,2358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nolan Kim — IT Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0a0b;
+  --bg2: #111114;
+  --bg3: #18181c;
+  --bg4: #1e1e24;
+  --border: #2a2a32;
+  --border2: #3a3a45;
+  --text: #e8e8f0;
+  --text2: #9090a8;
+  --text3: #5a5a70;
+  --green: #00d97e;
+  --green-dim: #00d97e22;
+  --green-border: #00d97e44;
+  --blue: #4d9eff;
+  --blue-dim: #4d9eff18;
+  --amber: #ffb347;
+  --amber-dim: #ffb34718;
+  --red: #ff5f5f;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-body: 'Inter', sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 15px; line-height: 1.6; min-height: 100vh; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+/* ── HEADER ── */
+.site-header {
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(10,10,11,0.92);
+  backdrop-filter: blur(12px);
+}
+
+.header-logo {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-logo .prompt { color: var(--green); }
+.header-logo .cursor { display: inline-block; width: 8px; height: 14px; background: var(--green); animation: blink 1.2s step-end infinite; margin-left: 2px; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+.header-nav { display: flex; gap: 2rem; align-items: center; }
+.header-nav a { font-family: var(--font-mono); font-size: 12px; color: var(--text3); text-decoration: none; text-transform: uppercase; letter-spacing: 0.08em; transition: color 0.15s; }
+.header-nav a:hover { color: var(--green); }
+
+.status-pill { display: flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 11px; color: var(--green); background: var(--green-dim); border: 1px solid var(--green-border); border-radius: 20px; padding: 4px 12px; }
+.status-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(0.85)} }
+
+/* ── HERO / CHAT SECTION ── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 50% at 50% 0%, #00d97e0a 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.hero-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--green);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.hero-eyebrow::before, .hero-eyebrow::after {
+  content: '';
+  width: 32px;
+  height: 1px;
+  background: var(--green-border);
+}
+
+.hero-name {
+  font-family: var(--font-mono);
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-bottom: 0.75rem;
+  color: var(--text);
+}
+
+.hero-name .accent { color: var(--green); }
+
+.hero-title {
+  font-family: var(--font-mono);
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
+  color: var(--text2);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.02em;
+}
+
+.hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 4px 10px;
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  color: var(--text3);
+  background: var(--bg3);
+}
+
+.tag.green { color: var(--green); border-color: var(--green-border); background: var(--green-dim); }
+.tag.blue { color: var(--blue); border-color: #4d9eff44; background: var(--blue-dim); }
+.tag.amber { color: var(--amber); border-color: #ffb34744; background: var(--amber-dim); }
+
+/* ── CHAT WIDGET ── */
+.chat-wrapper {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 720px;
+}
+
+.chat-window {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 60px rgba(0,217,126,0.06), 0 24px 80px rgba(0,0,0,0.6);
+}
+
+.chat-titlebar {
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.titlebar-dots { display: flex; gap: 6px; }
+.titlebar-dots span { width: 12px; height: 12px; border-radius: 50%; }
+.titlebar-dots span:nth-child(1) { background: #ff5f57; }
+.titlebar-dots span:nth-child(2) { background: #febc2e; }
+.titlebar-dots span:nth-child(3) { background: #28c840; }
+
+.titlebar-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text3);
+  margin-left: 4px;
+}
+
+.titlebar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--green);
+}
+
+.titlebar-right .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+
+.chat-body { position: relative; }
+.messages {
+  height: 420px;
+  overflow-y: auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  scroll-behavior: smooth;
+}
+
+.messages::-webkit-scrollbar { width: 3px; }
+.messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.msg-row { display: flex; gap: 10px; align-items: flex-end; animation: fadeUp 0.2s ease forwards; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.msg-row.user { flex-direction: row-reverse; }
+
+.msg-avatar {
+  width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+}
+
+.msg-avatar.bot { background: var(--green-dim); border: 1px solid var(--green-border); color: var(--green); }
+.msg-avatar.user { background: var(--bg4); border: 1px solid var(--border2); color: var(--text2); }
+
+.bubble {
+  max-width: 480px; padding: 0.65rem 0.9rem; border-radius: 8px;
+  font-size: 13.5px; line-height: 1.65;
+}
+
+.bubble.bot {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-bottom-left-radius: 3px; color: var(--text);
+  font-family: var(--font-body);
+}
+
+.bubble.user {
+  background: var(--bg4); border: 1px solid var(--border2);
+  border-bottom-right-radius: 3px; color: var(--text2);
+  font-family: var(--font-mono); font-size: 13px;
+}
+
+.bubble.ticket {
+  background: #ff5f5f10; border: 1px solid #ff5f5f33; border-left: 2px solid var(--red);
+}
+
+.bubble.recruited {
+  background: var(--green-dim); border: 1px solid var(--green-border); border-left: 2px solid var(--green);
+}
+
+.ticket-id { font-family: var(--font-mono); font-size: 11px; color: var(--red); font-weight: 500; }
+.recruit-id { font-family: var(--font-mono); font-size: 11px; color: var(--green); font-weight: 500; }
+
+.history-divider {
+  text-align: center; font-size: 11px; font-family: var(--font-mono);
+  color: var(--text3); padding: 0.25rem 0; letter-spacing: 0.06em;
+}
+
+.typing { display: flex; align-items: center; gap: 4px; padding: 0.65rem 0.9rem; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; border-bottom-left-radius: 3px; width: fit-content; }
+.typing span { width: 5px; height: 5px; background: var(--green); border-radius: 50%; animation: bounce 1.2s infinite; opacity: 0.5; }
+.typing span:nth-child(2) { animation-delay: 0.2s; }
+.typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce { 0%,60%,100%{transform:translateY(0);opacity:0.4} 30%{transform:translateY(-4px);opacity:1} }
+
+.input-area {
+  border-top: 1px solid var(--border);
+  padding: 0.75rem 1rem;
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  background: var(--bg3);
+}
+
+.input-prefix { font-family: var(--font-mono); font-size: 13px; color: var(--green); padding-bottom: 0.6rem; flex-shrink: 0; }
+
+.input-box {
+  flex: 1; background: transparent; border: none; outline: none;
+  font-family: var(--font-mono); font-size: 13px; color: var(--text);
+  resize: none; line-height: 1.5; max-height: 100px; padding: 0.5rem 0;
+}
+
+.input-box::placeholder { color: var(--text3); }
+.input-box:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.send-btn {
+  width: 34px; height: 34px; border-radius: 6px; background: var(--green-dim);
+  border: 1px solid var(--green-border); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s; flex-shrink: 0;
+}
+
+.send-btn:hover { background: var(--green); }
+.send-btn:hover svg { stroke: var(--bg); }
+.send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.send-btn svg { width: 14px; height: 14px; fill: none; stroke: var(--green); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ── RESUME SECTIONS ── */
+.resume { max-width: 900px; margin: 0 auto; padding: 5rem 2rem; }
+
+.section { margin-bottom: 4rem; }
+
+.section-header {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 1.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-label {
+  font-family: var(--font-mono); font-size: 11px; color: var(--green);
+  text-transform: uppercase; letter-spacing: 0.12em;
+}
+
+.section-line { flex: 1; height: 1px; background: var(--border); }
+.section-num { font-family: var(--font-mono); font-size: 10px; color: var(--text3); }
+
+/* Skills grid */
+.skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+
+.skill-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 1rem 1.25rem;
+  transition: border-color 0.15s;
+}
+
+.skill-card:hover { border-color: var(--border2); }
+.skill-card-label { font-family: var(--font-mono); font-size: 10px; color: var(--green); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; }
+.skill-card-items { font-size: 13px; color: var(--text2); line-height: 1.7; }
+
+/* Experience */
+.exp-item { margin-bottom: 2.5rem; padding-left: 1.5rem; border-left: 1px solid var(--border); position: relative; }
+.exp-item::before { content: ''; position: absolute; left: -4px; top: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--green); border: 2px solid var(--bg); }
+
+.exp-header { margin-bottom: 0.5rem; }
+.exp-company { font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--text); }
+.exp-role { font-size: 13px; color: var(--text2); margin-top: 2px; }
+.exp-meta { display: flex; gap: 12px; margin-top: 4px; }
+.exp-tag { font-family: var(--font-mono); font-size: 10px; padding: 2px 8px; border-radius: 3px; }
+.exp-tag.date { color: var(--text3); background: var(--bg3); border: 1px solid var(--border); }
+.exp-tag.ft { color: var(--green); background: var(--green-dim); border: 1px solid var(--green-border); }
+.exp-tag.contract { color: var(--amber); background: var(--amber-dim); border: 1px solid #ffb34744; }
+.exp-tag.remote { color: var(--blue); background: var(--blue-dim); border: 1px solid #4d9eff44; }
+
+.exp-bullets { margin-top: 0.75rem; list-style: none; }
+.exp-bullets li { font-size: 13px; color: var(--text2); line-height: 1.7; padding: 0.2rem 0; padding-left: 1rem; position: relative; }
+.exp-bullets li::before { content: '›'; position: absolute; left: 0; color: var(--green); font-family: var(--font-mono); }
+
+/* Education & certs */
+.edu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+
+.edu-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem;
+}
+
+.edu-card-school { font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 0.25rem; }
+.edu-card-degree { font-size: 13px; color: var(--text2); margin-bottom: 0.5rem; }
+.edu-card-meta { font-family: var(--font-mono); font-size: 11px; color: var(--text3); }
+.edu-card-note { font-size: 12px; color: var(--text3); margin-top: 0.5rem; line-height: 1.5; border-top: 1px solid var(--border); padding-top: 0.5rem; }
+
+.cert-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.cert-badge {
+  font-family: var(--font-mono); font-size: 12px;
+  padding: 6px 14px; border-radius: 6px;
+  background: var(--bg3); border: 1px solid var(--border2); color: var(--text2);
+}
+
+/* Contact / Footer */
+.contact-row {
+  display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1rem;
+}
+
+.contact-link {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono); font-size: 12px; color: var(--text2);
+  text-decoration: none; padding: 8px 14px;
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.contact-link:hover { border-color: var(--green); color: var(--green); }
+
+.site-footer {
+  border-top: 1px solid var(--border); padding: 2rem;
+  text-align: center; font-family: var(--font-mono); font-size: 11px; color: var(--text3);
+}
+
+/* Modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center; z-index: 200; backdrop-filter: blur(4px); }
+.modal {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 2.5rem; width: 480px; max-width: 92vw;
+  animation: fadeUp 0.2s ease;
+  box-shadow: 0 0 80px rgba(0,217,126,0.08), 0 32px 80px rgba(0,0,0,0.7);
+}
+.modal-title { font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 0.25rem; }
+.modal-sub { font-size: 13px; color: var(--text2); margin-bottom: 1.5rem; }
+.field { margin-bottom: 1rem; }
+.field label { display: block; font-family: var(--font-mono); font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.4rem; }
+.field input {
+  width: 100%; padding: 0.6rem 0.9rem; background: var(--bg3);
+  border: 1px solid var(--border); border-radius: 6px;
+  font-family: var(--font-mono); font-size: 13px; color: var(--text); outline: none;
+  transition: border-color 0.15s;
+}
+.field input:focus { border-color: var(--green); }
+.field input::placeholder { color: var(--text3); }
+.modal-btn {
+  width: 100%; padding: 0.7rem; background: var(--green-dim);
+  border: 1px solid var(--green-border); border-radius: 6px;
+  font-family: var(--font-mono); font-size: 13px; color: var(--green);
+  cursor: pointer; margin-top: 0.5rem; transition: background 0.15s;
+}
+.modal-btn:hover { background: var(--green); color: var(--bg); }
+
+/* ── GATE MODAL ── */
+.gate-overlay {
+  position: absolute; inset: 0; z-index: 20;
+  background: rgba(17,17,20,0.96);
+  backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.5rem;
+}
+.gate-modal {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem 1.4rem;
+  width: 100%; max-width: 400px;
+  max-height: 92%; overflow-y: auto;
+  animation: gateIn 0.3s ease;
+}
+@keyframes gateIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+.gate-logo { font-family: var(--font-mono); font-size: 13px; color: var(--text2); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 6px; }
+.gate-prompt { color: var(--green); }
+.gate-cursor { display: inline-block; width: 7px; height: 13px; background: var(--green); animation: blink 1.2s step-end infinite; }
+.gate-title { font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 0.4rem; }
+.gate-sub { font-size: 12.5px; color: var(--text2); line-height: 1.55; margin-bottom: 1.25rem; }
+.gate-field { margin-bottom: 1rem; }
+.gate-field label { display: block; font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text3); margin-bottom: 0.4rem; }
+.gate-field input {
+  width: 100%; padding: 0.7rem 0.9rem;
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 8px;
+  font-family: var(--font-mono); font-size: 13.5px; color: var(--text); outline: none;
+  transition: border-color 0.15s;
+}
+.gate-field input:focus { border-color: var(--green); }
+.gate-field input::placeholder { color: var(--text3); }
+.gate-field input.invalid { border-color: var(--red); }
+.gate-error { font-family: var(--font-mono); font-size: 12px; color: var(--red); min-height: 16px; margin-bottom: 0.5rem; }
+.gate-btn {
+  width: 100%; padding: 0.8rem;
+  background: var(--green-dim); border: 1px solid var(--green-border); border-radius: 8px;
+  font-family: var(--font-mono); font-size: 14px; font-weight: 500; color: var(--green);
+  cursor: pointer; transition: background 0.15s, color 0.15s;
+}
+.gate-btn:hover { background: var(--green); color: var(--bg); }
+.gate-note { font-family: var(--font-mono); font-size: 11px; color: var(--text3); text-align: center; margin-top: 1rem; }
+
+/* ── REFINED PORTFOLIO REDESIGN ── */
+:root {
+  --bg: #f5f7fb;
+  --bg2: #ffffff;
+  --bg3: #f0f3f8;
+  --bg4: #e6edf5;
+  --border: #d8e0ea;
+  --border2: #bac7d6;
+  --text: #182230;
+  --text2: #526171;
+  --text3: #788596;
+  --green: #0a8f6a;
+  --green-dim: #e4f7f1;
+  --green-border: #93d8c0;
+  --blue: #2563eb;
+  --blue-dim: #e8efff;
+  --amber: #b7791f;
+  --amber-dim: #fff4dc;
+  --red: #c2413a;
+}
+
+body {
+  background:
+    linear-gradient(180deg, #ffffff 0%, #f5f7fb 38%, #eef3f8 100%);
+  color: var(--text);
+}
+
+::-webkit-scrollbar-track { background: #edf2f7; }
+::-webkit-scrollbar-thumb { background: #b7c3d0; }
+
+.site-header {
+  border-bottom: 1px solid rgba(216,224,234,0.9);
+  background: rgba(255,255,255,0.86);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.9), 0 12px 40px rgba(31,42,55,0.06);
+}
+
+.header-logo {
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.header-logo .cursor { height: 12px; border-radius: 1px; }
+.header-nav a { letter-spacing: 0.04em; color: #697586; }
+.header-nav a:hover { color: var(--blue); }
+
+.status-pill {
+  color: #095c48;
+  background: var(--green-dim);
+  border-color: var(--green-border);
+  border-radius: 999px;
+}
+
+.hero {
+  min-height: calc(100vh - 58px);
+  display: grid;
+  grid-template-columns: minmax(300px, 0.86fr) minmax(400px, 1.14fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: center;
+  justify-content: center;
+  padding: clamp(3rem, 7vw, 6rem) clamp(1.25rem, 5vw, 5rem);
+  overflow: visible;
+}
+
+.hero::before { display: none; }
+
+.hero-grid {
+  background-image:
+    linear-gradient(rgba(37,99,235,0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(10,143,106,0.055) 1px, transparent 1px);
+  background-size: 52px 52px;
+  opacity: 0.75;
+  mask-image: linear-gradient(to bottom, black 0%, transparent 88%);
+}
+
+.hero-content {
+  text-align: left;
+  margin: 0;
+  max-width: 620px;
+}
+
+.hero-eyebrow {
+  justify-content: flex-start;
+  color: var(--blue);
+  letter-spacing: 0.08em;
+  margin-bottom: 1rem;
+}
+
+.hero-eyebrow::before { display: none; }
+.hero-eyebrow::after { width: 56px; background: #b8c7dc; }
+
+.hero-name {
+  font-family: var(--font-body);
+  font-size: clamp(3rem, 6vw, 5.75rem);
+  letter-spacing: 0;
+  line-height: 0.96;
+  color: #101828;
+}
+
+.hero-name .accent { color: var(--blue); }
+
+.hero-title {
+  font-family: var(--font-body);
+  color: var(--text2);
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  max-width: 640px;
+  line-height: 1.55;
+}
+
+.hero-tags {
+  justify-content: flex-start;
+  gap: 10px;
+  margin-top: 1.75rem;
+}
+
+.tag {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #465568;
+  border-color: #d4deea;
+  padding: 6px 11px;
+  box-shadow: 0 8px 24px rgba(31,42,55,0.05);
+}
+
+.tag.green { color: #087154; background: var(--green-dim); }
+.tag.blue { color: #1d4ed8; background: var(--blue-dim); }
+.tag.amber { color: #8a5a13; background: var(--amber-dim); }
+
+.chat-wrapper { max-width: 780px; }
+
+.chat-window {
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(186,199,214,0.9);
+  border-radius: 18px;
+  box-shadow: 0 28px 90px rgba(24,34,48,0.14), 0 2px 0 rgba(255,255,255,0.85) inset;
+  backdrop-filter: blur(18px);
+}
+
+.chat-titlebar {
+  background: linear-gradient(180deg, #ffffff, #f4f7fb);
+  border-bottom-color: var(--border);
+  padding: 0.9rem 1rem;
+}
+
+.titlebar-dots span { width: 10px; height: 10px; }
+.titlebar-label { color: #536273; font-weight: 600; }
+.titlebar-right { color: var(--green); font-weight: 600; }
+
+.messages {
+  height: 430px;
+  padding: 1.25rem;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.78), rgba(244,247,251,0.86));
+}
+
+.msg-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  font-family: var(--font-body);
+}
+
+.msg-avatar.bot {
+  background: #e8efff;
+  border-color: #b8c7f4;
+  color: var(--blue);
+}
+
+.msg-avatar.user {
+  background: #eef3f8;
+  border-color: #d3dce7;
+  color: #526171;
+}
+
+.bubble {
+  max-width: min(560px, calc(100vw - 7rem));
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.62;
+  box-shadow: 0 10px 24px rgba(24,34,48,0.06);
+}
+
+.bubble.bot {
+  background: #ffffff;
+  border-color: #dce4ee;
+  border-bottom-left-radius: 5px;
+}
+
+.bubble.user {
+  background: #182230;
+  border-color: #182230;
+  border-bottom-right-radius: 5px;
+  color: #ffffff;
+  font-family: var(--font-body);
+}
+
+.bubble.ticket {
+  background: #fff8f0;
+  border-color: #f3cf98;
+  border-left-color: var(--amber);
+}
+
+.bubble.recruited {
+  background: var(--green-dim);
+  border-color: var(--green-border);
+}
+
+.ticket-id { color: var(--amber); }
+.recruit-id { color: var(--green); }
+
+.typing {
+  background: #ffffff;
+  border-color: #dce4ee;
+}
+
+.input-area {
+  background: #ffffff;
+  border-top-color: var(--border);
+  padding: 0.95rem 1rem;
+}
+
+.input-prefix { color: var(--blue); }
+.input-box { color: var(--text); font-family: var(--font-body); }
+
+.send-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background: var(--blue);
+  border-color: var(--blue);
+  box-shadow: 0 10px 24px rgba(37,99,235,0.22);
+}
+
+.send-btn svg { stroke: #ffffff; }
+.send-btn:hover { background: #1d4ed8; }
+.send-btn:hover svg { stroke: #ffffff; }
+
+.resume {
+  max-width: 1080px;
+  padding: 5rem clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.section {
+  margin-bottom: 4.5rem;
+}
+
+.section-header {
+  border-bottom-color: var(--border);
+}
+
+.section-label {
+  color: var(--blue);
+  letter-spacing: 0.08em;
+}
+
+.skill-card,
+.edu-card,
+.contact-link {
+  background: #ffffff;
+  border-color: #dce4ee;
+  box-shadow: 0 16px 40px rgba(24,34,48,0.06);
+}
+
+.skill-card:hover,
+.contact-link:hover {
+  border-color: #9db2ca;
+}
+
+.skill-card-label { color: var(--green); }
+
+.exp-item {
+  border-left-color: #cfd8e5;
+}
+
+.exp-item::before {
+  background: var(--blue);
+  border-color: var(--bg);
+}
+
+.exp-company { color: #101828; }
+
+.cert-badge {
+  background: #ffffff;
+  border-color: #d4deea;
+  color: #465568;
+}
+
+.site-footer {
+  border-top-color: var(--border);
+  background: #ffffff;
+}
+
+.gate-overlay {
+  background: rgba(245,247,251,0.92);
+}
+
+.gate-modal {
+  background: #ffffff;
+  border-color: #dce4ee;
+  border-radius: 16px;
+  padding: 1.15rem;
+  max-width: 380px;
+  max-height: none;
+  overflow-y: visible;
+  box-shadow: 0 28px 80px rgba(24,34,48,0.16);
+}
+
+.gate-logo { color: var(--text2); margin-bottom: 0.75rem; }
+.gate-prompt, .gate-cursor { color: var(--blue); background: var(--blue); }
+.gate-title { color: #101828; font-size: 18px; margin-bottom: 0.25rem; }
+.gate-sub { color: var(--text2); font-size: 12px; line-height: 1.45; margin-bottom: 0.8rem; }
+.gate-field { margin-bottom: 0.65rem; }
+.gate-field label { color: #697586; }
+.gate-field input {
+  padding: 0.58rem 0.75rem;
+  background: #f8fafc;
+  border-color: #dce4ee;
+  color: var(--text);
+}
+.gate-field input:focus { border-color: var(--blue); }
+.gate-error { min-height: 14px; margin-bottom: 0.25rem; }
+.gate-btn {
+  padding: 0.68rem;
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #ffffff;
+}
+.gate-btn:hover { background: #1d4ed8; color: #ffffff; }
+.gate-note { display: none; }
+
+@media (max-width: 980px) {
+  .hero {
+    grid-template-columns: 1fr;
+    padding-top: 3rem;
+  }
+
+  .hero-content {
+    text-align: center;
+    margin-inline: auto;
+  }
+
+  .hero-eyebrow,
+  .hero-tags {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 720px) {
+  .site-header {
+    padding: 0.85rem 1rem;
+    gap: 0.75rem;
+  }
+
+  .header-nav {
+    display: none;
+  }
+
+  .status-pill {
+    font-size: 10px;
+    padding: 4px 9px;
+  }
+
+  .hero {
+    gap: 1.15rem;
+    padding: 1.25rem 1rem 2rem;
+  }
+
+  .hero-name {
+    font-size: clamp(2.3rem, 13vw, 3.25rem);
+    margin-bottom: 0.45rem;
+  }
+
+  .hero-eyebrow {
+    margin-bottom: 0.75rem;
+  }
+
+  .hero-title {
+    line-height: 1.35;
+  }
+
+  .hero-tags {
+    gap: 7px;
+    margin-top: 1rem;
+  }
+
+  .tag {
+    padding: 5px 9px;
+  }
+
+  .messages {
+    height: 400px;
+    padding: 1rem;
+  }
+
+  .bubble {
+    max-width: calc(100vw - 5.5rem);
+  }
+
+  .gate-modal {
+    padding: 0.85rem;
+    max-width: calc(100vw - 2rem);
+  }
+
+  .gate-logo,
+  .gate-note {
+    display: none;
+  }
+
+  .gate-title {
+    font-size: 17px;
+  }
+
+  .gate-sub {
+    font-size: 11.5px;
+    line-height: 1.35;
+    margin-bottom: 0.65rem;
+  }
+
+  .gate-field {
+    margin-bottom: 0.55rem;
+  }
+
+  .gate-field input,
+  .gate-btn {
+    padding: 0.56rem 0.7rem;
+  }
+}
+
+/* ── LEFT-RAIL INTERACTIVE RESUME REDESIGN ── */
+:root {
+  --ink: #07131f;
+  --ink2: #0d1f33;
+  --paper: #f4efe6;
+  --paper2: #fffaf0;
+  --line: #d2c5af;
+  --cobalt: #3d6cf3;
+  --mint: #3dd6a0;
+  --coral: #e86f57;
+  --gold: #d79a2b;
+}
+
+body {
+  background: var(--ink);
+  color: #182230;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(7, 19, 31, 0.92);
+  border-bottom: 1px solid rgba(244, 239, 230, 0.14);
+  box-shadow: none;
+  color: #f7efe2;
+}
+
+.header-logo,
+.header-nav a {
+  color: #f7efe2;
+}
+
+.header-nav a:hover {
+  color: var(--mint);
+}
+
+.status-pill {
+  background: rgba(61, 214, 160, 0.12);
+  border-color: rgba(61, 214, 160, 0.36);
+  color: #a9f2d7;
+}
+
+.portfolio-shell {
+  display: grid;
+  grid-template-columns: minmax(390px, 38vw) minmax(0, 1fr);
+  min-height: calc(100vh - 58px);
+  background:
+    radial-gradient(circle at 7% 12%, rgba(61,108,243,0.22), transparent 28%),
+    linear-gradient(90deg, var(--ink) 0%, var(--ink2) 38%, var(--paper) 38%, var(--paper) 100%);
+}
+
+.chat-rail {
+  position: sticky;
+  top: 58px;
+  height: calc(100vh - 58px);
+  padding: clamp(1rem, 2vw, 1.6rem);
+  display: flex;
+  align-items: stretch;
+  border-right: 1px solid rgba(244, 239, 230, 0.16);
+}
+
+.chat-wrapper {
+  width: 100%;
+  max-width: none;
+}
+
+.chat-window {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: rgba(7, 19, 31, 0.86);
+  border: 1px solid rgba(244, 239, 230, 0.2);
+  border-radius: 0;
+  box-shadow: 0 28px 80px rgba(0,0,0,0.34);
+  backdrop-filter: blur(18px);
+}
+
+.chat-titlebar {
+  flex: 0 0 auto;
+  background: rgba(255, 250, 240, 0.06);
+  border-bottom-color: rgba(244, 239, 230, 0.14);
+}
+
+.titlebar-label,
+.titlebar-right {
+  color: #f7efe2;
+}
+
+.chat-body {
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.messages {
+  min-height: 0;
+  flex: 1;
+  height: auto;
+  background:
+    linear-gradient(180deg, rgba(13,31,51,0.82), rgba(7,19,31,0.94));
+}
+
+.input-area {
+  flex: 0 0 auto;
+  background: rgba(255, 250, 240, 0.06);
+  border-top-color: rgba(244, 239, 230, 0.14);
+}
+
+.input-box {
+  color: #f7efe2;
+}
+
+.input-box::placeholder {
+  color: rgba(247,239,226,0.5);
+}
+
+.bubble.bot {
+  background: #fffaf0;
+  border-color: rgba(255,250,240,0.2);
+  color: #172033;
+}
+
+.bubble.user {
+  background: var(--cobalt);
+  border-color: var(--cobalt);
+}
+
+.gate-overlay {
+  background:
+    linear-gradient(180deg, rgba(7,19,31,0.72), rgba(7,19,31,0.92));
+}
+
+.gate-modal {
+  background: #fffaf0;
+  border-color: rgba(255,250,240,0.22);
+  border-radius: 0;
+  max-width: 410px;
+}
+
+.gate-prompt,
+.gate-cursor,
+.input-prefix {
+  color: var(--coral);
+  background: var(--coral);
+}
+
+.gate-btn,
+.send-btn {
+  background: var(--coral);
+  border-color: var(--coral);
+  color: #fffaf0;
+}
+
+.send-btn:hover,
+.gate-btn:hover {
+  background: #c95742;
+  border-color: #c95742;
+}
+
+.resume-pane {
+  min-width: 0;
+  background:
+    linear-gradient(rgba(7,19,31,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(7,19,31,0.035) 1px, transparent 1px),
+    var(--paper);
+  background-size: 42px 42px;
+  padding: clamp(2rem, 5vw, 5rem);
+}
+
+.resume-pane .hero-content {
+  max-width: 980px;
+  margin: 0 0 3rem;
+  text-align: left;
+}
+
+.hero-eyebrow {
+  color: var(--coral);
+}
+
+.hero-eyebrow::after {
+  background: var(--line);
+}
+
+.hero-name {
+  color: var(--ink);
+  font-size: clamp(3.8rem, 7.2vw, 7rem);
+  line-height: 1.02;
+  max-width: 900px;
+}
+
+.hero-name .accent {
+  color: var(--cobalt);
+}
+
+.hero-title {
+  max-width: 760px;
+  color: #344154;
+  font-size: clamp(1.1rem, 2.2vw, 1.7rem);
+}
+
+.hero-summary {
+  max-width: 650px;
+  margin-top: 1rem;
+  color: #5d4d39;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.hero-tags {
+  justify-content: flex-start;
+}
+
+.tag {
+  appearance: none;
+  cursor: pointer;
+  border-radius: 0;
+  border-color: var(--line);
+  background: rgba(255,250,240,0.72);
+  color: #233143;
+  box-shadow: 4px 4px 0 rgba(7,19,31,0.12);
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+
+.tag:hover,
+.resume-ask:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0 rgba(7,19,31,0.18);
+  border-color: var(--coral);
+}
+
+.tag.green,
+.tag.blue,
+.tag.amber {
+  background: rgba(255,250,240,0.86);
+}
+
+.resume {
+  max-width: 980px;
+  margin: 0;
+  padding: 0;
+}
+
+.section {
+  margin-bottom: 5rem;
+}
+
+.section-header {
+  border-bottom: 2px solid var(--ink);
+  margin-bottom: 1.35rem;
+}
+
+.section-label {
+  color: var(--ink);
+  font-size: 12px;
+}
+
+.section-num {
+  color: var(--coral);
+}
+
+.section-line {
+  background: transparent;
+}
+
+.skills-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.skill-card,
+.edu-card {
+  border-radius: 0;
+  background: rgba(255,250,240,0.72);
+  border: 1px solid var(--line);
+  box-shadow: 7px 7px 0 rgba(7,19,31,0.1);
+}
+
+.skill-card,
+.exp-item,
+.edu-card,
+.cert-badge,
+.exp-bullets li {
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.skill-card:hover,
+.edu-card:hover,
+.exp-item:hover {
+  transform: translate(-3px, -3px);
+  border-color: var(--coral);
+  box-shadow: 11px 11px 0 rgba(7,19,31,0.16);
+}
+
+.skill-card-label,
+.edu-card-school,
+.exp-company {
+  color: var(--ink);
+}
+
+.skill-card-items,
+.edu-card-note,
+.edu-card-meta,
+.exp-bullets,
+.exp-meta,
+.exp-role {
+  color: #4b5870;
+}
+
+.exp-item {
+  padding: 1.2rem 1.3rem 1.2rem 1.6rem;
+  border-left: 4px solid var(--ink);
+  background: rgba(255,250,240,0.52);
+  box-shadow: 7px 7px 0 rgba(7,19,31,0.08);
+}
+
+.exp-item::before {
+  background: var(--coral);
+  border-color: var(--paper);
+  left: -8px;
+}
+
+.exp-bullets li:hover {
+  color: var(--ink);
+  background: rgba(232,111,87,0.12);
+}
+
+.exp-tag {
+  border-radius: 0;
+  border-color: var(--line);
+  background: rgba(255,250,240,0.72);
+}
+
+.cert-badge {
+  border-radius: 0;
+  background: rgba(255,250,240,0.72);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.cert-badge:hover {
+  transform: translate(-2px, -2px);
+  border-color: var(--coral);
+  box-shadow: 6px 6px 0 rgba(7,19,31,0.14);
+}
+
+.contact-link {
+  border-radius: 0;
+  background: rgba(255,250,240,0.72);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.site-footer {
+  display: none;
+}
+
+@media (max-width: 980px) {
+  .portfolio-shell {
+    display: block;
+    background: var(--paper);
+  }
+
+  .chat-rail {
+    position: relative;
+    top: auto;
+    height: min(760px, calc(100vh - 58px));
+    background: var(--ink);
+  }
+
+  .resume-pane {
+    padding: 2rem 1rem 4rem;
+  }
+
+  .resume-pane .hero-content {
+    text-align: center;
+    margin-inline: auto;
+  }
+
+  .hero-tags,
+  .hero-eyebrow {
+    justify-content: center;
+  }
+
+  .hero-name {
+    font-size: clamp(3rem, 16vw, 5.5rem);
+  }
+
+  .skills-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .chat-rail {
+    padding: 0.75rem;
+    height: calc(100vh - 54px);
+  }
+
+  .chat-window,
+  .gate-modal {
+    border-radius: 0;
+  }
+
+  .messages {
+    height: auto;
+  }
+
+  .resume-pane {
+    padding-top: 1.5rem;
+  }
+
+  .hero-summary {
+    font-size: 13px;
+  }
+
+  .section {
+    margin-bottom: 3rem;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="site-header">
+  <div class="header-logo">
+    <span class="prompt">~</span>
+    <span>nolan@kim</span>
+    <span class="cursor"></span>
+  </div>
+  <nav class="header-nav">
+    <a href="#chat">chat</a>
+    <a href="#skills">skills</a>
+    <a href="#experience">experience</a>
+    <a href="#education">education</a>
+    <a href="#contact">contact</a>
+  </nav>
+  <div class="status-pill"><div class="dot"></div> open to opportunities</div>
+</header>
+
+<!-- Portfolio Workspace -->
+<main class="portfolio-shell">
+  <aside class="chat-rail" id="chat">
+    <div class="chat-wrapper">
+    <div class="chat-window">
+      <div class="chat-titlebar">
+        <div class="titlebar-dots">
+          <span></span><span></span><span></span>
+        </div>
+        <span class="titlebar-label">nolan kim — live chat</span>
+        <div class="titlebar-right">
+          <div class="dot"></div>
+          nolan online
+        </div>
+      </div>
+      <div class="chat-body">
+      <div class="gate-overlay" id="gateOverlay">
+        <div class="gate-modal">
+          <div class="gate-logo"><span class="gate-prompt">~</span> nolan@kim <span class="gate-cursor"></span></div>
+          <h2 class="gate-title">Hey, let's talk</h2>
+          <p class="gate-sub">I'm AI Nolan, Nolan's portfolio bot. I can answer questions about his experience, capture recruiter opportunities, help with basic tech issues, create Jira tickets, and check NAI or REC ticket status.<br><br>What's your name and email? That gives the real Nolan a way to follow up when the chat needs a human.</p>
+          <div class="gate-field">
+            <label>Name</label>
+            <input type="text" id="gateName" placeholder="Jane Smith" autocomplete="name" onkeydown="if(event.key==='Enter')document.getElementById('gateEmail').focus()" />
+          </div>
+          <div class="gate-field">
+            <label>Email</label>
+            <input type="email" id="gateEmail" placeholder="jane@company.com" autocomplete="email" onkeydown="if(event.key==='Enter')submitGate()" />
+          </div>
+          <div class="gate-error" id="gateError"></div>
+          <button class="gate-btn" id="gateBtn" onclick="submitGate()">Start chatting &rarr;</button>
+          <p class="gate-note">The real Nolan can review conversations submitted here.</p>
+        </div>
+      </div>
+      <div class="messages" id="messages"></div>
+      <div class="input-area">
+        <span class="input-prefix">›</span>
+        <textarea class="input-box" id="msgInput" rows="1" placeholder="ask me anything..." onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+          <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+      </div>
+    </div>
+  </div>
+  </aside>
+
+  <section class="resume-pane">
+    <div class="hero-content">
+      <div class="hero-eyebrow">IT Support Engineer</div>
+      <h1 class="hero-name">Nolan <span class="accent">Kim</span></h1>
+      <p class="hero-title">Identity · Endpoint · SaaS · Automation · 6+ years</p>
+      <p class="hero-summary">This resume is interactive. Click a skill, role, bullet, school, or certification and AI Nolan will explain how it connects to Nolan's work.</p>
+      <div class="hero-tags">
+        <button class="tag green resume-ask" type="button" data-chat-prompt="Tell me about Nolan's Okta experience.">Okta</button>
+        <button class="tag green resume-ask" type="button" data-chat-prompt="Tell me about Nolan's Google Workspace administration experience.">Google Workspace</button>
+        <button class="tag green resume-ask" type="button" data-chat-prompt="Tell me about Nolan's Kandji and endpoint management experience.">Kandji</button>
+        <button class="tag blue resume-ask" type="button" data-chat-prompt="Tell me about Nolan's Python scripting and automation experience.">Python</button>
+        <button class="tag blue resume-ask" type="button" data-chat-prompt="Tell me about Nolan's Zapier automation work.">Zapier</button>
+        <button class="tag blue resume-ask" type="button" data-chat-prompt="Tell me about Nolan's OpenAI API projects.">OpenAI API</button>
+        <button class="tag resume-ask" type="button" data-chat-prompt="Tell me about Nolan's Jira and Jira Service Management experience.">Jira</button>
+        <button class="tag resume-ask" type="button" data-chat-prompt="Tell me about Nolan's Splunk diagnostic experience.">Splunk</button>
+        <button class="tag resume-ask" type="button" data-chat-prompt="Tell me about Nolan's macOS support and endpoint experience.">macOS</button>
+        <button class="tag amber resume-ask" type="button" data-chat-prompt="Tell me about Nolan's CompTIA A+ certification.">CompTIA A+</button>
+        <button class="tag amber resume-ask" type="button" data-chat-prompt="Tell me about Nolan's Okta certification.">Okta Certified</button>
+        <button class="tag amber resume-ask" type="button" data-chat-prompt="Tell me about Nolan's ITIL background.">ITIL</button>
+      </div>
+    </div>
+
+<!-- Skills -->
+<div class="resume">
+  <section class="section" id="skills">
+    <div class="section-header">
+      <span class="section-label">Skills</span>
+      <div class="section-line"></div>
+      <span class="section-num">01</span>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-card">
+        <div class="skill-card-label">SaaS & Collaboration</div>
+        <div class="skill-card-items">Google Workspace, Google Admin Console, Azure, Microsoft 365, Slack, Zoom, GitHub, Asana, Atlassian Confluence</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-label">ITSM & Support</div>
+        <div class="skill-card-items">Jira, Jira Service Management, Salesforce, ServiceNow</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-label">Identity & Access</div>
+        <div class="skill-card-items">Okta, Active Directory, Microsoft Entra ID / Azure AD, SAML, OAuth/OIDC, SCIM, MFA, RBAC</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-label">Endpoint & Security</div>
+        <div class="skill-card-items">Kandji, Iru, Jamf Pro, Microsoft Intune, Sophos</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-label">Diagnostics & Logging</div>
+        <div class="skill-card-items">Splunk Cloud, SAML Tracer</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-label">Operating Systems</div>
+        <div class="skill-card-items">macOS, iOS, Windows, Windows Server, Linux, Android, ChromeOS</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-label">Automation & Scripting</div>
+        <div class="skill-card-items">Okta Workflows, Slack Workflow Builder, Zapier, OpenAI API, Python, PowerShell, Bash, JavaScript, Node.js, SQL</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Experience -->
+  <section class="section" id="experience">
+    <div class="section-header">
+      <span class="section-label">Experience</span>
+      <div class="section-line"></div>
+      <span class="section-num">02</span>
+    </div>
+
+    <div class="exp-item">
+      <div class="exp-header">
+        <div class="exp-company">Calbright College</div>
+        <div class="exp-role">IT Support Engineer</div>
+        <div class="exp-meta">
+          <span class="exp-tag date">July 2024 – Present</span>
+          <span class="exp-tag ft">Full Time</span>
+          <span class="exp-tag remote">Remote</span>
+        </div>
+      </div>
+      <ul class="exp-bullets">
+        <li>One of four primary L2 support contacts in a state-funded educational startup, supporting ~180 staff and a student base that grew from 4,000 to ~7,800 users</li>
+        <li>Administered Google Workspace at scale — user/group management, org units, shared drives, email routing, licensing, security controls via Google Admin Console</li>
+        <li>Managed identity lifecycle in Okta as the central platform for provisioning, RBAC, SSO (SAML/OIDC), SCIM, onboarding/offboarding, and SaaS access — built automations with Okta Workflows and API scripts</li>
+        <li>Managed endpoint lifecycle across Jamf Pro, Kandji, Iru, Intune, and Google Admin Console — supported Jamf to Kandji migration, handled provisioning, config profiles, app deployment, and compliance</li>
+        <li>Used Splunk Cloud, API responses, and config review for root cause analysis; partnered with engineering and vendors on repeatable fixes and knowledge base documentation</li>
+        <li>Supported a full domain migration across email, SSO, and SaaS integrations in Okta, Azure, Google Workspace, Jira, Confluence, Slack, and Zoom</li>
+      </ul>
+    </div>
+
+    <div class="exp-item">
+      <div class="exp-header">
+        <div class="exp-company">DRI Inc.</div>
+        <div class="exp-role">IT Support Specialist & System Administrator Consultant</div>
+        <div class="exp-meta">
+          <span class="exp-tag date">August 2018 – July 2024</span>
+          <span class="exp-tag contract">Contract / Part Time</span>
+        </div>
+      </div>
+      <ul class="exp-bullets">
+        <li>Sole IT contact for 120+ users across three branches in insurance and disaster restoration — built and owned all IT support and sysadmin from the ground up</li>
+        <li>Deployed and maintained Windows/Linux servers, branch network infrastructure, and endpoint fleets using Intune and OpenVPN for remote access</li>
+        <li>Built Python scripts to automate HR-driven identity provisioning, onboarding/offboarding, and SSO access across platforms</li>
+        <li>Built an internal AI support agent using the OpenAI API and Zapier that automated Jira case creation and reduced basic ticket volume by 46%</li>
+        <li>Implemented Jira as the primary ticketing system; reduced onboarding time by 3 hours per user through documentation and workflow improvements</li>
+      </ul>
+    </div>
+
+    <div class="exp-item">
+      <div class="exp-header">
+        <div class="exp-company">Keck Medical Center of USC</div>
+        <div class="exp-role">IT Helpdesk Analyst II</div>
+        <div class="exp-meta">
+          <span class="exp-tag date">May 2021 – July 2023</span>
+          <span class="exp-tag ft">Full Time</span>
+          <span class="exp-tag remote">Remote</span>
+        </div>
+      </div>
+      <ul class="exp-bullets">
+        <li>First point of contact for 10,000+ staff in a large-scale healthcare environment — resolved issues across Windows/macOS, SSO, Google Workspace, AD, Office 365, Citrix, Cerner, Azure Intune, and mobile</li>
+        <li>Maintained HIPAA-compliant handling of user and system information throughout</li>
+        <li>Managed incidents, P2/P3 escalations, ticket queues, and knowledge base documentation in ServiceNow</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Education -->
+  <section class="section" id="education">
+    <div class="section-header">
+      <span class="section-label">Education & Certifications</span>
+      <div class="section-line"></div>
+      <span class="section-num">03</span>
+    </div>
+    <div class="edu-grid" style="margin-bottom:1.5rem">
+      <div class="edu-card">
+        <div class="edu-card-school">École 42 Silicon Valley</div>
+        <div class="edu-card-degree">BASc Computer Science — France RNCP Level 6</div>
+        <div class="edu-card-meta">November 2018 – March 2022</div>
+        <div class="edu-card-note">~1.1% acceptance rate. Project-based engineering in C, JavaScript, Python, and C# covering systems programming, algorithms, UNIX/Linux, networking, and OOP.</div>
+      </div>
+      <div class="edu-card">
+        <div class="edu-card-school">2016 FIRST Robotics</div>
+        <div class="edu-card-degree">3rd Place — 50+ competitors</div>
+        <div class="edu-card-meta">Engineering & Programming</div>
+        <div class="edu-card-note">Built and programmed ball scooping and launching mechanisms for a competition robot designed to navigate rough terrain.</div>
+      </div>
+    </div>
+    <div class="cert-list">
+      <span class="cert-badge">CompTIA A+</span>
+      <span class="cert-badge">Okta Certified Professional</span>
+      <span class="cert-badge">ITIL Foundation</span>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section class="section" id="contact">
+    <div class="section-header">
+      <span class="section-label">Contact</span>
+      <div class="section-line"></div>
+      <span class="section-num">04</span>
+    </div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:1rem">Reach out directly or use AI Nolan on the left — he'll pass along recruiter leads, support tickets, and anything that needs the real Nolan.</p>
+    <div class="contact-row">
+      <a href="mailto:noki21@protonmail.com" class="contact-link">✉ noki21@protonmail.com</a>
+      <a href="https://linkedin.com/in/no-ki/" target="_blank" class="contact-link">↗ linkedin.com/in/no-ki</a>
+      <a href="#chat" class="contact-link">⌘ chat with AI Nolan</a>
+    </div>
+  </section>
+</div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <span style="color:var(--green)">nolan kim</span> · fresno, ca · built with OpenAI + Zapier
+</footer>
+
+<script>
+  // ==========================================================================
+  //  AI NOLAN CHATBOT — front-end controller
+  // --------------------------------------------------------------------------
+  //  Talks to two serverless endpoints, never to OpenAI or Zapier directly:
+  //    /api/chat           → sends the conversation, gets AI Nolan's JSON reply
+  //    /api/forward        → relays event payloads (ticket / recruiter_lead / log) to Zapier
+  //    /api/ticket-status  → reads a matching Jira ticket for status checks
+  //  No secrets live in this file. Sections below: state → events → UI helpers
+  //  → networking → parsing → logging → main send loop.
+  // ==========================================================================
+
+  // --- Conversation state ---------------------------------------------------
+  // All chat state lives in plain variables (no framework needed for one widget).
+  //  config            visitor identity from the gate; reused in every payload so
+  //                    Nolan always knows who to follow up with.
+  //  conversationMessages  full history — resent every call because the model is
+  //                    stateless and this is the only way it keeps context.
+  //  attempt           failed support turns. Starts at -1 so the FIRST reply
+  //                    counts as attempt 0; we escalate at >=2 (i.e. the 3rd
+  //                    unsolved turn) rather than giving up too early.
+  //  currentMode       support/recruitment/general — decides the log's "type"
+  //                    and whether the attempt counter should climb.
+  //  idleTimer + lastLoggedCount  power the debounce: only log after a pause,
+  //                    and only if the conversation actually changed.
+  let config = { name: '', email: '', sessionId: '' };
+  let conversationMessages = [];
+  let attempt = 0;   // genuine troubleshooting attempts the bot has made (support)
+  let messageCount = 0;
+  let currentMode = '';
+  let idleTimer = null;
+  let lastLoggedCount = 0;  // message_count at last successful log
+  let lastSentIndex = 0;    // index into conversationMessages already sent in a comment
+  let recruiterFired = false; // true once a recruiter_lead has fired — prevents duplicate leads
+  let supportFired = false;   // true once a SUPPORT ticket exists — prevents dup support tickets; later support logs comment on it
+  let sending = false;       // true while a send is in flight — blocks double-submits
+  let lookupTicketKey = '';   // remembers the last ticket key a visitor mentioned
+  let pendingResumePrompt = ''; // resume clicks before the gate opens are sent after sign-in
+
+  // --- Tab-close logging ----------------------------------------------------
+  // The 15s idle timer might not have fired yet when someone closes the tab, so
+  // this is the safety net that guarantees every conversation gets logged. We
+  // skip it if nothing changed since the last log (no point sending a duplicate),
+  // and logConversation uses sendBeacon precisely because a normal fetch would be
+  // killed mid-flight by the browser as the page unloads.
+  // Fire full conversation log on tab close if not already sent
+  window.addEventListener('beforeunload', () => {
+    cancelIdleLog();
+    // On close: always log the final state to the chat-log case. If a ticket exists,
+    // send 'ongoing' so it also comments on the ticket; otherwise 'final'.
+    if (conversationMessages.length > 2 && messageCount !== lastLoggedCount) {
+      logConversation((supportFired || recruiterFired) ? 'ongoing' : 'final');
+    }
+  });
+
+  // --- Session id -----------------------------------------------------------
+  // One id per conversation (timestamp + random). It tags every payload so Zapier
+  // can treat all logs from one chat as the same record — without it, an updating
+  // log would create a brand-new Jira issue on every fire.
+  function generateSessionId() {
+    return 'sess-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
+  }
+
+  // --- Gate: capture name + email before chatting ---------------------------
+  // We collect identity up front rather than letting the bot ask, for two reasons:
+  // it guarantees we always have follow-up contact details (even if the visitor
+  // bails after one message), and it keeps the conversation itself focused on
+  // their actual question. Email is regex-checked so a typo'd address doesn't
+  // silently make replies undeliverable.
+  function submitGate() {
+    const nameEl = document.getElementById('gateName');
+    const emailEl = document.getElementById('gateEmail');
+    const errEl = document.getElementById('gateError');
+    const name = nameEl.value.trim();
+    const email = emailEl.value.trim();
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+    nameEl.classList.remove('invalid');
+    emailEl.classList.remove('invalid');
+
+    if (!name) {
+      errEl.textContent = 'Please enter your name.';
+      nameEl.classList.add('invalid'); nameEl.focus();
+      return;
+    }
+    if (!email || !emailOk) {
+      errEl.textContent = 'Please enter a valid email address.';
+      emailEl.classList.add('invalid'); emailEl.focus();
+      return;
+    }
+
+    errEl.textContent = '';
+    config.name = name;
+    config.email = email;
+    document.getElementById('gateOverlay').style.display = 'none';
+    startChat();
+    document.getElementById('msgInput').focus();
+    if (pendingResumePrompt) {
+      const prompt = pendingResumePrompt;
+      pendingResumePrompt = '';
+      setTimeout(() => askChat(prompt), 250);
+    }
+  }
+
+  // --- Start the conversation -----------------------------------------------
+  // Resets state and shows the greeting. The key trick: we push a hidden system
+  // note carrying the visitor's name/email into the history, so the model treats
+  // those as already-known and never re-asks. That note is internal plumbing, so
+  // buildTranscript strips it before anything is logged or emailed.
+  function startChat() {
+    config.sessionId = generateSessionId();
+    attempt = 0; messageCount = 0; lastSentIndex = 0;
+    recruiterFired = false;
+    supportFired = false;
+    conversationMessages = [];
+    const firstName = config.name.split(' ')[0];
+    const greeting = `Hey ${firstName}! I'm AI Nolan: a portfolio chatbot that shows how Nolan thinks about support, automation, and clean handoffs.
+
+Ask me about his IT support, IAM, SaaS admin, endpoint, and automation experience. You can also hand me a recruiter lead, troubleshoot a basic tech issue, or check a NAI/REC ticket from your confirmation email.
+
+If something needs the real Nolan, I'll route the right details through Zapier and Jira so he can review it.
+
+What would you like to do?`;
+    addBotMessage(greeting);
+    conversationMessages.push({ role: 'assistant', content: greeting });
+    // Seed the model with the visitor's identity so it never has to ask
+    conversationMessages.push({ role: 'user', content: `[system note: the visitor's name is ${config.name} and their email is ${config.email}. Do not ask for these again. Greet them and help.]` });
+    conversationMessages.push({ role: 'assistant', content: 'Understood.' });
+  }
+
+  // --- Small UI helpers -----------------------------------------------------
+  // Enter-to-send (Shift+Enter for newline) matches chat-app muscle memory;
+  // auto-grow keeps long messages readable; escHtml prevents user text from being
+  // interpreted as markup (basic XSS hygiene since we set innerHTML).
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  }
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+  }
+
+  function isGateOpen() {
+    const gate = document.getElementById('gateOverlay');
+    return gate && gate.style.display !== 'none';
+  }
+
+  function askChat(prompt) {
+    const input = document.getElementById('msgInput');
+    if (!input || !prompt) return;
+    if (isGateOpen()) {
+      pendingResumePrompt = prompt;
+      const gate = document.getElementById('gateOverlay');
+      if (gate) gate.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const name = document.getElementById('gateName');
+      if (name) name.focus();
+      return;
+    }
+    input.value = prompt;
+    autoResize(input);
+    input.focus();
+    sendMessage();
+  }
+
+  function buildResumePrompt(target) {
+    const explicit = target.getAttribute('data-chat-prompt');
+    if (explicit) return explicit;
+
+    const skillCard = target.closest('.skill-card');
+    if (skillCard) {
+      const label = skillCard.querySelector('.skill-card-label')?.textContent?.trim() || 'this skill area';
+      return `Tell me how Nolan has used ${label} in real work.`;
+    }
+
+    const bullet = target.closest('.exp-bullets li');
+    if (bullet) {
+      const company = bullet.closest('.exp-item')?.querySelector('.exp-company')?.textContent?.trim() || 'this role';
+      return `Can you explain this resume bullet from ${company}: "${bullet.textContent.trim()}"`;
+    }
+
+    const expItem = target.closest('.exp-item');
+    if (expItem) {
+      const company = expItem.querySelector('.exp-company')?.textContent?.trim() || 'this role';
+      const role = expItem.querySelector('.exp-role')?.textContent?.trim() || '';
+      return `Tell me about Nolan's ${role} experience at ${company}.`;
+    }
+
+    const eduCard = target.closest('.edu-card');
+    if (eduCard) {
+      const school = eduCard.querySelector('.edu-card-school')?.textContent?.trim() || 'this education item';
+      return `Tell me about Nolan's ${school} background.`;
+    }
+
+    const cert = target.closest('.cert-badge');
+    if (cert) return `Tell me about Nolan's ${cert.textContent.trim()} certification.`;
+
+    return '';
+  }
+
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function hasTicketLookupIntent(text) {
+    const s = String(text || '').toLowerCase();
+    return /\b(ticket|jira|case|issue|status|update|check|lookup|look up|progress|created|submitted)\b/.test(s);
+  }
+
+  function extractTicketKey(text, allowCompact = false) {
+    const s = String(text || '').toUpperCase();
+    const dashed = s.match(/\b(?:NAI|REC)-\d+\b/);
+    if (dashed) return dashed[0];
+    if (!allowCompact) return '';
+    const compact = s.match(/\b(NAI|REC)(\d+)\b/);
+    return compact ? `${compact[1]}-${compact[2]}` : '';
+  }
+
+  function isTicketLookup(text) {
+    const s = String(text || '').toLowerCase();
+    const hasIntent = hasTicketLookupIntent(s);
+    if (extractTicketKey(s, hasIntent)) return true;
+    return /\b(ticket|jira|case|issue)\b/.test(s) &&
+           /\b(status|update|check|look|lookup|progress|created|submitted)\b/.test(s);
+  }
+
+  // --- Render messages ------------------------------------------------------
+  // addBotMessage/addUserMessage append bubbles. The optional badge ("ticket
+  // submitted", "details sent") gives the visitor visible confirmation that the
+  // automation actually fired. The typing dots exist to mask model latency — a
+  // few seconds of silence reads as "broken", a few seconds of dots reads as
+  // "thinking".
+  function addBotMessage(text, type = 'normal', badge = null) {
+    const msgs = document.getElementById('messages');
+    const row = document.createElement('div');
+    row.className = 'msg-row bot';
+    let cls = 'bubble bot';
+    if (type === 'ticket') cls += ' ticket';
+    if (type === 'recruited') cls += ' recruited';
+    let content = escHtml(text).replace(/\n/g, '<br>');
+    if (badge) {
+      const badgeCls = type === 'recruited' ? 'recruit-id' : 'ticket-id';
+      content += `<br><br><span class="${badgeCls}">${escHtml(badge)}</span>`;
+    }
+    row.innerHTML = `<div class="msg-avatar bot">NK</div><div class="${cls}">${content}</div>`;
+    msgs.appendChild(row);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function addUserMessage(text) {
+    const msgs = document.getElementById('messages');
+    const initials = config.name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase() || 'U';
+    const row = document.createElement('div');
+    row.className = 'msg-row user';
+    row.innerHTML = `<div class="msg-avatar user">${initials}</div><div class="bubble user">${escHtml(text).replace(/\n/g,'<br>')}</div>`;
+    msgs.appendChild(row);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function showTyping() {
+    const msgs = document.getElementById('messages');
+    const row = document.createElement('div');
+    row.className = 'msg-row bot'; row.id = 'typingRow';
+    row.innerHTML = `<div class="msg-avatar bot">NK</div><div class="typing"><span></span><span></span><span></span></div>`;
+    msgs.appendChild(row);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function removeTyping() {
+    const t = document.getElementById('typingRow');
+    if (t) t.remove();
+  }
+
+  // --- Track conversation mode ----------------------------------------------
+  // The model tells us the mode each turn. We reset the attempt counter when
+  // leaving support so that, e.g., a recruiter chat that later turns into a
+  // support question doesn't inherit stale "attempts" and escalate immediately.
+  function setMode(mode) {
+    if (currentMode === 'support' && mode !== 'support') attempt = 0;
+    currentMode = mode;
+  }
+
+  // --- Send an event to Zapier (via /api/forward) ---------------------------
+  // One sender for all three event types. sendBeacon is tried first because it's
+  // the only reliable way to send during tab-close (the browser guarantees
+  // delivery of a beacon even as the page dies); keepalive fetch is the fallback
+  // for normal sends. It's fire-and-forget on purpose — the visitor should never
+  // wait on, or see an error from, background logging.
+  // Sends a payload to Zapier via /api/forward.
+  //  critical=false (logs): fire-and-forget. Uses sendBeacon when possible so it
+  //    survives tab close; we don't care about the result. Always resolves true.
+  //  critical=true (ticket / recruiter_lead): we MUST know if it landed, so we
+  //    use a real fetch, await the result, and return true/false. A beacon can't
+  //    report success, so it's never used for critical events.
+  async function fireZapier(_unused, payload, critical = false) {
+    const body = JSON.stringify(payload);
+
+    if (!critical) {
+      try {
+        if (navigator.sendBeacon) {
+          const blob = new Blob([body], { type: 'application/json' });
+          if (navigator.sendBeacon('/api/forward', blob)) {
+            console.log('Forwarded to Zapier (beacon):', payload.event);
+            return true;
+          }
+        }
+        await fetch('/api/forward', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body,
+          keepalive: true
+        });
+        console.log('Forwarded to Zapier (fetch):', payload.event);
+        return true;
+      } catch (e) {
+        console.warn('Background forward failed (non-critical):', e.message);
+        return false;
+      }
+    }
+
+    // Critical path: verify it actually reached Zapier.
+    try {
+      const res = await fetch('/api/forward', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.ok) {
+        console.log('Forwarded to Zapier (verified):', payload.event);
+        return true;
+      }
+      console.error('Zapier forward rejected:', data.error || res.status);
+      return false;
+    } catch (e) {
+      console.error('Zapier forward failed:', e.message);
+      return false;
+    }
+  }
+
+  // Robustly turn the model's response into {mode,label,reply,...}.
+  // Falls back to extracting just the reply text if JSON is malformed or truncated,
+  // so raw JSON never leaks into the chat.
+  // --- Robustly parse the model's JSON --------------------------------------
+  // Even with JSON mode, a reply can occasionally arrive malformed or truncated.
+  // A naive JSON.parse would throw and we'd dump raw braces into the chat (a real
+  // bug we hit). So this degrades gracefully: strict parse → regex-extract just
+  // the reply text → friendly fallback message. The visitor always sees prose.
+  function parseModelResponse(raw) {
+    // Try strict JSON first
+    try {
+      const p = JSON.parse(raw);
+      if (p && typeof p === 'object' && typeof p.reply === 'string') return normalizeParsed(p);
+    } catch (e) {}
+
+    // Try to recover JSON if there's surrounding text or a code fence
+    const fenced = raw.match(/\{[\s\S]*\}/);
+    if (fenced) {
+      try {
+        const p = JSON.parse(fenced[0]);
+        if (p && typeof p === 'object' && typeof p.reply === 'string') return normalizeParsed(p);
+      } catch (e) {}
+    }
+
+    // Last resort: pull just the "reply" field value out of a (possibly truncated) JSON string
+    const m = raw.match(/"reply"\s*:\s*"((?:[^"\\]|\\.)*)/);
+    if (m) {
+      let txt = m[1];
+      // Unescape common sequences
+      txt = txt.replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+      return { mode: 'general', label: 'basic', reply: txt, user_email: '', user_full_name: '', recruiter_data: {} };
+    }
+
+    // Nothing parseable — show a friendly message, never the raw JSON
+    return { mode: 'general', label: 'basic', reply: "Sorry, I had a hiccup generating that. Could you say that again?", user_email: '', user_full_name: '', recruiter_data: {} };
+  }
+
+  function normalizeParsed(p) {
+    return {
+      mode: p.mode || 'general',
+      label: p.label || 'basic',
+      support_phase: p.support_phase || '',
+      recruiter_phase: p.recruiter_phase || '',
+      reply: p.reply || '',
+      user_email: p.user_email || '',
+      user_full_name: p.user_full_name || '',
+      recruiter_data: p.recruiter_data || {}
+    };
+  }
+
+// Logs/updates the running conversation to Zapier. Same session_id every time so
+  // your Zap can dedupe on it and UPDATE one Jira issue per session instead of creating many.
+  // Build a clean transcript — strips the hidden system note and the model's 'Understood.' ack
+  // --- Build a clean transcript ---------------------------------------------
+  // Logs should read like a real conversation, so we strip two pieces of internal
+  // plumbing: the hidden identity system-note (it's not something the visitor
+  // "said") and the model's 'Understood.' ack to it. Centralising this in one
+  // function means the ticket, recruiter, and log payloads can never drift and
+  // start leaking the note again (which is exactly what happened before).
+  function buildTranscript() {
+    return conversationMessages
+      .filter(m => {
+        if (typeof m.content !== 'string') return false;
+        if (m.content.startsWith('[system note')) return false;
+        if (m.content === 'Understood.') return false;
+        return true;
+      })
+      .map(m => `${m.role === 'user' ? config.name : 'AI Nolan'}: ${m.content}`)
+      .join('\n');
+  }
+
+  // Always-fires conversation log. event = 'log'; type carries the conversation kind.
+  // --- Conversation logging -------------------------------------------------
+  // Goal: log EVERY conversation, cheaply, on the free Zapier plan. The split of
+  // event vs type is deliberate — event ('log') is what Zapier routes on, type
+  // ('support'/'recruitment'/'general') is context that rides along, so a log
+  // never overwrites a chat's real nature. The debounce (log only after 45s of
+  // quiet, and only if messageCount changed) is what keeps one busy chat from
+  // burning dozens of Zapier tasks.
+  // Builds the COMPLETE field set every payload sends, so Zapier always sees an
+  // identical schema regardless of event. Missing values are empty strings.
+  // NOTE: empty string counts as "exists" in Zapier — path conditions that test
+  // these fields must use "is not empty", not "exists".
+  // Returns the most recent exchange as a single string: the bot's previous reply
+  // followed by the user's newest message. This is what feeds Jira comment updates
+  // on an existing chat log (Path 15), so each comment shows the latest back-and-forth.
+  // Skips the hidden system note / 'Understood.' ack so they never leak into comments.
+  // Returns every visible message AFTER lastSentIndex — i.e. the batch of exchanges
+  // not yet sent in a comment — formatted oldest-first. This lets one debounced fire
+  // capture all messages since the last fire (nothing dropped) at the cost of a single
+  // task. The hidden system note / 'Understood.' ack are skipped. logConversation
+  // advances lastSentIndex on a successful send so content is never sent twice.
+  function unsentExchanges() {
+    const parts = [];
+    for (let i = lastSentIndex; i < conversationMessages.length; i++) {
+      const m = conversationMessages[i];
+      if (typeof m.content !== 'string') continue;
+      if (m.content.startsWith('[system note')) continue;
+      if (m.content === 'Understood.') continue;
+      parts.push(`${m.role === 'user' ? config.name : 'AI Nolan'}: ${m.content}`);
+    }
+    return parts.join('\n');
+  }
+
+    function buildPayload(overrides) {
+    const base = {
+      event: '',            // log | ticket | recruiter_lead
+      type: currentMode || 'general',
+      status: '',           // ongoing | final | '' (blank on create so Path 4 fires)
+      session_id: config.sessionId,
+      user_name: config.name,
+      user_email: config.email || '',
+      message: unsentExchanges(),  // all exchanges since the last fire (the unsent batch)
+      attempt: '',          // support attempt count (ticket only, else blank)
+      message_count: messageCount,
+      conversation: buildTranscript(),
+      company: '',
+      role_title: '',
+      role_description: '',
+      contact: ''
+    };
+    return Object.assign(base, overrides || {});
+  }
+
+  function logConversation(status) {
+    fireZapier(null, buildPayload({
+      event: 'log',
+      status: status || 'ongoing'
+    }));
+    lastLoggedCount = messageCount;
+    lastSentIndex = conversationMessages.length;  // everything up to here has now been sent
+  }
+
+  // 45s idle debounce — fires one log if the conversation changed since the last log.
+  function armIdleLog() {
+    cancelIdleLog();
+    idleTimer = setTimeout(() => {
+      // Every conversation is always logged to the chat-log case. If a ticket exists,
+      // this 'ongoing' log also comments on the ticket (Zapier ticket-update path).
+      if (messageCount !== lastLoggedCount) logConversation('ongoing');
+    }, 45000);
+  }
+  function cancelIdleLog() {
+    if (idleTimer) { clearTimeout(idleTimer); idleTimer = null; }
+  }
+
+  // --- Call the model (via /api/chat) ---------------------------------------
+  // Sends the whole history (the model is stateless, so this is how it remembers).
+  // We push the user's text BEFORE sending and the assistant's reply AFTER, so the
+  // array always mirrors the real exchange and the next turn has full context.
+  // Asks the model to write the ticket-confirmation message, informing it that the
+  // escalation conditions have been met and a ticket was just created. Used when the
+  // code decides to escalate (e.g. two failed attempts) and the model's last reply
+  // was a troubleshooting attempt rather than a handoff. Returns '' on any failure so
+  // the caller can fall back to a hard-coded confirmation.
+  async function requestTicketConfirmation() {
+    const note = '[system note: the support conditions to escalate have been met and a ticket has just been created for the real Nolan. Reply with a brief, warm message telling the user you could not resolve it yourself so you have created a ticket, the real Nolan will follow up by email with the ticket number, and ask if there is anything else you can help with. Do not troubleshoot further.]';
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [...conversationMessages, { role: 'user', content: note }] })
+      });
+      if (!res.ok) return '';
+      const data = await res.json();
+      return parseModelResponse(data.raw || '{}').reply || '';
+    } catch (e) {
+      return '';
+    }
+  }
+
+  async function callOpenAI(userText) {
+    conversationMessages.push({ role: 'user', content: userText });
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: conversationMessages })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `Server error ${res.status}`);
+    }
+    const data = await res.json();
+    const raw = data.raw || '{}';
+    const parsed = parseModelResponse(raw);
+    conversationMessages.push({ role: 'assistant', content: parsed.reply });
+    return parsed;
+  }
+
+  async function lookupTicket(userText) {
+    const ticketKey = extractTicketKey(userText, hasTicketLookupIntent(userText)) || lookupTicketKey;
+    if (ticketKey) lookupTicketKey = ticketKey;
+
+    const res = await fetch('/api/ticket-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ticket_key: ticketKey,
+        session_id: config.sessionId
+      })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || `Ticket lookup failed (${res.status})`);
+    return data.ticket;
+  }
+
+  function formatTicketLookupError(errorMessage) {
+    if (!lookupTicketKey) {
+      return "I don't have a ticket number for this chat yet. It should be in the Jira confirmation email sent when the ticket was created. Send me the key, something like NAI-31, and I can check it.";
+    }
+    if (/Jira returned 404/i.test(errorMessage)) {
+      return `I couldn't find ${lookupTicketKey}. Double-check the ticket number from the confirmation email and send it again.`;
+    }
+    if (/no ticket with that key/i.test(errorMessage)) {
+      return `I couldn't find ${lookupTicketKey}. Double-check the ticket number and send it again.`;
+    }
+    if (/no ticket for this chat/i.test(errorMessage)) {
+      return "I don't see a Jira ticket attached to this chat yet. If you have the ticket number from the Jira confirmation email, send it over and I'll check that directly.";
+    }
+    return `I couldn't look up the ticket just now: ${errorMessage}`;
+  }
+
+  function formatTicketStatus(ticket) {
+    const status = ticket.status || 'unknown';
+    const isRecruiterLead = /^REC-\d+$/i.test(ticket.key || '');
+    const lines = [`I found ${ticket.key}. It's currently ${status}${ticket.resolution ? ` (${ticket.resolution})` : ''}.`];
+
+    if (isRecruiterLead && /to do|open|new/i.test(status)) {
+      lines.push("This looks like a recruiter lead. Nolan has the details and will take a look, then respond soon if it looks like a fit.");
+    } else if (isRecruiterLead && /progress|review|triage/i.test(status)) {
+      lines.push("This recruiter lead looks like it's under review. Nolan is taking a look at the role details.");
+    } else if (isRecruiterLead && /done|resolved|closed/i.test(status)) {
+      lines.push("This recruiter lead looks like it has already been reviewed.");
+    } else if (/to do|open|new/i.test(status)) {
+      lines.push("It looks like it has been created and is waiting for Nolan to pick it up.");
+    } else if (/progress|review|triage/i.test(status)) {
+      lines.push("It looks like Nolan has started working through it.");
+    } else if (/done|resolved|closed/i.test(status)) {
+      lines.push("It looks like the ticket has been completed.");
+    }
+
+    if (ticket.updated) {
+      lines.push(`Last updated: ${new Date(ticket.updated).toLocaleString()}.`);
+    }
+    return lines.join('\n');
+  }
+
+  // --- Main send loop -------------------------------------------------------
+  // The orchestrator. The model's "label" is the decision signal:
+  //   intake_complete → recruiter gave everything → fire recruiter_lead + final log
+  //   human (only after 2 failed support attempts) → fire ticket + final log
+  //   anything else → just reply, and arm the 45s idle log
+  // The terminal branches fire their event AND a final log, so an escalated or
+  // completed chat is still captured in full — logging is never either/or.
+  async function sendMessage() {
+    // Re-entry guard: if a send is already in flight, ignore extra triggers
+    // (double Enter, Enter + button tap, etc.) so we never fire an event twice.
+    if (sending) return;
+
+    const input = document.getElementById('msgInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    sending = true;
+    input.value = '';
+    input.style.height = 'auto';
+    document.getElementById('sendBtn').disabled = true;
+    cancelIdleLog();
+    addUserMessage(text);
+    showTyping();
+    messageCount++;
+
+    try {
+      if (isTicketLookup(text)) {
+        let ticketReply = '';
+        let ticketBadge = '↙ ticket lookup';
+        try {
+          const ticket = await lookupTicket(text);
+          ticketReply = formatTicketStatus(ticket);
+        } catch (lookupErr) {
+          ticketReply = formatTicketLookupError(lookupErr.message);
+          ticketBadge = 'ticket lookup';
+        }
+        conversationMessages.push({ role: 'user', content: text });
+        conversationMessages.push({ role: 'assistant', content: ticketReply });
+        removeTyping();
+        addBotMessage(ticketReply, 'ticket', ticketBadge);
+        armIdleLog();
+        if (messageCount === 1) logConversation('ongoing');
+        sending = false;
+        document.getElementById('sendBtn').disabled = false;
+        input.focus();
+        return;
+      }
+
+      const result = await callOpenAI(text);
+      removeTyping();
+
+      const label  = result.label  || 'basic';
+      const mode   = result.mode   || 'general';
+      const phase  = result.support_phase || '';  // 'gathering' | 'attempt' (support only)
+      const recPhase = result.recruiter_phase || ''; // 'gathering' | 'ready' (recruitment only)
+      const reply  = result.reply  || "Thanks, I've received your message.";
+
+      setMode(mode);
+
+      // === RECRUITER — fire ticket + email once the bot has the bare minimum
+      // (company + role title), signalled by recruiter_phase === 'ready'. While the
+      // model is still gathering those, it stays in recruitment mode but doesn't fire.
+      // Anything the recruiter adds after 'ready' flows in as ongoing comments.
+      if (mode === 'recruitment' && recPhase === 'ready' && !recruiterFired) {
+        addBotMessage(reply);
+        cancelIdleLog();
+        const sent = await fireZapier(config.webhook, buildPayload({
+          event: 'recruiter_lead',
+          type: 'recruitment',
+          user_name: result.user_full_name || config.name,
+          user_email: result.user_email || config.email || '',
+          company: result.recruiter_data?.company || '',
+          role_title: result.recruiter_data?.role_title || '',
+          role_description: result.recruiter_data?.role_description || '',
+          contact: result.recruiter_data?.contact || ''
+        }), true);
+        if (sent) {
+          recruiterFired = true;  // latch on success — a recruiter ticket now exists; later recruitment logs comment on it
+          addBotMessage("Passed to the real Nolan and logged for him — anything else you share, I'll add to it. He'll follow up if it's a good fit.", 'recruited', '✓ sent to Nolan');
+        } else {
+          addBotMessage("I had trouble passing your details through just now. Could you email the real Nolan directly at noki21@protonmail.com so nothing gets lost? Sorry about that.", 'ticket', '⚠ send failed');
+        }
+        if (sent) armIdleLog();
+
+      // === SUPPORT — escalate on EITHER condition: (1) two genuine troubleshooting
+      // attempts have failed, or (2) the model signals it needs a human now
+      // (support_phase = 'escalate') — but only after at least one prior turn, so it
+      // confirms the situation rather than escalating on the literal first message.
+      } else if (mode === 'support' && !supportFired &&
+                 (attempt >= 2 || (phase === 'escalate' && messageCount > 1))) {
+        cancelIdleLog();
+        const sent = await fireZapier(config.webhook, buildPayload({
+          event: 'ticket',
+          type: 'support',
+          user_name: result.user_full_name || config.name,
+          user_email: result.user_email || config.email || '',
+          attempt: attempt
+        }), true);
+        if (sent) {
+          supportFired = true;  // latch on success so a failed send can retry
+          // The confirmation message is written by the model. If it set phase='escalate'
+          // it already wrote a handoff reply (use it). Otherwise (attempt-exhaustion,
+          // a code decision) its last reply was a troubleshooting attempt, so we ask
+          // the model for a confirmation now that conditions are met. Fall back to a
+          // fixed message if the model returns nothing.
+          let ticketMsg = (phase === 'escalate' && reply) ? reply : '';
+          if (!ticketMsg) {
+            showTyping();
+            ticketMsg = await requestTicketConfirmation();
+            removeTyping();
+          }
+          if (!ticketMsg) {
+            ticketMsg = "I wasn't able to resolve this one myself, so I've created a ticket for the real Nolan to take over — you'll get an email confirmation with your ticket number shortly. In the meantime, is there anything else I can help you with?";
+          }
+          addBotMessage(ticketMsg, 'ticket', '↗ ticket submitted');
+          // Tell the model the issue is now in the real Nolan's hands so it stops
+          // troubleshooting the same problem and instead offers other help.
+          conversationMessages.push({ role: 'user', content: '[system note: a support ticket has been filed for this issue and the real Nolan will follow up by email. Do NOT keep troubleshooting this same problem or claim you can fix it now. Acknowledge it is with Nolan and offer to help with anything else.]' });
+          conversationMessages.push({ role: 'assistant', content: 'Understood.' });
+        } else {
+          addBotMessage("I couldn't file your ticket just now. Please email the real Nolan directly at noki21@protonmail.com and he'll pick it up. Sorry about that.", 'ticket', '⚠ send failed');
+        }
+        if (sent) armIdleLog();
+
+      // === NORMAL — reply, count a troubleshooting attempt if this was a support
+      // turn (and no ticket exists yet), and arm the idle log. Once a ticket exists,
+      // these idle/close logs become 'ongoing' comments on it.
+      } else {
+        addBotMessage(reply);
+        // Only a genuine fix attempt counts toward escalation — info-gathering turns
+        // (support_phase = 'gathering') do not. Two real attempts triggers the ticket.
+        if (mode === 'support' && phase === 'attempt' && !supportFired) attempt++;
+        armIdleLog();
+      }
+
+      // Create the chat log immediately on the first user message so it exists right
+      // away (message_count = 1 → Zapier "create new chat log" path). Without this the
+      // log isn't created until the 45s idle/close fire, and a fast follow-up could
+      // hit the "find + comment" path before any log exists. Subsequent messages are
+      // handled by the idle/close debounce as comments.
+      if (messageCount === 1) logConversation('ongoing');
+
+      sending = false;
+      document.getElementById('sendBtn').disabled = false;
+      input.focus();
+
+    } catch (err) {
+      removeTyping();
+      addBotMessage(`Something went wrong: ${err.message}`);
+      sending = false;
+      document.getElementById('sendBtn').disabled = false;
+      input.focus();
+    }
+  }
+  // Show gate on load
+  // --- Boot -----------------------------------------------------------------
+  // Just focus the gate's name field on load so the visitor can type immediately.
+  // Nothing else runs until they submit the gate — that's what gates the whole
+  // chat behind having a name + email.
+  window.addEventListener("DOMContentLoaded", function() {
+    const n = document.getElementById("gateName");
+    if (n) n.focus();
+
+    document.querySelectorAll('.skill-card, .exp-item, .edu-card, .cert-badge, .exp-bullets li').forEach(el => {
+      el.classList.add('resume-ask');
+      el.setAttribute('tabindex', '0');
+      el.setAttribute('role', 'button');
+      el.setAttribute('title', 'Ask AI Nolan about this');
+    });
+
+    document.addEventListener('click', (event) => {
+      const target = event.target.closest('.resume-ask, .skill-card, .exp-item, .edu-card, .cert-badge, .exp-bullets li');
+      if (!target) return;
+      const prompt = buildResumePrompt(target);
+      if (prompt) askChat(prompt);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      const target = event.target.closest('.resume-ask, .skill-card, .exp-item, .edu-card, .cert-badge, .exp-bullets li');
+      if (!target) return;
+      event.preventDefault();
+      const prompt = buildResumePrompt(target);
+      if (prompt) askChat(prompt);
+    });
+  });
+</script>
+</body>
+</html>
