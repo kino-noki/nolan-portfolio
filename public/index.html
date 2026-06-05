@@ -972,7 +972,7 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
         <div class="gate-modal">
           <div class="gate-logo"><span class="gate-prompt">~</span> nolan@kim <span class="gate-cursor"></span></div>
           <h2 class="gate-title" id="gateTitle">Hey, let's talk</h2>
-          <p class="gate-sub" id="gateSub">I'm AI Nolan, a public recreation of Nolan's DRI triage chatbot, adapted for recruiters and hiring managers. This version does not include the internal knowledge base, but it can talk through his support background, IAM/SaaS work, endpoint tooling, automation projects, ticket systems, and how he approaches messy IT problems.<br><br>You can start with your name and email, or skip for now and chat anonymously. If I need to create a support ticket, I'll ask for contact details then.</p>
+          <p class="gate-sub" id="gateSub">I'm AI Nolan, a public recreation of Nolan's DRI triage chatbot, adapted for recruiters and hiring managers. This version does not include the internal knowledge base, but it can talk through his support background, IAM/SaaS work, endpoint tooling, automation projects, ticket systems, and how he approaches messy IT problems.<br><br>You can start with your name and email, or skip for now and chat anonymously. If I need to create a support ticket or send Nolan a recruiter lead, I'll ask for contact details then.</p>
           <div class="gate-field">
             <label>Name</label>
             <input type="text" id="gateName" placeholder="Jane Smith" autocomplete="name" onkeydown="if(event.key==='Enter')document.getElementById('gateEmail').focus()">
@@ -1622,8 +1622,8 @@ leads, support tickets, and anything that needs the real Nolan.</p>
 
   // --- Gate: optional identity, required for ticket handoff ------------------
   // Visitors can skip the initial gate and chat as Anonymous. If the bot needs
-  // to create a support ticket, the gate returns with ticket-specific copy so
-  // Nolan has a contact address for follow-up.
+  // to create a support ticket or pass a recruiter lead, the gate returns with
+  // focused copy so Nolan has a contact address for follow-up.
   function setGateCopy(mode = 'start') {
     const title = document.getElementById('gateTitle');
     const sub = document.getElementById('gateSub');
@@ -1636,9 +1636,14 @@ leads, support tickets, and anything that needs the real Nolan.</p>
       sub.innerHTML = "I need to create a support ticket for this, but Nolan needs a name and email so he can send your ticket number and follow up if needed.";
       btn.textContent = 'Create ticket →';
       skip.style.display = 'none';
+    } else if (mode === 'recruiter') {
+      title.textContent = 'Where should Nolan follow up?';
+      sub.innerHTML = "I can pass this opportunity to Nolan, but he needs your name and email so he knows who to respond to if the role looks like a fit.";
+      btn.textContent = 'Send recruiter lead →';
+      skip.style.display = 'none';
     } else {
       title.textContent = "Hey, let's talk";
-      sub.innerHTML = "I'm AI Nolan, a public recreation of Nolan's DRI triage chatbot, adapted for recruiters and hiring managers. This version does not include the internal knowledge base, but it can talk through his support background, IAM/SaaS work, endpoint tooling, automation projects, ticket systems, and how he approaches messy IT problems.<br><br>You can start with your name and email, or skip for now and chat anonymously. If I need to create a support ticket, I'll ask for contact details then.";
+      sub.innerHTML = "I'm AI Nolan, a public recreation of Nolan's DRI triage chatbot, adapted for recruiters and hiring managers. This version does not include the internal knowledge base, but it can talk through his support background, IAM/SaaS work, endpoint tooling, automation projects, ticket systems, and how he approaches messy IT problems.<br><br>You can start with your name and email, or skip for now and chat anonymously. If I need to create a support ticket or send Nolan a recruiter lead, I'll ask for contact details then.";
       btn.textContent = 'Start chatting →';
       skip.style.display = '';
     }
@@ -1659,6 +1664,11 @@ leads, support tickets, and anything that needs the real Nolan.</p>
 
   function hasContactInfo() {
     return config.name && config.name !== 'Anonymous' && !!config.email;
+  }
+
+  function hasRecruiterLeadMinimum(result) {
+    const data = result?.recruiter_data || {};
+    return !!String(data.company || '').trim() && !!String(data.role_title || '').trim();
   }
 
   function skipGate() {
@@ -1711,6 +1721,14 @@ leads, support tickets, and anything that needs the real Nolan.</p>
       });
       return;
     }
+    if (pendingGateAction?.type === 'recruiter_lead') {
+      const action = pendingGateAction;
+      pendingGateAction = null;
+      sendRecruiterLead(action.result).catch(err => {
+        addBotMessage(`Something went wrong sending the recruiter lead: ${err.message}`, 'ticket', '⚠ send failed');
+      });
+      return;
+    }
     if (pendingResumePrompt) {
       const prompt = pendingResumePrompt;
       pendingResumePrompt = '';
@@ -1741,7 +1759,7 @@ Here are a few useful things I can do:
 • Troubleshoot basic tech issues. If I can't resolve it, I can create a support ticket for Nolan.
 • Check ticket status if you send a key like NAI-31 or REC-4 from your confirmation email.
 
-If you skipped contact info, no problem. I'll only ask for name and email if a support ticket needs to be created.
+If you skipped contact info, no problem. I'll only ask for name and email if a support ticket or recruiter lead needs follow-up.
 
 What should we look at first?`;
     addBotMessage(greeting);
@@ -2179,6 +2197,39 @@ What should we look at first?`;
     if (sent) armIdleLog();
   }
 
+  async function sendRecruiterLead(result) {
+    if (!hasRecruiterLeadMinimum(result)) {
+      addBotMessage("I can pass that along once I have the company and role title. Send those two details and I'll attach anything else you share.", 'recruited');
+      armIdleLog();
+      return;
+    }
+    if (!hasContactInfo()) {
+      pendingGateAction = { type: 'recruiter_lead', result };
+      addBotMessage("I can pass this to Nolan. Before I send it, I need your name and email so he knows where to follow up if the role looks like a fit.", 'recruited');
+      showGate('recruiter');
+      return;
+    }
+
+    cancelIdleLog();
+    const sent = await fireZapier(config.webhook, buildPayload({
+      event: 'recruiter_lead',
+      type: 'recruitment',
+      user_name: config.name || result.user_full_name || '',
+      user_email: config.email || result.user_email || '',
+      company: result.recruiter_data?.company || '',
+      role_title: result.recruiter_data?.role_title || '',
+      role_description: result.recruiter_data?.role_description || '',
+      contact: result.recruiter_data?.contact || ''
+    }), true);
+    if (sent) {
+      recruiterFired = true;  // latch on success — a recruiter ticket now exists; later recruitment logs comment on it
+      addBotMessage("Passed to the real Nolan and logged for him — anything else you share, I'll add to it. He'll follow up if it's a good fit.", 'recruited', '✓ sent to Nolan');
+    } else {
+      addBotMessage("I had trouble passing your details through just now. Could you email the real Nolan directly at noki21@protonmail.com so nothing gets lost? Sorry about that.", 'ticket', '⚠ send failed');
+    }
+    if (sent) armIdleLog();
+  }
+
   // --- Call the model (via /api/chat) ---------------------------------------
   // Sends the whole history (the model is stateless, so this is how it remembers).
   // We push the user's text BEFORE sending and the assistant's reply AFTER, so the
@@ -2328,24 +2379,7 @@ What should we look at first?`;
       // Anything the recruiter adds after 'ready' flows in as ongoing comments.
       if (mode === 'recruitment' && recPhase === 'ready' && !recruiterFired) {
         addBotMessage(reply);
-        cancelIdleLog();
-        const sent = await fireZapier(config.webhook, buildPayload({
-          event: 'recruiter_lead',
-          type: 'recruitment',
-          user_name: result.user_full_name || config.name,
-          user_email: result.user_email || config.email || '',
-          company: result.recruiter_data?.company || '',
-          role_title: result.recruiter_data?.role_title || '',
-          role_description: result.recruiter_data?.role_description || '',
-          contact: result.recruiter_data?.contact || ''
-        }), true);
-        if (sent) {
-          recruiterFired = true;  // latch on success — a recruiter ticket now exists; later recruitment logs comment on it
-          addBotMessage("Passed to the real Nolan and logged for him — anything else you share, I'll add to it. He'll follow up if it's a good fit.", 'recruited', '✓ sent to Nolan');
-        } else {
-          addBotMessage("I had trouble passing your details through just now. Could you email the real Nolan directly at noki21@protonmail.com so nothing gets lost? Sorry about that.", 'ticket', '⚠ send failed');
-        }
-        if (sent) armIdleLog();
+        await sendRecruiterLead(result);
 
       // === SUPPORT — escalate on EITHER condition: (1) two genuine troubleshooting
       // attempts have failed, or (2) the model signals it needs a human now
