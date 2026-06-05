@@ -214,56 +214,6 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
   margin-top: 1.75rem;
 }
 
-.ops-strip {
-  display: grid;
-  grid-template-columns: minmax(135px, 0.35fr) minmax(0, 1fr);
-  gap: 10px;
-  margin: 1.6rem 0 0.4rem;
-  max-width: 760px;
-  align-items: stretch;
-}
-
-.ops-stat {
-  padding: 10px 12px;
-  border: 1px solid var(--line);
-  background: rgba(238,231,216,0.7);
-  box-shadow: 4px 4px 0 rgba(51,47,40,0.1);
-}
-
-.ops-stat b {
-  display: block;
-  color: var(--heading);
-  font: 16px var(--font-mono);
-}
-
-.ops-stat span {
-  color: var(--soft);
-  font: 10px var(--font-mono);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.ops-tech {
-  display: flex;
-  flex-wrap: wrap;
-  align-content: center;
-  gap: 7px;
-  padding: 10px 12px;
-  border: 1px solid var(--line);
-  background: rgba(238,231,216,0.54);
-  box-shadow: 4px 4px 0 rgba(51,47,40,0.08);
-}
-
-.ops-tech span {
-  font-family: var(--font-body);
-  font-size: 12px;
-  font-weight: 600;
-  color: #384238;
-  padding: 3px 8px;
-  border: 1px solid rgba(120,148,130,0.4);
-  background: rgba(120,148,130,0.12);
-}
-
 .tag {
   appearance: none;
   cursor: pointer;
@@ -747,12 +697,6 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
     justify-content: center;
   }
 
-  .ops-strip {
-    margin-inline: auto;
-    grid-template-columns: 1fr;
-    max-width: 620px;
-  }
-
   .hero-name {
     font-size: clamp(3rem, 16vw, 5.5rem);
   }
@@ -828,14 +772,6 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
   .hero-tags {
     gap: 7px;
     margin-top: 1rem;
-  }
-
-  .ops-strip {
-    grid-template-columns: 1fr;
-  }
-
-  .ops-tech {
-    justify-content: center;
   }
 
   .hero-summary {
@@ -952,17 +888,6 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
       <p class="hero-summary">This resume is interactive. Click a skill,
  role, bullet, school, or certification and AI Nolan will explain how it
  connects to Nolan's work.</p>
-      <div class="ops-strip" aria-label="Resume highlights">
-        <div class="ops-stat"><b>6+</b><span>years in IT</span></div>
-        <div class="ops-tech" aria-label="Core technologies">
-          <span>Okta</span>
-          <span>Google Workspace</span>
-          <span>Jira</span>
-          <span>Kandji</span>
-          <span>Intune</span>
-          <span>Splunk</span>
-        </div>
-      </div>
       <div class="hero-tags">
         <button class="tag green resume-ask" type="button" data-chat-prompt="Tell me about Nolan's Okta experience.">Okta</button>
         <button class="tag green resume-ask" type="button" data-chat-prompt="Tell me about Nolan's Google Workspace administration experience.">Google Workspace</button>
