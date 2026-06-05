@@ -139,8 +139,7 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
 }
 
 .chat-rail {
-  position: sticky;
-  top: 58px;
+  position: relative;
   align-self: start;
   height: calc(100vh - 58px);
   padding: clamp(1rem, 2vw, 1.6rem);
@@ -249,11 +248,11 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
   height: 100%;
   overflow: hidden;
   position: relative;
-  background: rgba(24, 37, 31, 0.66);
-  border: 1px solid rgba(238, 231, 216, 0.22);
+  background: rgba(24, 37, 31, 0.18);
+  border: 1px solid rgba(24, 37, 31, 0.32);
   border-radius: 0;
   box-shadow: 0 26px 80px rgba(23,26,18,0.32);
-  backdrop-filter: blur(8px);
+  backdrop-filter: none;
 }
 
 .chat-titlebar {
@@ -262,7 +261,7 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
   align-items: center;
   gap: 10px;
   padding: 0.9rem 1rem;
-  background: rgba(238, 231, 216, 0.035);
+  background: rgba(24, 37, 31, 0.12);
   border-bottom: 1px solid rgba(238, 231, 216, 0.14);
 }
 
@@ -306,7 +305,7 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
   flex-direction: column;
   gap: 1rem;
   scroll-behavior: smooth;
-  background: linear-gradient(180deg, rgba(34,52,41,0.34), rgba(24,37,31,0.58));
+  background: linear-gradient(180deg, rgba(24,37,31,0.08), rgba(24,37,31,0.18));
 }
 
 .messages::-webkit-scrollbar { width: 3px; }
@@ -323,12 +322,20 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
   overflow: hidden;
 }
 
-.msg-avatar.bot { background: #eee7d8; border: 1px solid #c4baa6; color: var(--accent); }
+.msg-avatar.bot {
+  width: 36px;
+  height: 42px;
+  border-radius: 0;
+  overflow: visible;
+  background: transparent;
+  border: 0;
+  color: var(--accent);
+}
 .msg-avatar.bot img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: center top;
+  object-fit: contain;
+  object-position: center bottom;
   display: block;
 }
 .msg-avatar.user { background: #dbe2e6; border: 1px solid #b7c0c5; color: #506378; }
@@ -379,7 +386,7 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
   gap: 8px;
   align-items: flex-end;
   padding: 0.95rem 1rem;
-  background: rgba(238, 231, 216, 0.035);
+  background: rgba(24, 37, 31, 0.12);
   border-top: 1px solid rgba(238, 231, 216, 0.14);
 }
 
@@ -764,13 +771,13 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
   }
 
   .mobile-chat-launcher img {
-    width: 34px;
-    height: 34px;
-    border-radius: 999px;
-    object-fit: cover;
-    object-position: center top;
-    border: 1px solid #c4baa6;
-    background: #eee7d8;
+    width: 40px;
+    height: 42px;
+    border-radius: 0;
+    object-fit: contain;
+    object-position: center bottom;
+    border: 0;
+    background: transparent;
   }
 
   body.mobile-chat-open .mobile-chat-launcher {
@@ -1188,6 +1195,7 @@ leads, support tickets, and anything that needs the real Nolan.</p>
   let activeCol = -1;
   let activeRow = -1;
   let animationFrame = 0;
+  let scrollShift = 0;
 
   function resizeMesh() {
     const rect = meshSurface.getBoundingClientRect();
@@ -1435,7 +1443,11 @@ leads, support tickets, and anything that needs the real Nolan.</p>
 
   function drawMesh() {
     ctx.clearRect(0, 0, width, height);
+    scrollShift = -((window.scrollY * 0.18) % small);
+    ctx.save();
+    ctx.translate(0, scrollShift);
     renderMesh();
+    ctx.restore();
   }
 
   function tickMesh() {
@@ -1472,6 +1484,7 @@ leads, support tickets, and anything that needs the real Nolan.</p>
   window.addEventListener('pointerleave', releaseMeshPointer);
   window.addEventListener('blur', releaseMeshPointer);
   window.addEventListener('scroll', () => {
+    drawMesh();
     if (pointer.active) scheduleMeshTick();
   }, { passive: true });
 
