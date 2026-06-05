@@ -2253,6 +2253,10 @@ What should we look at first?`;
       lines.push("It looks like the ticket has been completed.");
     }
 
+    if (ticket.latest_reply) {
+      lines.push(`Latest reply from Nolan: ${ticket.latest_reply}`);
+    }
+
     if (ticket.updated) {
       lines.push(`Last updated: ${new Date(ticket.updated).toLocaleString()}.`);
     }

@@ -67,6 +67,65 @@ function issueFields() {
   return ['summary', 'status', 'created', 'updated', 'resolution', 'project', 'issuetype'];
 }
 
+function normalizeText(value) {
+  return String(value || '')
+    .replace(/\r\n/g, '\n')
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/[ \t]{2,}/g, ' ')
+    .trim();
+}
+
+function jiraDocToText(node) {
+  if (!node) return '';
+  if (typeof node === 'string') return node;
+  if (Array.isArray(node)) return node.map(jiraDocToText).join('');
+  if (node.type === 'text') return node.text || '';
+  if (node.type === 'hardBreak') return '\n';
+
+  const childText = jiraDocToText(node.content || []);
+  if (['paragraph', 'heading', 'blockquote'].includes(node.type)) return `${childText}\n`;
+  if (node.type === 'listItem') return `- ${childText.trim()}\n`;
+  return childText;
+}
+
+function commentBodyToText(body) {
+  if (typeof body === 'string') return normalizeText(body);
+  return normalizeText(jiraDocToText(body));
+}
+
+function isLikelyInternalLogComment(text) {
+  const clean = normalizeText(text);
+  if (!clean) return true;
+  if (/\[system note:/i.test(clean)) return true;
+  if (/\bAI Nolan\s*:/i.test(clean)) return true;
+
+  const prefixedLines = clean
+    .split('\n')
+    .filter(line => /^[^:\n]{1,70}:\s+\S/.test(line.trim()));
+  return prefixedLines.length >= 2;
+}
+
+function shortCommentSummary(text) {
+  const clean = normalizeText(text).replace(/\n+/g, ' ');
+  if (clean.length <= 240) return clean;
+  return `${clean.slice(0, 237).replace(/\s+\S*$/, '')}...`;
+}
+
+function latestUserFacingComment(comments) {
+  const newestFirst = [...comments].sort((a, b) => new Date(b.created || 0) - new Date(a.created || 0));
+  for (const comment of newestFirst) {
+    const text = commentBodyToText(comment.body);
+    if (isLikelyInternalLogComment(text)) continue;
+    return {
+      body: shortCommentSummary(text),
+      created: comment.created || '',
+      author: comment.author?.displayName || ''
+    };
+  }
+  return null;
+}
+
 async function getIssueByKey({ baseUrl, auth, ticketKey }) {
   const resp = await fetch(`${baseUrl}/rest/api/3/issue/${encodeURIComponent(ticketKey)}?fields=${issueFields().join(',')}`, {
     method: 'GET',
@@ -112,8 +171,27 @@ async function searchIssueBySession({ baseUrl, auth, sessionId }) {
   return data.issues || [];
 }
 
-function summarizeIssue(issue) {
+async function getIssueComments({ baseUrl, auth, issueKey }) {
+  const url = `${baseUrl}/rest/api/3/issue/${encodeURIComponent(issueKey)}/comment?orderBy=-created&maxResults=10`;
+  const resp = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+      'Authorization': auth
+    }
+  });
+
+  const data = await resp.json().catch(() => ({}));
+  if (!resp.ok) {
+    console.warn(data.errorMessages?.[0] || data.message || `Jira comment lookup failed (${resp.status})`);
+    return [];
+  }
+  return data.comments || [];
+}
+
+function summarizeIssue(issue, comments) {
   const fields = issue.fields || {};
+  const latestComment = latestUserFacingComment(comments || []);
 
   return {
     key: issue.key,
@@ -123,7 +201,10 @@ function summarizeIssue(issue) {
     status: fields.status?.name || '',
     resolution: fields.resolution?.name || '',
     created: fields.created || '',
-    updated: fields.updated || ''
+    updated: fields.updated || '',
+    latest_reply: latestComment?.body || '',
+    latest_reply_created: latestComment?.created || '',
+    latest_reply_author: latestComment?.author || ''
   };
 }
 
@@ -156,7 +237,8 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    return res.status(200).json({ ok: true, ticket: summarizeIssue(issue) });
+    const comments = await getIssueComments({ baseUrl, auth, issueKey: issue.key });
+    return res.status(200).json({ ok: true, ticket: summarizeIssue(issue, comments) });
   } catch (e) {
     return res.status(e.statusCode || 502).json({ error: e.message });
   }
