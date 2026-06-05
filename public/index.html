@@ -141,10 +141,11 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
 .chat-rail {
   position: fixed;
   top: 58px;
+  bottom: 0;
   left: 0;
   z-index: 30;
   width: var(--chat-rail-width);
-  height: calc(100vh - 58px);
+  height: auto;
   padding: 0;
   display: flex;
   align-items: stretch;
@@ -435,7 +436,7 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
   background: transparent;
   background-size: auto, auto;
   margin-left: var(--chat-rail-width);
-  padding: clamp(2rem, 5vw, 5rem);
+  padding: clamp(1.5rem, 3vw, 3.5rem) clamp(2rem, 5vw, 5rem) clamp(2rem, 5vw, 5rem);
   overflow: hidden;
 }
 
