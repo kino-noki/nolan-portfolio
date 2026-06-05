@@ -131,7 +131,9 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
 
 /* ── PORTFOLIO SHELL: sticky chat rail + interactive resume ── */
 .portfolio-shell {
-  display: block;
+  display: grid;
+  grid-template-columns: var(--chat-rail-width) minmax(0, 1fr);
+  align-items: start;
   min-height: calc(100vh - 58px);
   position: relative;
   overflow: visible;
@@ -139,13 +141,10 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
 }
 
 .chat-rail {
-  position: fixed;
+  position: sticky;
   top: 58px;
-  bottom: 0;
-  left: 0;
   z-index: 30;
-  width: var(--chat-rail-width);
-  height: auto;
+  height: calc(100vh - 58px);
   padding: 0;
   display: flex;
   align-items: stretch;
@@ -435,7 +434,6 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
   min-width: 0;
   background: transparent;
   background-size: auto, auto;
-  margin-left: var(--chat-rail-width);
   padding: clamp(1.5rem, 3vw, 3.5rem) clamp(2rem, 5vw, 5rem) clamp(2rem, 5vw, 5rem);
   overflow: hidden;
 }
@@ -451,7 +449,6 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
 }
 
 .portfolio-shell > :not(.mesh-canvas) {
-  position: relative;
   z-index: 1;
 }
 
