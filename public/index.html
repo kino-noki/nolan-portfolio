@@ -1239,7 +1239,8 @@ leads, support tickets, and anything that needs the real Nolan.</p>
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const pointer = { x: 0.78, y: 0.18, active: false, speed: 0 };
   const follow = { x: 0.78, y: 0.18 };
-  const small = 28;
+  const baseSmall = 28;
+  let small = baseSmall;
   let columns = [];
   let width = 0;
   let height = 0;
@@ -1250,9 +1251,12 @@ leads, support tickets, and anything that needs the real Nolan.</p>
 
   function resizeMesh() {
     const rect = meshSurface.getBoundingClientRect();
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     width = Math.max(1, Math.floor(rect.width));
     height = Math.max(1, Math.floor(rect.height));
+    const area = width * height;
+    const maxDpr = area > 3200000 ? 1.15 : 1.5;
+    const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
+    small = Math.max(baseSmall, Math.min(42, Math.sqrt(area / 3600)));
     canvas.width = Math.floor(width * dpr);
     canvas.height = Math.floor(height * dpr);
     canvas.style.width = width + 'px';
@@ -1404,8 +1408,8 @@ leads, support tickets, and anything that needs the real Nolan.</p>
   function settleMesh() {
     let moving = false;
     const speedBoost = Math.min(1, pointer.speed * 28);
-    const followEase = reduceMotion ? 1 : 0.2 + speedBoost * 0.2;
-    const ease = reduceMotion ? 1 : 0.17 + speedBoost * 0.11;
+    const followEase = reduceMotion ? 1 : 0.14 + speedBoost * 0.14;
+    const ease = reduceMotion ? 1 : 0.12 + speedBoost * 0.08;
     const colorEase = reduceMotion ? 1 : 0.075;
 
     if (pointer.active) {
