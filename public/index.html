@@ -75,6 +75,12 @@ body[data-font-theme="home"] {
   --font-display: 'Fraunces', serif;
 }
 
+body[data-font-theme="hybrid"] {
+  --font-body: 'Space Grotesk', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-display: 'Fraunces', serif;
+}
+
 html { scroll-behavior: smooth; }
 body { background: var(--shell); color: var(--text); font-family: var(--font-body); font-size: 15px; line-height: 1.6; min-height: 100vh; }
 
@@ -619,6 +625,24 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
   cursor: pointer; transition: background 0.15s, color 0.15s;
 }
 .gate-btn:hover { background: #6c806e; border-color: #6c806e; color: #fffaf0; }
+.gate-skip {
+  width: 100%;
+  margin-top: 0.55rem;
+  padding: 0.62rem;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--soft);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.gate-skip:hover {
+  color: var(--heading);
+  border-color: var(--accent);
+  background: rgba(120,148,130,0.1);
+}
 .gate-note { display: none; font-family: var(--font-mono); font-size: 11px; color: var(--text3); text-align: center; margin-top: 1rem; }
 
 /* ── RESPONSIVE ── */
@@ -801,11 +825,11 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
       <div class="gate-overlay" id="gateOverlay">
         <div class="gate-modal">
           <div class="gate-logo"><span class="gate-prompt">~</span> nolan@kim <span class="gate-cursor"></span></div>
-          <h2 class="gate-title">Hey, let's talk</h2>
-          <p class="gate-sub">I'm AI Nolan, Nolan's portfolio bot. I can
+          <h2 class="gate-title" id="gateTitle">Hey, let's talk</h2>
+          <p class="gate-sub" id="gateSub">I'm AI Nolan, Nolan's portfolio bot. I can
  answer questions about his experience, capture recruiter opportunities,
  help with basic tech issues, create Jira tickets, and check NAI or REC 
-ticket status.<br><br>What's your name and email? That gives the real Nolan a way to follow up when the chat needs a human.</p>
+ticket status.<br><br>You can start with your name and email, or skip for now and chat anonymously. If I need to create a ticket, I'll ask for contact details then.</p>
           <div class="gate-field">
             <label>Name</label>
             <input type="text" id="gateName" placeholder="Jane Smith" autocomplete="name" onkeydown="if(event.key==='Enter')document.getElementById('gateEmail').focus()">
@@ -816,6 +840,7 @@ ticket status.<br><br>What's your name and email? That gives the real Nolan a wa
           </div>
           <div class="gate-error" id="gateError"></div>
           <button class="gate-btn" id="gateBtn" onclick="submitGate()">Start chatting →</button>
+          <button class="gate-skip" id="gateSkip" onclick="skipGate()" type="button">Skip for now</button>
           <p class="gate-note">The real Nolan can review conversations submitted here.</p>
         </div>
       </div>
@@ -1052,7 +1077,7 @@ leads, support tickets, and anything that needs the real Nolan.</p>
 
 <script>
 (() => {
-  const allowedFonts = new Set(['default', 'plex', 'atkinson', 'space', 'editorial', 'home']);
+  const allowedFonts = new Set(['default', 'plex', 'atkinson', 'space', 'editorial', 'home', 'hybrid']);
   const font = new URLSearchParams(window.location.search).get('font') || 'default';
   if (allowedFonts.has(font)) {
     document.body.dataset.fontTheme = font;
@@ -1402,6 +1427,8 @@ leads, support tickets, and anything that needs the real Nolan.</p>
   let sending = false;       // true while a send is in flight — blocks double-submits
   let lookupTicketKey = '';   // remembers the last ticket key a visitor mentioned
   let pendingResumePrompt = ''; // resume clicks before the gate opens are sent after sign-in
+  let chatStarted = false;
+  let pendingGateAction = null;
 
   // --- Tab-close logging ----------------------------------------------------
   // The 15s idle timer might not have fired yet when someone closes the tab, so
@@ -1427,12 +1454,60 @@ leads, support tickets, and anything that needs the real Nolan.</p>
     return 'sess-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
   }
 
-  // --- Gate: capture name + email before chatting ---------------------------
-  // We collect identity up front rather than letting the bot ask, for two reasons:
-  // it guarantees we always have follow-up contact details (even if the visitor
-  // bails after one message), and it keeps the conversation itself focused on
-  // their actual question. Email is regex-checked so a typo'd address doesn't
-  // silently make replies undeliverable.
+  // --- Gate: optional identity, required for ticket handoff ------------------
+  // Visitors can skip the initial gate and chat as Anonymous. If the bot needs
+  // to create a support ticket, the gate returns with ticket-specific copy so
+  // Nolan has a contact address for follow-up.
+  function setGateCopy(mode = 'start') {
+    const title = document.getElementById('gateTitle');
+    const sub = document.getElementById('gateSub');
+    const btn = document.getElementById('gateBtn');
+    const skip = document.getElementById('gateSkip');
+    if (!title || !sub || !btn || !skip) return;
+
+    if (mode === 'ticket') {
+      title.textContent = 'Where should Nolan follow up?';
+      sub.innerHTML = "I can create a support ticket for this, but Nolan needs a name and email so he can send the confirmation and follow up if needed.";
+      btn.textContent = 'Create ticket →';
+      skip.style.display = 'none';
+    } else {
+      title.textContent = "Hey, let's talk";
+      sub.innerHTML = "I'm AI Nolan, Nolan's portfolio bot. I can answer questions about his experience, capture recruiter opportunities, help with basic tech issues, create Jira tickets, and check NAI or REC ticket status.<br><br>You can start with your name and email, or skip for now and chat anonymously. If I need to create a ticket, I'll ask for contact details then.";
+      btn.textContent = 'Start chatting →';
+      skip.style.display = '';
+    }
+  }
+
+  function showGate(mode = 'start') {
+    setGateCopy(mode);
+    const gate = document.getElementById('gateOverlay');
+    if (gate) gate.style.display = 'flex';
+    const name = document.getElementById('gateName');
+    if (name) name.focus();
+  }
+
+  function hideGate() {
+    const gate = document.getElementById('gateOverlay');
+    if (gate) gate.style.display = 'none';
+  }
+
+  function hasContactInfo() {
+    return config.name && config.name !== 'Anonymous' && !!config.email;
+  }
+
+  function skipGate() {
+    config.name = 'Anonymous';
+    config.email = '';
+    hideGate();
+    if (!chatStarted) startChat();
+    document.getElementById('msgInput').focus();
+    if (pendingResumePrompt) {
+      const prompt = pendingResumePrompt;
+      pendingResumePrompt = '';
+      setTimeout(() => askChat(prompt), 250);
+    }
+  }
+
   function submitGate() {
     const nameEl = document.getElementById('gateName');
     const emailEl = document.getElementById('gateEmail');
@@ -1458,9 +1533,18 @@ leads, support tickets, and anything that needs the real Nolan.</p>
     errEl.textContent = '';
     config.name = name;
     config.email = email;
-    document.getElementById('gateOverlay').style.display = 'none';
-    startChat();
+    hideGate();
+    if (!chatStarted) startChat();
+    else conversationMessages.push({ role: 'user', content: `[system note: the visitor's name is ${config.name} and their email is ${config.email}. Do not ask for these again. Continue helping.]` });
     document.getElementById('msgInput').focus();
+    if (pendingGateAction?.type === 'support_ticket') {
+      const action = pendingGateAction;
+      pendingGateAction = null;
+      createSupportTicket(action.result, action.reply, action.phase).catch(err => {
+        addBotMessage(`Something went wrong creating the ticket: ${err.message}`, 'ticket', '⚠ send failed');
+      });
+      return;
+    }
     if (pendingResumePrompt) {
       const prompt = pendingResumePrompt;
       pendingResumePrompt = '';
@@ -1478,19 +1562,20 @@ leads, support tickets, and anything that needs the real Nolan.</p>
     attempt = 0; messageCount = 0; lastSentIndex = 0;
     recruiterFired = false;
     supportFired = false;
+    chatStarted = true;
     conversationMessages = [];
-    const firstName = config.name.split(' ')[0];
+    const firstName = config.name && config.name !== 'Anonymous' ? config.name.split(' ')[0] : 'there';
     const greeting = `Hey ${firstName}! I'm AI Nolan: a portfolio chatbot that shows how Nolan thinks about support, automation, and clean handoffs.
 
 Ask me about his IT support, IAM, SaaS admin, endpoint, and automation experience. You can also hand me a recruiter lead, troubleshoot a basic tech issue, or check a NAI/REC ticket from your confirmation email.
 
-If something needs the real Nolan, I'll route the right details through Zapier and Jira so he can review it.
+If something needs the real Nolan, I'll route the right details through Zapier and Jira so he can review it. If you skipped contact info, I'll ask for it only when it's needed for a ticket.
 
 What would you like to do?`;
     addBotMessage(greeting);
     conversationMessages.push({ role: 'assistant', content: greeting });
     // Seed the model with the visitor's identity so it never has to ask
-    conversationMessages.push({ role: 'user', content: `[system note: the visitor's name is ${config.name} and their email is ${config.email}. Do not ask for these again. Greet them and help.]` });
+    conversationMessages.push({ role: 'user', content: `[system note: the visitor's name is ${config.name || 'Anonymous'} and their email is ${config.email || 'not provided yet'}. Do not ask for contact details unless a support ticket must be created. Greet them and help.]` });
     conversationMessages.push({ role: 'assistant', content: 'Understood.' });
   }
 
@@ -1615,7 +1700,8 @@ What would you like to do?`;
 
   function addUserMessage(text) {
     const msgs = document.getElementById('messages');
-    const initials = config.name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase() || 'U';
+    const displayName = config.name || 'Anonymous';
+    const initials = displayName === 'Anonymous' ? 'AN' : displayName.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
     const row = document.createElement('div');
     row.className = 'msg-row user';
     row.innerHTML = `<div class="msg-avatar user">${initials}</div><div class="bubble user">${escHtml(text).replace(/\n/g,'<br>')}</div>`;
@@ -1764,7 +1850,7 @@ What would you like to do?`;
         if (m.content === 'Understood.') return false;
         return true;
       })
-      .map(m => `${m.role === 'user' ? config.name : 'AI Nolan'}: ${m.content}`)
+      .map(m => `${m.role === 'user' ? (config.name || 'Anonymous') : 'AI Nolan'}: ${m.content}`)
       .join('\n');
   }
 
@@ -1781,7 +1867,7 @@ What would you like to do?`;
       if (typeof m.content !== 'string') continue;
       if (m.content.startsWith('[system note')) continue;
       if (m.content === 'Understood.') continue;
-      parts.push(`${m.role === 'user' ? config.name : 'AI Nolan'}: ${m.content}`);
+      parts.push(`${m.role === 'user' ? (config.name || 'Anonymous') : 'AI Nolan'}: ${m.content}`);
     }
     return parts.join('\n');
   }
@@ -1796,7 +1882,7 @@ What would you like to do?`;
       type: currentMode || 'general',
       status: '',           // ongoing | final | '' (blank on create so Path 4 fires)
       session_id: config.sessionId,
-      user_name: config.name,
+      user_name: config.name || 'Anonymous',
       user_email: config.email || '',
       message: unsentExchanges(),  // all exchanges since the last fire (the unsent batch)
       attempt: '',          // support attempt count (ticket only, else blank)
@@ -1860,6 +1946,42 @@ What would you like to do?`;
     } catch (e) {
       return '';
     }
+  }
+
+  async function createSupportTicket(result, reply, phase) {
+    cancelIdleLog();
+    const sent = await fireZapier(config.webhook, buildPayload({
+      event: 'ticket',
+      type: 'support',
+      user_name: result.user_full_name || config.name,
+      user_email: result.user_email || config.email || '',
+      attempt: attempt
+    }), true);
+    if (sent) {
+      supportFired = true;  // latch on success so a failed send can retry
+      // The confirmation message is written by the model. If it set phase='escalate'
+      // it already wrote a handoff reply (use it). Otherwise (attempt-exhaustion,
+      // a code decision) its last reply was a troubleshooting attempt, so we ask
+      // the model for a confirmation now that conditions are met. Fall back to a
+      // fixed message if the model returns nothing.
+      let ticketMsg = (phase === 'escalate' && reply) ? reply : '';
+      if (!ticketMsg) {
+        showTyping();
+        ticketMsg = await requestTicketConfirmation();
+        removeTyping();
+      }
+      if (!ticketMsg) {
+        ticketMsg = "I wasn't able to resolve this one myself, so I've created a ticket for the real Nolan to take over — you'll get an email confirmation with your ticket number shortly. In the meantime, is there anything else I can help you with?";
+      }
+      addBotMessage(ticketMsg, 'ticket', '↗ ticket submitted');
+      // Tell the model the issue is now in the real Nolan's hands so it stops
+      // troubleshooting the same problem and instead offers other help.
+      conversationMessages.push({ role: 'user', content: '[system note: a support ticket has been filed for this issue and the real Nolan will follow up by email. Do NOT keep troubleshooting this same problem or claim you can fix it now. Acknowledge it is with Nolan and offer to help with anything else.]' });
+      conversationMessages.push({ role: 'assistant', content: 'Understood.' });
+    } else {
+      addBotMessage("I couldn't file your ticket just now. Please email the real Nolan directly at noki21@protonmail.com and he'll pick it up. Sorry about that.", 'ticket', '⚠ send failed');
+    }
+    if (sent) armIdleLog();
   }
 
   // --- Call the model (via /api/chat) ---------------------------------------
@@ -2032,39 +2154,13 @@ What would you like to do?`;
       // confirms the situation rather than escalating on the literal first message.
       } else if (mode === 'support' && !supportFired &&
                  (attempt >= 2 || (phase === 'escalate' && messageCount > 1))) {
-        cancelIdleLog();
-        const sent = await fireZapier(config.webhook, buildPayload({
-          event: 'ticket',
-          type: 'support',
-          user_name: result.user_full_name || config.name,
-          user_email: result.user_email || config.email || '',
-          attempt: attempt
-        }), true);
-        if (sent) {
-          supportFired = true;  // latch on success so a failed send can retry
-          // The confirmation message is written by the model. If it set phase='escalate'
-          // it already wrote a handoff reply (use it). Otherwise (attempt-exhaustion,
-          // a code decision) its last reply was a troubleshooting attempt, so we ask
-          // the model for a confirmation now that conditions are met. Fall back to a
-          // fixed message if the model returns nothing.
-          let ticketMsg = (phase === 'escalate' && reply) ? reply : '';
-          if (!ticketMsg) {
-            showTyping();
-            ticketMsg = await requestTicketConfirmation();
-            removeTyping();
-          }
-          if (!ticketMsg) {
-            ticketMsg = "I wasn't able to resolve this one myself, so I've created a ticket for the real Nolan to take over — you'll get an email confirmation with your ticket number shortly. In the meantime, is there anything else I can help you with?";
-          }
-          addBotMessage(ticketMsg, 'ticket', '↗ ticket submitted');
-          // Tell the model the issue is now in the real Nolan's hands so it stops
-          // troubleshooting the same problem and instead offers other help.
-          conversationMessages.push({ role: 'user', content: '[system note: a support ticket has been filed for this issue and the real Nolan will follow up by email. Do NOT keep troubleshooting this same problem or claim you can fix it now. Acknowledge it is with Nolan and offer to help with anything else.]' });
-          conversationMessages.push({ role: 'assistant', content: 'Understood.' });
+        if (!hasContactInfo()) {
+          pendingGateAction = { type: 'support_ticket', result, reply, phase };
+          addBotMessage("I can create a ticket for this. Before I send it to Nolan, I need your name and email so he can send the confirmation and follow up.", 'ticket');
+          showGate('ticket');
         } else {
-          addBotMessage("I couldn't file your ticket just now. Please email the real Nolan directly at noki21@protonmail.com and he'll pick it up. Sorry about that.", 'ticket', '⚠ send failed');
+          await createSupportTicket(result, reply, phase);
         }
-        if (sent) armIdleLog();
 
       // === NORMAL — reply, count a troubleshooting attempt if this was a support
       // turn (and no ticket exists yet), and arm the idle log. Once a ticket exists,
@@ -2099,8 +2195,8 @@ What would you like to do?`;
   // Show gate on load
   // --- Boot -----------------------------------------------------------------
   // Just focus the gate's name field on load so the visitor can type immediately.
-  // Nothing else runs until they submit the gate — that's what gates the whole
-  // chat behind having a name + email.
+  // The gate appears first, but visitors can skip it and chat as Anonymous.
+  // Contact details are required later only if the bot needs to create a ticket.
   window.addEventListener("DOMContentLoaded", function() {
     const n = document.getElementById("gateName");
     if (n) n.focus();
