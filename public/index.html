@@ -26,9 +26,9 @@
   --amber: #7f6e56;
   --amber-dim: #eee7d8;
   --red: #a2514b;
-  --font-mono: 'JetBrains Mono', monospace;
-  --font-body: 'Inter', sans-serif;
-  --font-display: var(--font-body);
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-body: 'Atkinson Hyperlegible', sans-serif;
+  --font-display: 'Fraunces', serif;
   /* Mushroom + spruce ops theme */
   --ink: #18251f;
   --ink2: #223429;
@@ -38,10 +38,10 @@
   --heading: #171a12;
   --soft: #5c6254;
   --accent: #789482;
-  --accent2: #b79a94;
+  --accent2: #506378;
   --cobalt: #506378;
   --mint: #789482;
-  --coral: #b79a94;
+  --coral: #506378;
   --shell: #332f28;
   --chat-rail-width: clamp(430px, 35vw, 540px);
 }
@@ -262,6 +262,17 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
 .tag.blue { color: #506378; border-color: rgba(80,99,120,0.35); background: rgba(238,231,216,0.86); }
 .tag.amber { color: #7f6e56; border-color: rgba(127,110,86,0.42); background: rgba(238,231,216,0.86); }
 
+.resume-ask,
+.tag,
+.skill-card,
+.exp-item,
+.edu-card,
+.cert-badge,
+.exp-bullets li {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(120, 148, 130, 0.18);
+}
+
 .tag:hover,
 .resume-ask:hover {
   transform: translate(-2px, -2px);
@@ -304,9 +315,9 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
 
 .titlebar-dots { display: flex; gap: 6px; }
 .titlebar-dots span { width: 10px; height: 10px; border-radius: 50%; }
-.titlebar-dots span:nth-child(1) { background: #ff5f57; }
-.titlebar-dots span:nth-child(2) { background: #febc2e; }
-.titlebar-dots span:nth-child(3) { background: #28c840; }
+.titlebar-dots span:nth-child(1) { background: #789482; }
+.titlebar-dots span:nth-child(2) { background: #506378; }
+.titlebar-dots span:nth-child(3) { background: #d7d0c1; }
 
 .titlebar-label { font-family: var(--font-mono); font-size: 12px; color: #eee7d8; font-weight: 600; margin-left: 4px; }
 
@@ -355,7 +366,7 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
 .msg-avatar {
   width: 30px; height: 30px; border-radius: 999px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-body); font-size: 11px; font-weight: 700;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700;
   overflow: hidden;
 }
 
@@ -381,22 +392,23 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
   max-width: min(560px, calc(100vw - 7rem)); padding: 0.65rem 0.9rem; border-radius: 14px;
   font-size: 14px; line-height: 1.62;
   box-shadow: 5px 5px 0 rgba(7,12,9,0.22);
+  font-family: var(--font-mono);
+  letter-spacing: 0;
 }
 
 .bubble.bot {
   background: rgba(238,231,216,0.92); border: 1px solid rgba(238,231,216,0.24);
   border-bottom-left-radius: 5px; color: var(--heading);
-  font-family: var(--font-body);
 }
 
 .bubble.user {
   background: rgba(120,148,130,0.88); border: 1px solid rgba(120,148,130,0.9);
   border-bottom-right-radius: 5px; color: #101711;
-  font-family: var(--font-body); font-size: 13px;
+  font-size: 13px;
 }
 
 .bubble.ticket {
-  background: #fff8f0; border: 1px solid #f3cf98; border-left: 2px solid var(--amber);
+  background: rgba(238,231,216,0.96); border: 1px solid rgba(134,125,108,0.42); border-left: 2px solid var(--accent);
 }
 
 .bubble.recruited {
@@ -429,28 +441,28 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
 
 .input-box {
   flex: 1; background: transparent; border: none; outline: none;
-  font-family: var(--font-body); font-size: 13px; color: #eee7d8;
+  font-family: var(--font-mono); font-size: 13px; color: #eee7d8;
   resize: none; line-height: 1.5; max-height: 100px; padding: 0.5rem 0;
 }
 
 .input-box::placeholder { color: rgba(238,231,216,0.5); }
 .input-box:disabled { opacity: 0.4; cursor: not-allowed; }
 
-/* Coral accents: gate prompt/cursor and the input prefix */
-.gate-prompt, .input-prefix { color: var(--accent2); background: transparent; }
-.gate-cursor { background: var(--accent2); }
+/* Spruce accents: gate prompt/cursor and the input prefix */
+.gate-prompt, .input-prefix { color: var(--accent); background: transparent; }
+.gate-cursor { background: var(--accent); }
 .input-prefix { font-family: var(--font-mono); font-size: 13px; padding-bottom: 0.6rem; flex-shrink: 0; }
 
 .send-btn {
   width: 38px; height: 38px; border-radius: 999px;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; flex-shrink: 0;
-  background: var(--accent2); border: 1px solid var(--accent2); color: #fffaf0;
-  box-shadow: 0 10px 24px rgba(183,154,148,0.22);
+  background: var(--accent); border: 1px solid rgba(238,231,216,0.18); color: #101711;
+  box-shadow: 0 10px 24px rgba(7,12,9,0.24);
   transition: background 0.15s;
 }
 
-.send-btn:hover { background: #a88680; border-color: #a88680; }
+.send-btn:hover { background: #6c806e; border-color: rgba(238,231,216,0.28); }
 .send-btn:hover svg { stroke: #ffffff; }
 .send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 .send-btn svg { width: 14px; height: 14px; fill: none; stroke: #ffffff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -960,7 +972,7 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
         <div class="titlebar-dots">
           <span></span><span></span><span></span>
         </div>
-        <span class="titlebar-label">nolan kim — live chat</span>
+        <span class="titlebar-label">ai nolan — live chat</span>
         <div class="titlebar-right">
           <div class="dot"></div>
           nolan online
