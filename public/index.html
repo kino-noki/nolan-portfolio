@@ -826,10 +826,7 @@ body { background: var(--shell); color: var(--text); font-family: var(--font-bod
         <div class="gate-modal">
           <div class="gate-logo"><span class="gate-prompt">~</span> nolan@kim <span class="gate-cursor"></span></div>
           <h2 class="gate-title" id="gateTitle">Hey, let's talk</h2>
-          <p class="gate-sub" id="gateSub">I'm AI Nolan, Nolan's portfolio bot. I can
- answer questions about his experience, capture recruiter opportunities,
- help with basic tech issues, create Jira tickets, and check NAI or REC 
-ticket status.<br><br>You can start with your name and email, or skip for now and chat anonymously. If I need to create a ticket, I'll ask for contact details then.</p>
+          <p class="gate-sub" id="gateSub">I'm AI Nolan, Nolan's portfolio bot. Ask about his support background, IAM/SaaS work, endpoint tooling, automation projects, ticket systems, or how he approaches messy IT problems.<br><br>You can start with your name and email, or skip for now and chat anonymously. If I need to create a support ticket, I'll ask for contact details then.</p>
           <div class="gate-field">
             <label>Name</label>
             <input type="text" id="gateName" placeholder="Jane Smith" autocomplete="name" onkeydown="if(event.key==='Enter')document.getElementById('gateEmail').focus()">
@@ -1467,12 +1464,12 @@ leads, support tickets, and anything that needs the real Nolan.</p>
 
     if (mode === 'ticket') {
       title.textContent = 'Where should Nolan follow up?';
-      sub.innerHTML = "I can create a support ticket for this, but Nolan needs a name and email so he can send the confirmation and follow up if needed.";
+      sub.innerHTML = "I need to create a support ticket for this, but Nolan needs a name and email so he can send your ticket number and follow up if needed.";
       btn.textContent = 'Create ticket →';
       skip.style.display = 'none';
     } else {
       title.textContent = "Hey, let's talk";
-      sub.innerHTML = "I'm AI Nolan, Nolan's portfolio bot. I can answer questions about his experience, capture recruiter opportunities, help with basic tech issues, create Jira tickets, and check NAI or REC ticket status.<br><br>You can start with your name and email, or skip for now and chat anonymously. If I need to create a ticket, I'll ask for contact details then.";
+      sub.innerHTML = "I'm AI Nolan, Nolan's portfolio bot. Ask about his support background, IAM/SaaS work, endpoint tooling, automation projects, ticket systems, or how he approaches messy IT problems.<br><br>You can start with your name and email, or skip for now and chat anonymously. If I need to create a support ticket, I'll ask for contact details then.";
       btn.textContent = 'Start chatting →';
       skip.style.display = '';
     }
@@ -1565,13 +1562,19 @@ leads, support tickets, and anything that needs the real Nolan.</p>
     chatStarted = true;
     conversationMessages = [];
     const firstName = config.name && config.name !== 'Anonymous' ? config.name.split(' ')[0] : 'there';
-    const greeting = `Hey ${firstName}! I'm AI Nolan: a portfolio chatbot that shows how Nolan thinks about support, automation, and clean handoffs.
+    const greeting = `Hey ${firstName}! I'm AI Nolan: Nolan's portfolio chatbot for IT support, IAM, SaaS administration, endpoint tooling, automation, and practical troubleshooting.
 
-Ask me about his IT support, IAM, SaaS admin, endpoint, and automation experience. You can also hand me a recruiter lead, troubleshoot a basic tech issue, or check a NAI/REC ticket from your confirmation email.
+Here are a few useful things I can do:
 
-If something needs the real Nolan, I'll route the right details through Zapier and Jira so he can review it. If you skipped contact info, I'll ask for it only when it's needed for a ticket.
+• Explain any resume item — click skills, roles, bullets, schools, or certs on the page.
+• Talk through Nolan's Google Workspace, Okta, Jira, endpoint, scripting, and automation work.
+• Capture recruiter leads and pass role details to Nolan.
+• Troubleshoot basic tech issues. If I can't resolve it, I can create a support ticket for Nolan.
+• Check ticket status if you send a key like NAI-31 or REC-4 from your confirmation email.
 
-What would you like to do?`;
+If you skipped contact info, no problem. I'll only ask for name and email if a support ticket needs to be created.
+
+What should we look at first?`;
     addBotMessage(greeting);
     conversationMessages.push({ role: 'assistant', content: greeting });
     // Seed the model with the visitor's identity so it never has to ask
