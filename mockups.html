@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Nolan Redesign Mockups</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: Inter, system-ui, sans-serif;
+  background: #0a0f17;
+  color: #eef3f8;
+}
+.mockup-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 14px 18px;
+  background: rgba(8, 12, 18, 0.9);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  backdrop-filter: blur(18px);
+  overflow-x: auto;
+}
+.mockup-nav strong { flex: 0 0 auto; margin-right: auto; font-size: 13px; letter-spacing: 0.02em; }
+.mockup-nav a {
+  flex: 0 0 auto;
+  color: #dbe7f4;
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,0.16);
+  padding: 7px 10px;
+  font: 12px JetBrains Mono, monospace;
+}
+.mockup {
+  min-height: 100vh;
+  padding: clamp(18px, 3vw, 40px);
+}
+.mockup-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 18px;
+}
+.mockup-title h1 { margin: 0; font-size: clamp(24px, 3vw, 42px); }
+.mockup-title p { margin: 0; color: rgba(255,255,255,0.62); max-width: 520px; font-size: 14px; }
+.layout {
+  display: grid;
+  grid-template-columns: minmax(360px, 35vw) minmax(0, 1fr);
+  min-height: calc(100vh - 132px);
+  border: 1px solid var(--line);
+  background: var(--bg);
+  box-shadow: var(--shadow);
+}
+.chat {
+  border-right: 1px solid var(--line);
+  background: var(--chat);
+  display: flex;
+  flex-direction: column;
+  min-height: 660px;
+}
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+  font: 12px JetBrains Mono, monospace;
+  color: var(--muted);
+}
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); }
+.chat-body {
+  flex: 1;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+.bubble {
+  max-width: 86%;
+  padding: 12px 13px;
+  border: 1px solid var(--bubble-line);
+  background: var(--bubble);
+  color: var(--bubble-text);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.bubble.user {
+  margin-left: auto;
+  background: var(--user);
+  color: var(--user-text);
+  border-color: transparent;
+}
+.composer {
+  display: flex;
+  gap: 8px;
+  padding: 14px;
+  border-top: 1px solid var(--line);
+}
+.composer span {
+  flex: 1;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font: 12px JetBrains Mono, monospace;
+}
+.composer button {
+  border: 0;
+  padding: 0 14px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 800;
+}
+.resume {
+  padding: clamp(24px, 4vw, 58px);
+  color: var(--text);
+  background: var(--resume);
+  overflow: hidden;
+}
+.eyebrow {
+  font: 12px JetBrains Mono, monospace;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.hero {
+  margin: 12px 0 24px;
+  font-size: clamp(52px, 8vw, 118px);
+  line-height: 0.92;
+  letter-spacing: -0.06em;
+}
+.subhead {
+  max-width: 720px;
+  color: var(--soft);
+  font-size: clamp(18px, 2vw, 28px);
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 26px 0 38px;
+}
+.chip, .card, .role, .bullet {
+  cursor: pointer;
+}
+.chip {
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--text);
+  padding: 8px 11px;
+  font: 12px JetBrains Mono, monospace;
+}
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 30px 0 14px;
+  font: 12px JetBrains Mono, monospace;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+.section-head::after { content: ""; height: 1px; flex: 1; background: var(--line); }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.card, .role {
+  background: var(--card);
+  border: 1px solid var(--line);
+  padding: 18px;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+.card:hover, .role:hover, .chip:hover, .bullet:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  box-shadow: var(--hover);
+}
+.card b, .role b { display: block; margin-bottom: 8px; color: var(--heading); }
+.card p, .role p { margin: 0; color: var(--soft); font-size: 13px; line-height: 1.65; }
+.role { margin-bottom: 14px; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+.meta span { border: 1px solid var(--line); padding: 4px 8px; color: var(--soft); font: 11px JetBrains Mono, monospace; }
+.bullet {
+  margin: 7px 0 0;
+  padding: 7px 9px;
+  border-left: 2px solid var(--accent);
+  color: var(--soft);
+  font-size: 13px;
+}
+.ask-note {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  margin-top: 10px;
+  color: var(--accent);
+  font: 11px JetBrains Mono, monospace;
+}
+.palette-board {
+  padding: clamp(18px, 3vw, 40px);
+  background: #12100d;
+}
+.palette-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.palette-card {
+  background: var(--p-bg);
+  border: 1px solid var(--p-line);
+  color: var(--p-text);
+  padding: 18px;
+  min-height: 260px;
+  box-shadow: 0 18px 50px rgba(0,0,0,0.22);
+}
+.palette-card h2 {
+  margin: 0 0 6px;
+  font-size: 20px;
+}
+.palette-card p {
+  margin: 0 0 14px;
+  color: var(--p-soft);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin: 12px 0 16px;
+}
+.swatch {
+  height: 42px;
+  border: 1px solid rgba(0,0,0,0.16);
+  background: var(--swatch);
+}
+.mini-preview {
+  display: grid;
+  grid-template-columns: 38% 1fr;
+  border: 1px solid var(--p-line);
+  min-height: 90px;
+}
+.mini-chat {
+  background: var(--p-chat);
+  padding: 10px;
+  border-right: 1px solid var(--p-line);
+}
+.mini-resume {
+  background: var(--p-paper);
+  padding: 10px;
+}
+.mini-line {
+  height: 8px;
+  margin-bottom: 7px;
+  background: var(--p-muted);
+  opacity: 0.8;
+}
+.mini-line.short { width: 62%; }
+.mini-pill {
+  display: inline-block;
+  width: 54px;
+  height: 18px;
+  margin: 3px 4px 0 0;
+  border: 1px solid var(--p-line);
+  background: var(--p-card);
+}
+.palette-values {
+  margin-top: 12px;
+  font: 11px JetBrains Mono, monospace;
+  color: var(--p-soft);
+}
+.walnut-sage {
+  --p-bg: #2a211b;
+  --p-chat: #1d1713;
+  --p-paper: #e8decd;
+  --p-card: #f5eddf;
+  --p-line: #8c7a63;
+  --p-text: #f5eddf;
+  --p-soft: #cdbda5;
+  --p-muted: #8fa18b;
+}
+.oat-ink {
+  --p-bg: #efe7d8;
+  --p-chat: #25313a;
+  --p-paper: #faf5eb;
+  --p-card: #e2d7c4;
+  --p-line: #b5a993;
+  --p-text: #24313a;
+  --p-soft: #657179;
+  --p-muted: #6b7f8d;
+}
+.mushroom-spruce {
+  --p-bg: #332f28;
+  --p-chat: #18251f;
+  --p-paper: #d7d0c1;
+  --p-card: #eee7d8;
+  --p-line: #867d6c;
+  --p-text: #f2eadb;
+  --p-soft: #bfb6a4;
+  --p-muted: #789482;
+}
+.linen-slate {
+  --p-bg: #e7dfd2;
+  --p-chat: #394047;
+  --p-paper: #f7f0e4;
+  --p-card: #ffffff;
+  --p-line: #bfb5a5;
+  --p-text: #30363b;
+  --p-soft: #697177;
+  --p-muted: #7f8b94;
+}
+.coffee-blue {
+  --p-bg: #261e1a;
+  --p-chat: #181b22;
+  --p-paper: #e6dccd;
+  --p-card: #f8f0e4;
+  --p-line: #8d7b66;
+  --p-text: #f8f0e4;
+  --p-soft: #cbbbab;
+  --p-muted: #6f8fa8;
+}
+.taupe-plum {
+  --p-bg: #312a2a;
+  --p-chat: #211c22;
+  --p-paper: #e4d9cf;
+  --p-card: #f5eee7;
+  --p-line: #928176;
+  --p-text: #f5eee7;
+  --p-soft: #cabbb0;
+  --p-muted: #9a7d91;
+}
+.blush-slate {
+  --p-bg: #0b0d1f;
+  --p-chat: #181a1a;
+  --p-paper: #d7b0a8;
+  --p-card: #d2e6c8;
+  --p-line: #6c6065;
+  --p-text: #f0ddd9;
+  --p-soft: #b89591;
+  --p-muted: #53657a;
+}
+
+#console {
+  --bg: #071016;
+  --chat: #09151d;
+  --resume: #0f1a22;
+  --card: #111f29;
+  --line: #27404d;
+  --text: #e7f4ef;
+  --heading: #ffffff;
+  --soft: #9bb4bf;
+  --muted: #82a2ad;
+  --accent: #41e3ad;
+  --accent-text: #03100c;
+  --bubble: #0f212b;
+  --bubble-line: #2a4a59;
+  --bubble-text: #dcefea;
+  --user: #41e3ad;
+  --user-text: #06120e;
+  --shadow: 0 24px 90px rgba(0,0,0,0.45);
+  --hover: 0 12px 0 rgba(65,227,173,0.1);
+}
+#ops-walnut {
+  --bg: #2a211b;
+  --chat: #1d1713;
+  --resume: #e8decd;
+  --card: #f5eddf;
+  --line: #8c7a63;
+  --text: #2a211b;
+  --heading: #18130f;
+  --soft: #5f5143;
+  --muted: #cdbda5;
+  --accent: #8fa18b;
+  --accent-text: #11170f;
+  --bubble: #2f251e;
+  --bubble-line: #6f604f;
+  --bubble-text: #f5eddf;
+  --user: #8fa18b;
+  --user-text: #11170f;
+  --shadow: 0 26px 80px rgba(28,20,14,0.34);
+  --hover: 8px 8px 0 rgba(42,33,27,0.16);
+}
+#ops-mushroom {
+  --bg: #332f28;
+  --chat: #18251f;
+  --resume: #d7d0c1;
+  --card: #eee7d8;
+  --line: #867d6c;
+  --text: #2d2a23;
+  --heading: #171510;
+  --soft: #5d574c;
+  --muted: #bfb6a4;
+  --accent: #789482;
+  --accent-text: #101711;
+  --bubble: #213229;
+  --bubble-line: #63745f;
+  --bubble-text: #f2eadb;
+  --user: #789482;
+  --user-text: #101711;
+  --shadow: 0 26px 80px rgba(23,26,18,0.32);
+  --hover: 8px 8px 0 rgba(51,47,40,0.16);
+}
+#ops-mushroom .layout {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(24,37,31,0.92) 0%, rgba(24,37,31,0.92) 35vw, rgba(215,208,193,0.96) 35vw),
+    var(--bg);
+}
+#ops-mushroom .layout::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(24,37,31,0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(24,37,31,0.045) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mix-blend-mode: multiply;
+}
+#ops-mushroom .chat,
+#ops-mushroom .resume {
+  position: relative;
+  z-index: 1;
+}
+#ops-mushroom .bar {
+  justify-content: space-between;
+  color: #d6cbb8;
+}
+#ops-mushroom .bar::after {
+  content: "live triage";
+  color: var(--accent);
+}
+#ops-mushroom .chat-body::before {
+  content: "session context";
+  display: block;
+  align-self: flex-start;
+  padding: 5px 8px;
+  border: 1px solid rgba(120,148,130,0.45);
+  color: #b9c9b9;
+  font: 11px JetBrains Mono, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+#ops-mushroom .bubble {
+  box-shadow: 5px 5px 0 rgba(7,12,9,0.22);
+}
+#ops-mushroom .composer span {
+  background: rgba(11,18,14,0.36);
+}
+#ops-mushroom .resume {
+  position: relative;
+  background:
+    radial-gradient(circle at 92% 7%, rgba(120,148,130,0.24), transparent 24%),
+    var(--resume);
+  background-size: auto, auto;
+}
+#ops-mushroom .resume > :not(.signal-canvas) {
+  position: relative;
+  z-index: 1;
+}
+#ops-mushroom .signal-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.78;
+  pointer-events: none;
+}
+#ops-mushroom .hero {
+  text-shadow: 2px 2px 0 rgba(238,231,216,0.65);
+}
+#ops-mushroom .subhead {
+  padding-left: 16px;
+  border-left: 4px solid var(--accent);
+}
+#ops-mushroom .chip,
+#ops-mushroom .card,
+#ops-mushroom .role {
+  box-shadow: 6px 6px 0 rgba(51,47,40,0.12);
+}
+#ops-mushroom .card {
+  position: relative;
+}
+#ops-mushroom .card::before {
+  content: "askable";
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  color: #6c806e;
+  font: 10px JetBrains Mono, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+#ops-mushroom .ops-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 26px 0 8px;
+}
+#ops-mushroom .ops-stat {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  background: rgba(238,231,216,0.7);
+  box-shadow: 4px 4px 0 rgba(51,47,40,0.1);
+}
+#ops-mushroom .ops-stat b {
+  display: block;
+  color: var(--heading);
+  font: 16px JetBrains Mono, monospace;
+}
+#ops-mushroom .ops-stat span {
+  color: var(--soft);
+  font: 10px JetBrains Mono, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+#ops-mushroom .role {
+  border-left: 4px solid var(--accent);
+}
+#ops-mushroom .bullet {
+  display: block;
+  margin-top: 12px;
+  padding: 11px 13px;
+  color: #4f493f;
+  background: linear-gradient(90deg, rgba(120, 148, 130, 0.12), rgba(245, 240, 229, 0.42));
+  border: 1px solid rgba(134, 125, 108, 0.34);
+  border-left: 4px solid var(--accent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38);
+}
+#ops-mushroom .role:hover .bullet,
+#ops-mushroom .bullet:hover {
+  color: #2d2a23;
+  background: linear-gradient(90deg, rgba(120, 148, 130, 0.22), rgba(245, 240, 229, 0.58));
+  border-color: rgba(120, 148, 130, 0.62);
+  border-left-color: var(--accent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42), 4px 4px 0 rgba(51, 47, 40, 0.1);
+}
+#desk {
+  --bg: #d9e2ee;
+  --chat: #172335;
+  --resume: #f5f7fb;
+  --card: #ffffff;
+  --line: #c8d3df;
+  --text: #172335;
+  --heading: #101827;
+  --soft: #596a7e;
+  --muted: #aebccc;
+  --accent: #2563eb;
+  --accent-text: #ffffff;
+  --bubble: #ffffff;
+  --bubble-line: #d8e2ed;
+  --bubble-text: #182336;
+  --user: #2563eb;
+  --user-text: #ffffff;
+  --shadow: 0 26px 80px rgba(23,35,53,0.16);
+  --hover: 0 14px 28px rgba(37,99,235,0.14);
+}
+#ticketwall {
+  --bg: #1f1712;
+  --chat: #241812;
+  --resume: #efe2cf;
+  --card: #fff6e8;
+  --line: #9e7c58;
+  --text: #22170f;
+  --heading: #120c08;
+  --soft: #69503a;
+  --muted: #d9c2a7;
+  --accent: #d75c37;
+  --accent-text: #fff8f0;
+  --bubble: #fff6e8;
+  --bubble-line: #b7936b;
+  --bubble-text: #241812;
+  --user: #d75c37;
+  --user-text: #fff8f0;
+  --shadow: 0 26px 80px rgba(30,18,9,0.28);
+  --hover: 8px 8px 0 rgba(30,18,9,0.16);
+}
+#command {
+  --bg: #080b16;
+  --chat: linear-gradient(180deg, #0b1020, #060914);
+  --resume: radial-gradient(circle at 80% 0%, rgba(109,91,255,0.28), transparent 32%), #0f1220;
+  --card: rgba(255,255,255,0.07);
+  --line: rgba(255,255,255,0.14);
+  --text: #f2f4ff;
+  --heading: #ffffff;
+  --soft: #b4bad7;
+  --muted: #8d94b9;
+  --accent: #9dff7a;
+  --accent-text: #071207;
+  --bubble: rgba(255,255,255,0.08);
+  --bubble-line: rgba(255,255,255,0.16);
+  --bubble-text: #edf0ff;
+  --user: #6d5bff;
+  --user-text: #ffffff;
+  --shadow: 0 28px 100px rgba(0,0,0,0.42);
+  --hover: 0 18px 50px rgba(109,91,255,0.28);
+}
+
+@media (max-width: 900px) {
+  .mockup-title { display: block; }
+  .layout { grid-template-columns: 1fr; }
+  .chat { min-height: 560px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .grid { grid-template-columns: 1fr; }
+  .palette-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+  <nav class="mockup-nav">
+    <strong>AI Nolan layout mockups</strong>
+    <a href="#palettes">Palettes</a>
+    <a href="#ops-walnut">Ops Walnut</a>
+    <a href="#ops-mushroom">Ops Mushroom</a>
+    <a href="#console">Ops Console</a>
+    <a href="#desk">Service Desk</a>
+    <a href="#ticketwall">Ticket Wall</a>
+    <a href="#command">Command Center</a>
+  </nav>
+
+  <section class="palette-board" id="palettes">
+    <div class="mockup-title">
+      <h1>Homey Palettes</h1>
+      <p>Warm brown/tan directions without orange accents. These can be applied to any of the left-chat/right-resume layouts below.</p>
+    </div>
+    <div class="palette-grid">
+      <article class="palette-card walnut-sage">
+        <h2>Walnut + Sage</h2>
+        <p>Cozy, grounded, and still technical. The green accent keeps it support/ops instead of coffee-shop.</p>
+        <div class="swatches">
+          <span class="swatch" style="--swatch:#2a211b"></span>
+          <span class="swatch" style="--swatch:#1d1713"></span>
+          <span class="swatch" style="--swatch:#e8decd"></span>
+          <span class="swatch" style="--swatch:#8fa18b"></span>
+          <span class="swatch" style="--swatch:#f5eddf"></span>
+        </div>
+        <div class="mini-preview"><div class="mini-chat"><div class="mini-line"></div><div class="mini-line short"></div></div><div class="mini-resume"><div class="mini-line"></div><span class="mini-pill"></span><span class="mini-pill"></span></div></div>
+        <div class="palette-values">walnut / espresso / oat / sage / ivory</div>
+      </article>
+      <article class="palette-card oat-ink">
+        <h2>Oat + Ink</h2>
+        <p>Bright enough for recruiters, warmer than the current blue-white look, with a serious left chat panel.</p>
+        <div class="swatches">
+          <span class="swatch" style="--swatch:#efe7d8"></span>
+          <span class="swatch" style="--swatch:#25313a"></span>
+          <span class="swatch" style="--swatch:#faf5eb"></span>
+          <span class="swatch" style="--swatch:#6b7f8d"></span>
+          <span class="swatch" style="--swatch:#b5a993"></span>
+        </div>
+        <div class="mini-preview"><div class="mini-chat"><div class="mini-line"></div><div class="mini-line short"></div></div><div class="mini-resume"><div class="mini-line"></div><span class="mini-pill"></span><span class="mini-pill"></span></div></div>
+        <div class="palette-values">oat / ink / cream / blue-gray / linen line</div>
+      </article>
+      <article class="palette-card mushroom-spruce">
+        <h2>Mushroom + Spruce</h2>
+        <p>Earthy and calm. Good if you want homey without beige monotony or orange warmth.</p>
+        <div class="swatches">
+          <span class="swatch" style="--swatch:#332f28"></span>
+          <span class="swatch" style="--swatch:#18251f"></span>
+          <span class="swatch" style="--swatch:#d7d0c1"></span>
+          <span class="swatch" style="--swatch:#789482"></span>
+          <span class="swatch" style="--swatch:#eee7d8"></span>
+        </div>
+        <div class="mini-preview"><div class="mini-chat"><div class="mini-line"></div><div class="mini-line short"></div></div><div class="mini-resume"><div class="mini-line"></div><span class="mini-pill"></span><span class="mini-pill"></span></div></div>
+        <div class="palette-values">mushroom / spruce / stone / herb / parchment</div>
+      </article>
+      <article class="palette-card linen-slate">
+        <h2>Linen + Slate</h2>
+        <p>The safest professional option: homey paper tones, cool slate structure, no orange energy.</p>
+        <div class="swatches">
+          <span class="swatch" style="--swatch:#e7dfd2"></span>
+          <span class="swatch" style="--swatch:#394047"></span>
+          <span class="swatch" style="--swatch:#f7f0e4"></span>
+          <span class="swatch" style="--swatch:#7f8b94"></span>
+          <span class="swatch" style="--swatch:#ffffff"></span>
+        </div>
+        <div class="mini-preview"><div class="mini-chat"><div class="mini-line"></div><div class="mini-line short"></div></div><div class="mini-resume"><div class="mini-line"></div><span class="mini-pill"></span><span class="mini-pill"></span></div></div>
+        <div class="palette-values">linen / slate / cream / cool gray / white card</div>
+      </article>
+      <article class="palette-card coffee-blue">
+        <h2>Coffee + Blue</h2>
+        <p>Still warm and personal, but the blue accent gives it a technical/admin feel instead of rustic.</p>
+        <div class="swatches">
+          <span class="swatch" style="--swatch:#261e1a"></span>
+          <span class="swatch" style="--swatch:#181b22"></span>
+          <span class="swatch" style="--swatch:#e6dccd"></span>
+          <span class="swatch" style="--swatch:#6f8fa8"></span>
+          <span class="swatch" style="--swatch:#f8f0e4"></span>
+        </div>
+        <div class="mini-preview"><div class="mini-chat"><div class="mini-line"></div><div class="mini-line short"></div></div><div class="mini-resume"><div class="mini-line"></div><span class="mini-pill"></span><span class="mini-pill"></span></div></div>
+        <div class="palette-values">coffee / charcoal / warm paper / dusty blue / cream</div>
+      </article>
+      <article class="palette-card taupe-plum">
+        <h2>Taupe + Plum</h2>
+        <p>Soft, homey, and a little distinctive. The muted plum gives personality without going flashy.</p>
+        <div class="swatches">
+          <span class="swatch" style="--swatch:#312a2a"></span>
+          <span class="swatch" style="--swatch:#211c22"></span>
+          <span class="swatch" style="--swatch:#e4d9cf"></span>
+          <span class="swatch" style="--swatch:#9a7d91"></span>
+          <span class="swatch" style="--swatch:#f5eee7"></span>
+        </div>
+        <div class="mini-preview"><div class="mini-chat"><div class="mini-line"></div><div class="mini-line short"></div></div><div class="mini-resume"><div class="mini-line"></div><span class="mini-pill"></span><span class="mini-pill"></span></div></div>
+        <div class="palette-values">taupe / deep plum / clay-gray / muted plum / milk</div>
+      </article>
+      <article class="palette-card blush-slate">
+        <h2>Blush + Slate</h2>
+        <p>Homey but cooler and more modern: blush paper, slate structure, pale sage cards, and deep navy depth.</p>
+        <div class="swatches">
+          <span class="swatch" style="--swatch:#d7b0a8"></span>
+          <span class="swatch" style="--swatch:#53657a"></span>
+          <span class="swatch" style="--swatch:#d2e6c8"></span>
+          <span class="swatch" style="--swatch:#6c6065"></span>
+          <span class="swatch" style="--swatch:#3d4a5f"></span>
+          <span class="swatch" style="--swatch:#181a1a"></span>
+          <span class="swatch" style="--swatch:#0b0d1f"></span>
+          <span class="swatch" style="--swatch:#b89591"></span>
+        </div>
+        <div class="mini-preview"><div class="mini-chat"><div class="mini-line"></div><div class="mini-line short"></div></div><div class="mini-resume"><div class="mini-line"></div><span class="mini-pill"></span><span class="mini-pill"></span></div></div>
+        <div class="palette-values">blush / slate / pale sage / mauve-gray / navy</div>
+      </article>
+    </div>
+  </section>
+
+  <section class="mockup" id="ops-walnut">
+    <div class="mockup-title">
+      <h1>Ops Console + Walnut Sage</h1>
+      <p>The Ops Console layout with the homey Walnut + Sage palette: dark left chat, warm paper resume, sage actions, and no orange.</p>
+    </div>
+    <div class="layout">
+      <aside class="chat">
+        <div class="bar"><span class="dot"></span> ai-nolan/support-console</div>
+        <div class="chat-body">
+          <div class="bubble">Click resume items on the right and I will explain how Nolan used that system in production.</div>
+          <div class="bubble user">Tell me about Okta lifecycle work.</div>
+          <div class="bubble">He handled SSO, SCIM, MFA, RBAC, onboarding/offboarding, and workflow automation across SaaS apps.</div>
+        </div>
+        <div class="composer"><span>ask about resume, tickets, recruiting...</span><button>↗</button></div>
+      </aside>
+      <main class="resume">
+        <div class="eyebrow">IT Support Engineer</div>
+        <div class="hero">Nolan<br>Kim</div>
+        <div class="subhead">Identity, endpoint, SaaS administration, troubleshooting, and automation for real support environments.</div>
+        <div class="ops-strip">
+          <div class="ops-stat"><b>6+</b><span>years support</span></div>
+          <div class="ops-stat"><b>7.8k</b><span>student users</span></div>
+          <div class="ops-stat"><b>46%</b><span>ticket reduction</span></div>
+          <div class="ops-stat"><b>NAI</b><span>jira flow</span></div>
+        </div>
+        <div class="chips">
+          <span class="chip">Okta</span><span class="chip">Google Workspace</span><span class="chip">Kandji</span><span class="chip">Jira</span><span class="chip">Splunk</span><span class="chip">Python</span>
+        </div>
+        <div class="section-head">Askable Skill Areas</div>
+        <div class="grid">
+          <div class="card"><b>Identity & Access</b><p>Okta, Entra ID, SAML/OIDC, SCIM, MFA, RBAC.</p><span class="ask-note">↳ ask AI Nolan</span></div>
+          <div class="card"><b>Endpoint & Security</b><p>Kandji, Jamf, Intune, Iru, app deployment, compliance.</p><span class="ask-note">↳ ask AI Nolan</span></div>
+          <div class="card"><b>SaaS Admin</b><p>Google Workspace, Slack, Zoom, GitHub, Atlassian.</p><span class="ask-note">↳ ask AI Nolan</span></div>
+          <div class="card"><b>Automation</b><p>Okta Workflows, Zapier, Python, OpenAI API, PowerShell.</p><span class="ask-note">↳ ask AI Nolan</span></div>
+        </div>
+        <div class="section-head">Experience</div>
+        <div class="role"><b>Calbright College · IT Support Engineer</b><div class="meta"><span>2024-present</span><span>remote</span></div><p class="bullet">Supported staff and student growth while administering Google Workspace, Okta, Jira, Slack, Zoom, and endpoint tooling.</p></div>
+      </main>
+    </div>
+  </section>
+
+  <section class="mockup" id="ops-mushroom">
+    <div class="mockup-title">
+      <h1>Ops Console + Mushroom Spruce</h1>
+      <p>The same Ops Console layout with a calmer earthy palette: spruce chat rail, mushroom resume paper, parchment cards, and herb-green actions.</p>
+    </div>
+    <div class="layout">
+      <aside class="chat">
+        <div class="bar"><span class="dot"></span> ai-nolan/support-console</div>
+        <div class="chat-body">
+          <div class="bubble">Click resume items on the right and I will explain how Nolan used that system in production.</div>
+          <div class="bubble user">Tell me about endpoint lifecycle work.</div>
+          <div class="bubble">He handled provisioning, app deployment, configuration profiles, compliance, and migrations across Jamf, Kandji, Iru, Intune, and Google Admin.</div>
+        </div>
+        <div class="composer"><span>ask about resume, tickets, recruiting...</span><button>↗</button></div>
+      </aside>
+      <main class="resume">
+        <canvas class="signal-canvas" data-signal-bg aria-hidden="true"></canvas>
+        <div class="eyebrow">IT Support Engineer</div>
+        <div class="hero">Nolan<br>Kim</div>
+        <div class="subhead">Identity, endpoint, SaaS administration, troubleshooting, and automation for real support environments.</div>
+        <div class="ops-strip">
+          <div class="ops-stat"><b>6+</b><span>years support</span></div>
+          <div class="ops-stat"><b>7.8k</b><span>student users</span></div>
+          <div class="ops-stat"><b>46%</b><span>ticket reduction</span></div>
+          <div class="ops-stat"><b>NAI</b><span>jira flow</span></div>
+        </div>
+        <div class="chips">
+          <span class="chip">Okta</span><span class="chip">Google Workspace</span><span class="chip">Kandji</span><span class="chip">Jira</span><span class="chip">Splunk</span><span class="chip">Python</span>
+        </div>
+        <div class="section-head">Askable Skill Areas</div>
+        <div class="grid">
+          <div class="card"><b>Identity & Access</b><p>Okta, Entra ID, SAML/OIDC, SCIM, MFA, RBAC.</p><span class="ask-note">↳ ask AI Nolan</span></div>
+          <div class="card"><b>Endpoint & Security</b><p>Kandji, Jamf, Intune, Iru, app deployment, compliance.</p><span class="ask-note">↳ ask AI Nolan</span></div>
+          <div class="card"><b>SaaS Admin</b><p>Google Workspace, Slack, Zoom, GitHub, Atlassian.</p><span class="ask-note">↳ ask AI Nolan</span></div>
+          <div class="card"><b>Automation</b><p>Okta Workflows, Zapier, Python, OpenAI API, PowerShell.</p><span class="ask-note">↳ ask AI Nolan</span></div>
+        </div>
+        <div class="section-head">Experience</div>
+        <div class="role"><b>Calbright College · IT Support Engineer</b><div class="meta"><span>2024-present</span><span>remote</span></div><p class="bullet">Supported staff and student growth while administering Google Workspace, Okta, Jira, Slack, Zoom, and endpoint tooling.</p></div>
+      </main>
+    </div>
+  </section>
+
+  <section class="mockup" id="console">
+    <div class="mockup-title">
+      <h1>Ops Console</h1>
+      <p>Dense, technical, and clearly IT-support oriented. Best if you want the site to feel like a working support cockpit.</p>
+    </div>
+    <div class="layout">
+      <aside class="chat">
+        <div class="bar"><span class="dot"></span> ai-nolan/support-console</div>
+        <div class="chat-body">
+          <div class="bubble">Click resume items on the right and I will explain how Nolan used that system in production.</div>
+          <div class="bubble user">Tell me about Okta lifecycle work.</div>
+          <div class="bubble">He handled SSO, SCIM, MFA, RBAC, onboarding/offboarding, and workflow automation across SaaS apps.</div>
+        </div>
+        <div class="composer"><span>ask about resume, tickets, recruiting...</span><button>↗</button></div>
+      </aside>
+      <main class="resume">
+        <div class="eyebrow">IT Support Engineer</div>
+        <div class="hero">Nolan<br>Kim</div>
+        <div class="subhead">Identity, endpoint, SaaS administration, troubleshooting, and automation for real support environments.</div>
+        <div class="chips">
+          <span class="chip">Okta</span><span class="chip">Google Workspace</span><span class="chip">Kandji</span><span class="chip">Jira</span><span class="chip">Splunk</span><span class="chip">Python</span>
+        </div>
+        <div class="section-head">Askable Skill Areas</div>
+        <div class="grid">
+          <div class="card"><b>Identity & Access</b><p>Okta, Entra ID, SAML/OIDC, SCIM, MFA, RBAC.</p><span class="ask-note">↳ ask AI Nolan</span></div>
+          <div class="card"><b>Endpoint & Security</b><p>Kandji, Jamf, Intune, Iru, app deployment, compliance.</p><span class="ask-note">↳ ask AI Nolan</span></div>
+          <div class="card"><b>SaaS Admin</b><p>Google Workspace, Slack, Zoom, GitHub, Atlassian.</p><span class="ask-note">↳ ask AI Nolan</span></div>
+          <div class="card"><b>Automation</b><p>Okta Workflows, Zapier, Python, OpenAI API, PowerShell.</p><span class="ask-note">↳ ask AI Nolan</span></div>
+        </div>
+        <div class="section-head">Experience</div>
+        <div class="role"><b>Calbright College · IT Support Engineer</b><div class="meta"><span>2024-present</span><span>remote</span></div><p class="bullet">Supported staff and student growth while administering Google Workspace, Okta, Jira, Slack, Zoom, and endpoint tooling.</p></div>
+      </main>
+    </div>
+  </section>
+
+  <section class="mockup" id="desk">
+    <div class="mockup-title">
+      <h1>Service Desk</h1>
+      <p>Cleaner and more recruiter-friendly, but still reads like support operations rather than a generic portfolio.</p>
+    </div>
+    <div class="layout">
+      <aside class="chat">
+        <div class="bar"><span class="dot"></span> AI Nolan available</div>
+        <div class="chat-body">
+          <div class="bubble">I can explain resume bullets, capture recruiter leads, create NAI support tickets, and check REC/NAI status.</div>
+          <div class="bubble user">What does he know about Jira?</div>
+          <div class="bubble">He has used Jira for ITSM workflows, automation handoffs, ticket logging, and support queue ownership.</div>
+        </div>
+        <div class="composer"><span>Ask about any highlighted card</span><button>Send</button></div>
+      </aside>
+      <main class="resume">
+        <div class="eyebrow">Support systems + automation</div>
+        <div class="hero">Nolan Kim</div>
+        <div class="subhead">A support engineer who can run identity, endpoint, SaaS, and helpdesk systems without making the process heavier than it needs to be.</div>
+        <div class="chips">
+          <span class="chip">Ticket triage</span><span class="chip">Okta</span><span class="chip">Google Admin</span><span class="chip">Jira Service Management</span>
+        </div>
+        <div class="section-head">Resume Topics</div>
+        <div class="grid">
+          <div class="card"><b>Support Operations</b><p>L2 support, ticket queues, escalation hygiene, knowledge base writing.</p><span class="ask-note">Ask about this topic</span></div>
+          <div class="card"><b>Automation Projects</b><p>Zapier, OpenAI API, Okta Workflows, Python scripting.</p><span class="ask-note">Ask about this topic</span></div>
+        </div>
+        <div class="section-head">Role Snapshot</div>
+        <div class="role"><b>DRI Inc. · IT Support Specialist</b><p class="bullet">Sole IT contact for 120+ users across three branches; built support and sysadmin from the ground up.</p><p class="bullet">Built an internal AI support agent that automated Jira case creation.</p></div>
+      </main>
+    </div>
+  </section>
+
+  <section class="mockup" id="ticketwall">
+    <div class="mockup-title">
+      <h1>Ticket Wall</h1>
+      <p>Warm paper, sharp support-ticket cards, and a very clear click-to-ask affordance.</p>
+    </div>
+    <div class="layout">
+      <aside class="chat">
+        <div class="bar"><span class="dot"></span> chat pinned left</div>
+        <div class="chat-body">
+          <div class="bubble">Every card on this resume can become a question.</div>
+          <div class="bubble user">Check REC-4.</div>
+          <div class="bubble">REC-4 is a recruiter lead. Nolan has the details and will review it soon.</div>
+        </div>
+        <div class="composer"><span>ticket number, recruiter lead, resume question...</span><button>Ask</button></div>
+      </aside>
+      <main class="resume">
+        <div class="eyebrow">Personal helpdesk portfolio</div>
+        <div class="hero">Nolan<br>Kim</div>
+        <div class="subhead">The resume reads like a queue: each skill, job, and bullet is a thing the chatbot can explain.</div>
+        <div class="section-head">Open Resume Cards</div>
+        <div class="grid">
+          <div class="card"><b>NAI support flow</b><p>Chatbot troubleshooting, Jira creation, ticket status lookup.</p><span class="ask-note">Open with AI Nolan</span></div>
+          <div class="card"><b>REC recruiter flow</b><p>Lead intake, role details, follow-up routing.</p><span class="ask-note">Open with AI Nolan</span></div>
+          <div class="card"><b>Domain migration</b><p>Okta, Azure, Google Workspace, Slack, Zoom, Jira.</p><span class="ask-note">Open with AI Nolan</span></div>
+          <div class="card"><b>Endpoint lifecycle</b><p>Provisioning, profiles, compliance, app deployment.</p><span class="ask-note">Open with AI Nolan</span></div>
+        </div>
+      </main>
+    </div>
+  </section>
+
+  <section class="mockup" id="command">
+    <div class="mockup-title">
+      <h1>Command Center</h1>
+      <p>Most expressive option: modern, high-contrast, and closer to an AI interface while staying IT-focused.</p>
+    </div>
+    <div class="layout">
+      <aside class="chat">
+        <div class="bar"><span class="dot"></span> AI Nolan command line</div>
+        <div class="chat-body">
+          <div class="bubble">Choose a system, role, or project and I will turn it into a focused question.</div>
+          <div class="bubble user">Explain his automation work.</div>
+          <div class="bubble">He has built workflow automations across Okta, Zapier, Python, and OpenAI-backed support flows.</div>
+        </div>
+        <div class="composer"><span>/ask resume.item</span><button>Run</button></div>
+      </aside>
+      <main class="resume">
+        <div class="eyebrow">Identity · Endpoint · SaaS · Automation</div>
+        <div class="hero">Nolan Kim</div>
+        <div class="subhead">A left-pinned assistant plus a resume workspace where each item is an interactive prompt.</div>
+        <div class="chips">
+          <span class="chip">Okta</span><span class="chip">Kandji</span><span class="chip">Google Workspace</span><span class="chip">Splunk</span><span class="chip">OpenAI API</span>
+        </div>
+        <div class="section-head">Command Cards</div>
+        <div class="grid">
+          <div class="card"><b>/identity</b><p>Ask about SSO, SCIM, RBAC, lifecycle, MFA.</p><span class="ask-note">Run prompt</span></div>
+          <div class="card"><b>/endpoint</b><p>Ask about Jamf, Kandji, Intune, provisioning, compliance.</p><span class="ask-note">Run prompt</span></div>
+          <div class="card"><b>/support</b><p>Ask about troubleshooting, queues, escalations, documentation.</p><span class="ask-note">Run prompt</span></div>
+          <div class="card"><b>/automation</b><p>Ask about OpenAI, Zapier, Okta Workflows, scripts.</p><span class="ask-note">Run prompt</span></div>
+        </div>
+      </main>
+    </div>
+  </section>
+<script>
+(() => {
+  const canvas = document.querySelector('#ops-mushroom [data-signal-bg]');
+  const resume = canvas?.closest('.resume');
+  if (!canvas || !resume) return;
+
+  const ctx = canvas.getContext('2d');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const pointer = { x: 0.78, y: 0.18, active: false };
+  const follow = { x: 0.78, y: 0.18 };
+  const small = 28;
+  let columns = [];
+  let width = 0;
+  let height = 0;
+  let activeCol = -1;
+  let activeRow = -1;
+  let animationFrame = 0;
+
+  function resize() {
+    const rect = resume.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    width = Math.max(1, Math.floor(rect.width));
+    height = Math.max(1, Math.floor(rect.height));
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    createMesh();
+  }
+
+  function drawMeshSegment(a, b, ledger, diagonal = false) {
+    const lock = Math.max(a.lock, b.lock);
+    const baseAlpha = ledger ? 0.18 : 0.08;
+
+    ctx.strokeStyle = lock > 0
+      ? `rgba(120, 148, 130, ${Math.min(diagonal ? 0.36 : 0.66, (ledger ? 0.3 : 0.24) + lock * (diagonal ? 0.2 : 0.34))})`
+      : `rgba(91, 86, 77, ${baseAlpha})`;
+    ctx.lineWidth = (diagonal ? 0.48 : (ledger ? 1.1 : 0.7)) + lock * (diagonal ? 0.36 : (ledger ? 0.95 : 0.68));
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+  }
+
+  function drawFacet(a, b, c) {
+    const lock = (a.lock + b.lock + c.lock) / 3;
+    if (lock < 0.08) return;
+
+    const area = (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+    const shade = area > 0 ? 1 : 0.74;
+    ctx.fillStyle = `rgba(120, 148, 130, ${lock * 0.16 * shade})`;
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.lineTo(c.x, c.y);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function drawMeshPoint(point) {
+    if (!point.lock) return;
+
+    ctx.fillStyle = `rgba(120, 148, 130, ${0.22 + point.lock * 0.5})`;
+    ctx.beginPath();
+    ctx.arc(point.x, point.y, 1.4 + point.lock * 2.4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function createMesh() {
+    columns = [];
+    const startX = -small;
+    const startY = -small;
+    const endX = width + small;
+    const endY = height + small;
+
+    for (let x = startX, col = 0; x <= endX; x += small, col++) {
+      const column = [];
+      for (let y = startY, row = 0; y <= endY; y += small, row++) {
+        column.push({
+          baseX: x,
+          baseY: y,
+          x,
+          y,
+          targetX: x,
+          targetY: y,
+          col,
+          row,
+          lock: 0,
+          targetLock: 0
+        });
+      }
+      columns.push(column);
+    }
+  }
+
+  function updateActivePoint(startX, startY) {
+    if (!pointer.active || !columns.length || !columns[0]?.length) {
+      activeCol = -1;
+      activeRow = -1;
+      return;
+    }
+
+    const px = follow.x * width;
+    const py = follow.y * height;
+    const maxCol = columns.length - 1;
+    const maxRow = columns[0].length - 1;
+
+    if (activeCol < 0 || activeRow < 0) {
+      activeCol = Math.max(0, Math.min(maxCol, Math.round((px - startX) / small)));
+      activeRow = Math.max(0, Math.min(maxRow, Math.round((py - startY) / small)));
+      return;
+    }
+
+    const threshold = small * 0.68;
+    const currentX = startX + activeCol * small;
+    const currentY = startY + activeRow * small;
+
+    if (px - currentX > threshold) activeCol = Math.min(maxCol, activeCol + 1);
+    if (currentX - px > threshold) activeCol = Math.max(0, activeCol - 1);
+    if (py - currentY > threshold) activeRow = Math.min(maxRow, activeRow + 1);
+    if (currentY - py > threshold) activeRow = Math.max(0, activeRow - 1);
+  }
+
+  function updateTargets() {
+    const startX = -small;
+    const startY = -small;
+    const px = follow.x * width;
+    const py = follow.y * height;
+    updateActivePoint(startX, startY);
+
+    for (const column of columns) {
+      for (const point of column) {
+        point.targetX = point.baseX;
+        point.targetY = point.baseY;
+        point.targetLock = 0;
+
+        if (!pointer.active || reduceMotion) continue;
+
+        const gridDistance = Math.hypot(point.col - activeCol, point.row - activeRow);
+        if (gridDistance > 2.05) continue;
+
+        let lock = 0;
+        let pull = 0;
+        let lift = 0;
+        if (gridDistance === 0) {
+          lock = 1;
+          pull = 0.62;
+          lift = 11;
+        } else if (gridDistance <= 1) {
+          lock = 0.62;
+          pull = 0.28;
+          lift = 6;
+        } else if (gridDistance <= 1.5) {
+          lock = 0.38;
+          pull = 0.16;
+          lift = 3.5;
+        } else {
+          lock = 0.18;
+          pull = 0.07;
+          lift = 1.5;
+        }
+
+        point.targetX = point.baseX + (px - point.baseX) * pull;
+        point.targetY = point.baseY + (py - point.baseY) * pull - lift;
+        point.targetLock = lock;
+      }
+    }
+  }
+
+  function settleMesh() {
+    let moving = false;
+    const followEase = reduceMotion ? 1 : 0.14;
+    const ease = reduceMotion ? 1 : 0.12;
+    const colorEase = reduceMotion ? 1 : 0.075;
+
+    if (pointer.active) {
+      follow.x += (pointer.x - follow.x) * followEase;
+      follow.y += (pointer.y - follow.y) * followEase;
+      if (
+        Math.abs(pointer.x - follow.x) > 0.0005 ||
+        Math.abs(pointer.y - follow.y) > 0.0005
+      ) {
+        moving = true;
+      }
+    }
+
+    updateTargets();
+
+    for (const column of columns) {
+      for (const point of column) {
+        point.x += (point.targetX - point.x) * ease;
+        point.y += (point.targetY - point.y) * ease;
+        point.lock += (point.targetLock - point.lock) * colorEase;
+
+        if (
+          Math.abs(point.targetX - point.x) > 0.05 ||
+          Math.abs(point.targetY - point.y) > 0.05 ||
+          Math.abs(point.targetLock - point.lock) > 0.01
+        ) {
+          moving = true;
+        }
+      }
+    }
+
+    return moving;
+  }
+
+  function renderMesh() {
+    if (!columns.length) return;
+
+    for (let col = 0; col < columns.length - 1; col++) {
+      for (let row = 0; row < columns[col].length - 1; row++) {
+        const topLeft = columns[col][row];
+        const topRight = columns[col + 1][row];
+        const bottomLeft = columns[col][row + 1];
+        const bottomRight = columns[col + 1][row + 1];
+
+        if ((col + row) % 2 === 0) {
+          drawFacet(topLeft, topRight, bottomRight);
+          drawFacet(topLeft, bottomRight, bottomLeft);
+        } else {
+          drawFacet(topLeft, topRight, bottomLeft);
+          drawFacet(topRight, bottomRight, bottomLeft);
+        }
+      }
+    }
+
+    for (let col = 0; col < columns.length; col++) {
+      const ledger = col % 5 === 0;
+      for (let row = 1; row < columns[col].length; row++) {
+        drawMeshSegment(columns[col][row - 1], columns[col][row], ledger);
+      }
+    }
+
+    for (let row = 0; row < columns[0].length; row++) {
+      const ledger = row % 5 === 0;
+      for (let col = 1; col < columns.length; col++) {
+        drawMeshSegment(columns[col - 1][row], columns[col][row], ledger);
+      }
+    }
+
+    for (let col = 0; col < columns.length - 1; col++) {
+      for (let row = 0; row < columns[col].length - 1; row++) {
+        if ((col + row) % 2 === 0) {
+          drawMeshSegment(columns[col][row], columns[col + 1][row + 1], false, true);
+        } else {
+          drawMeshSegment(columns[col + 1][row], columns[col][row + 1], false, true);
+        }
+      }
+    }
+
+    for (const column of columns) {
+      for (const point of column) {
+        drawMeshPoint(point);
+      }
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, width, height);
+    renderMesh();
+  }
+
+  function tick() {
+    animationFrame = 0;
+    const moving = settleMesh();
+    draw();
+    if (moving) scheduleTick();
+  }
+
+  function scheduleTick() {
+    if (!animationFrame) {
+      animationFrame = requestAnimationFrame(tick);
+    }
+  }
+
+  resume.addEventListener('pointermove', (event) => {
+    const rect = resume.getBoundingClientRect();
+    pointer.x = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
+    pointer.y = Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height));
+    pointer.active = true;
+    scheduleTick();
+  });
+
+  resume.addEventListener('pointerleave', () => {
+    pointer.active = false;
+    updateTargets();
+    scheduleTick();
+  });
+
+  resize();
+  updateTargets();
+  draw();
+  window.addEventListener('resize', () => {
+    resize();
+    updateTargets();
+    draw();
+  });
+})();
+</script>
+</body>
+</html>
