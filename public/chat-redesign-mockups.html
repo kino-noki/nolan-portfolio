@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Nolan Chat Redesign Mockups</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+:root {
+  --ink: #18251f;
+  --spruce: #223429;
+  --sage: #789482;
+  --mushroom: #d7d0c1;
+  --paper: #eee7d8;
+  --line: #867d6c;
+  --soft: #5c6254;
+  --blue: #506378;
+  --shadow: rgba(51, 47, 40, 0.14);
+  --body: 'Atkinson Hyperlegible', sans-serif;
+  --display: 'Fraunces', serif;
+  --mono: 'IBM Plex Mono', monospace;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  background:
+    linear-gradient(rgba(134,125,108,0.11) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(134,125,108,0.11) 1px, transparent 1px),
+    var(--mushroom);
+  background-size: 46px 46px;
+  font-family: var(--body);
+}
+
+.page {
+  width: min(1440px, 100%);
+  margin: 0 auto;
+  padding: clamp(1rem, 2.4vw, 2rem);
+}
+
+.intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: end;
+  margin-bottom: 1.5rem;
+  padding: clamp(1rem, 2.4vw, 2rem) 0 0;
+}
+
+.eyebrow {
+  display: inline-flex;
+  width: fit-content;
+  margin-bottom: 0.75rem;
+  color: var(--sage);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(2.6rem, 6.5vw, 6.5rem);
+  line-height: 0.95;
+}
+
+.intro p {
+  max-width: 720px;
+  margin: 0.8rem 0 0;
+  color: #423f36;
+  font-size: clamp(0.95rem, 1.5vw, 1.08rem);
+  line-height: 1.6;
+}
+
+.palette {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.swatch {
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(24,37,31,0.24);
+  box-shadow: 3px 3px 0 var(--shadow);
+}
+
+.swatch:nth-child(1) { background: var(--ink); }
+.swatch:nth-child(2) { background: var(--spruce); }
+.swatch:nth-child(3) { background: var(--sage); }
+.swatch:nth-child(4) { background: var(--paper); }
+.swatch:nth-child(5) { background: var(--blue); }
+
+.mockups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1rem, 2vw, 1.5rem);
+}
+
+.mockup {
+  min-height: 690px;
+  display: grid;
+  grid-template-columns: minmax(310px, 0.44fr) minmax(0, 0.56fr);
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid rgba(134,125,108,0.55);
+  background: rgba(238,231,216,0.7);
+  box-shadow: 10px 10px 0 rgba(51,47,40,0.12);
+}
+
+.chat {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.chat-head {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 1rem;
+  border-bottom: 1px solid rgba(134,125,108,0.34);
+}
+
+.avatar {
+  width: 58px;
+  height: 68px;
+  flex: 0 0 auto;
+  object-fit: contain;
+  object-position: center bottom;
+}
+
+.chat-title {
+  min-width: 0;
+}
+
+.chat-title strong {
+  display: block;
+  font-size: 0.92rem;
+  line-height: 1.2;
+}
+
+.chat-title span {
+  display: block;
+  margin-top: 0.22rem;
+  color: var(--soft);
+  font-size: 0.76rem;
+  line-height: 1.25;
+}
+
+.status {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--soft);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+}
+
+.status::before {
+  content: "";
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 50%;
+  background: var(--sage);
+}
+
+.chat-scroll {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1rem;
+}
+
+.row {
+  display: flex;
+  gap: 0.55rem;
+  align-items: flex-end;
+}
+
+.row.user { justify-content: flex-end; }
+
+.mini {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(80,99,120,0.16);
+  color: var(--blue);
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.bubble {
+  max-width: 82%;
+  padding: 0.72rem 0.84rem;
+  border: 1px solid rgba(134,125,108,0.3);
+  color: #2d2a23;
+  background: rgba(238,231,216,0.9);
+  box-shadow: 4px 4px 0 rgba(51,47,40,0.09);
+  font-size: 0.86rem;
+  line-height: 1.48;
+}
+
+.row.user .bubble {
+  border-color: rgba(120,148,130,0.55);
+  background: rgba(120,148,130,0.2);
+}
+
+.composer {
+  display: flex;
+  gap: 0.65rem;
+  align-items: center;
+  padding: 0.9rem 1rem 1rem;
+  border-top: 1px solid rgba(134,125,108,0.34);
+}
+
+.input {
+  flex: 1;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  padding: 0 0.85rem;
+  color: var(--soft);
+  background: rgba(238,231,216,0.62);
+  border: 1px solid rgba(134,125,108,0.42);
+  font-size: 0.84rem;
+}
+
+.send {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(120,148,130,0.58);
+  background: var(--sage);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-weight: 700;
+}
+
+.resume-preview {
+  position: relative;
+  padding: clamp(1rem, 2vw, 1.35rem);
+  background:
+    linear-gradient(135deg, rgba(134,125,108,0.14) 1px, transparent 1px),
+    rgba(215,208,193,0.72);
+  background-size: 34px 34px;
+  border-left: 1px solid rgba(134,125,108,0.38);
+}
+
+.resume-preview h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(2.2rem, 4.2vw, 4.2rem);
+  line-height: 0.95;
+}
+
+.resume-preview h2 span { color: var(--sage); }
+.role {
+  margin: 0.65rem 0 1rem;
+  color: var(--spruce);
+  font-weight: 700;
+  font-size: 1.02rem;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 1.2rem;
+}
+
+.chip {
+  padding: 0.35rem 0.55rem;
+  border: 1px solid rgba(134,125,108,0.46);
+  background: rgba(238,231,216,0.7);
+  box-shadow: 3px 3px 0 rgba(51,47,40,0.08);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.resume-card {
+  padding: 0.9rem;
+  margin-top: 0.8rem;
+  border: 1px solid rgba(134,125,108,0.4);
+  background: rgba(238,231,216,0.64);
+  box-shadow: 5px 5px 0 rgba(51,47,40,0.08);
+}
+
+.resume-card strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.86rem;
+}
+
+.resume-card p {
+  margin: 0;
+  color: #4f493f;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.notes {
+  margin-top: 1rem;
+  color: var(--soft);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.mock-title {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.7rem 0.85rem;
+  background: rgba(24,37,31,0.94);
+  color: var(--paper);
+}
+
+.mock-title strong {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.mock-title span {
+  color: #d6cbb8;
+  font-size: 0.74rem;
+}
+
+/* Direction A: Resume Card */
+.a .chat {
+  background: rgba(238,231,216,0.82);
+}
+.a .chat-head {
+  background: rgba(238,231,216,0.76);
+}
+.a .bubble {
+  border-radius: 10px;
+}
+.a .row.user .bubble {
+  background: rgba(120,148,130,0.24);
+}
+
+/* Direction B: Helpdesk Pane */
+.b .chat {
+  background: rgba(223,217,203,0.94);
+  border-right: 6px solid rgba(120,148,130,0.36);
+}
+.b .chat-head {
+  background: rgba(238,231,216,0.58);
+}
+.b .bubble {
+  border-radius: 4px;
+  box-shadow: none;
+}
+.b .bubble::before {
+  content: attr(data-label);
+  display: block;
+  margin-bottom: 0.3rem;
+  color: var(--sage);
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.b .row.user .bubble::before { color: var(--blue); }
+
+/* Direction C: Soft Messenger */
+.c .chat {
+  background: linear-gradient(180deg, rgba(238,231,216,0.9), rgba(215,208,193,0.86));
+}
+.c .chat-head,
+.c .composer {
+  background: rgba(238,231,216,0.58);
+}
+.c .bubble {
+  border-radius: 20px 20px 20px 7px;
+  box-shadow: 0 8px 22px rgba(51,47,40,0.08);
+}
+.c .row.user .bubble {
+  border-radius: 20px 20px 7px 20px;
+  background: rgba(80,99,120,0.14);
+  border-color: rgba(80,99,120,0.26);
+}
+.c .input,
+.c .send { border-radius: 999px; }
+
+/* Direction D: Resume Companion */
+.d .chat {
+  background: rgba(24,37,31,0.9);
+  color: var(--paper);
+}
+.d .chat-head,
+.d .composer {
+  border-color: rgba(238,231,216,0.16);
+  background: rgba(238,231,216,0.06);
+}
+.d .chat-title span,
+.d .status { color: #d6cbb8; }
+.d .chat-title strong { color: var(--paper); }
+.d .bubble {
+  color: var(--paper);
+  background: rgba(238,231,216,0.08);
+  border-color: rgba(238,231,216,0.16);
+}
+.d .row.user .bubble {
+  color: #101711;
+  background: rgba(120,148,130,0.72);
+  border-color: rgba(120,148,130,0.7);
+}
+.d .input {
+  background: rgba(238,231,216,0.08);
+  border-color: rgba(238,231,216,0.16);
+  color: #d6cbb8;
+}
+
+/* Direction E: Portfolio Sidebar */
+.e .chat {
+  background: rgba(238,231,216,0.86);
+  border-right: 1px solid rgba(134,125,108,0.36);
+}
+.e .chat-head {
+  align-items: flex-start;
+  padding: 1.2rem 1.05rem;
+  background: rgba(215,208,193,0.44);
+}
+.e .avatar {
+  width: 74px;
+  height: 84px;
+}
+.e .chat-title strong {
+  font-family: var(--display);
+  font-size: 1.4rem;
+  line-height: 1;
+}
+.e .status {
+  align-self: flex-start;
+  margin-top: 0.15rem;
+}
+.e .chat-scroll {
+  padding: 1.1rem;
+}
+.e .bubble {
+  border-radius: 0;
+  border-left: 4px solid var(--sage);
+  box-shadow: none;
+}
+.e .row.user .bubble {
+  border-left: 1px solid rgba(80,99,120,0.32);
+  border-right: 4px solid var(--blue);
+}
+
+/* Direction F: Intake Sheet */
+.f .chat {
+  background: rgba(215,208,193,0.92);
+}
+.f .chat-head {
+  padding: 1rem 1rem 0.8rem;
+  border-bottom: 0;
+}
+.f .chat-scroll {
+  margin: 0 1rem 1rem;
+  padding: 1rem;
+  border: 1px solid rgba(134,125,108,0.44);
+  background: rgba(238,231,216,0.72);
+}
+.f .row {
+  display: block;
+}
+.f .mini {
+  display: none;
+}
+.f .bubble {
+  max-width: 100%;
+  padding: 0.75rem 0;
+  border: 0;
+  border-bottom: 1px solid rgba(134,125,108,0.24);
+  background: transparent;
+  box-shadow: none;
+}
+.f .bubble::before {
+  content: attr(data-label);
+  display: block;
+  margin-bottom: 0.28rem;
+  color: var(--sage);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.f .row.user .bubble::before { color: var(--blue); }
+.f .composer {
+  margin-top: auto;
+}
+
+/* Direction G: Docked Assistant */
+.g {
+  grid-template-columns: minmax(0, 1fr);
+}
+.g .chat {
+  min-height: 340px;
+  margin: 1rem;
+  border: 1px solid rgba(134,125,108,0.44);
+  background: rgba(238,231,216,0.8);
+  box-shadow: 8px 8px 0 rgba(51,47,40,0.1);
+}
+.g .resume-preview {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(320px, 0.55fr);
+  gap: 1rem;
+  border-left: 0;
+  border-top: 1px solid rgba(134,125,108,0.38);
+}
+.g .chat-scroll {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+}
+.g .row,
+.g .row.user {
+  display: block;
+}
+.g .mini {
+  margin-bottom: 0.4rem;
+}
+.g .bubble {
+  max-width: 100%;
+  min-height: 118px;
+  border-radius: 8px;
+}
+.g .composer {
+  background: rgba(215,208,193,0.36);
+}
+
+/* Direction H: Warm Split */
+.h .chat {
+  background:
+    linear-gradient(180deg, rgba(238,231,216,0.92), rgba(238,231,216,0.76)),
+    var(--paper);
+}
+.h .chat-head {
+  margin: 1rem 1rem 0;
+  padding: 1rem;
+  border: 1px solid rgba(134,125,108,0.36);
+  background: rgba(215,208,193,0.48);
+}
+.h .chat-scroll {
+  padding: 1rem 1rem 0.5rem;
+}
+.h .bubble {
+  border: 0;
+  border-radius: 12px;
+  background: rgba(215,208,193,0.58);
+  box-shadow: inset 0 0 0 1px rgba(134,125,108,0.24);
+}
+.h .row.user .bubble {
+  background: rgba(120,148,130,0.18);
+  box-shadow: inset 0 0 0 1px rgba(120,148,130,0.32);
+}
+.h .composer {
+  margin: 0 1rem 1rem;
+  border: 1px solid rgba(134,125,108,0.36);
+  background: rgba(238,231,216,0.68);
+}
+
+/* Direction I: Minimal Resume Gutter */
+.i .chat {
+  background: transparent;
+  border-right: 1px solid rgba(134,125,108,0.4);
+}
+.i .chat-head,
+.i .composer {
+  background: transparent;
+}
+.i .chat-scroll {
+  padding: 1.2rem 1rem;
+}
+.i .row {
+  position: relative;
+  padding-left: 1rem;
+  border-left: 1px solid rgba(120,148,130,0.4);
+}
+.i .row.user {
+  padding-left: 0;
+  padding-right: 1rem;
+  border-left: 0;
+  border-right: 1px solid rgba(80,99,120,0.34);
+}
+.i .mini {
+  position: absolute;
+  left: -14px;
+  background: var(--mushroom);
+}
+.i .row.user .mini {
+  display: none;
+}
+.i .bubble {
+  max-width: 100%;
+  padding: 0.2rem 0 0.2rem 0.8rem;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.i .row.user .bubble {
+  padding: 0.2rem 0.8rem 0.2rem 0;
+  background: transparent;
+}
+
+/* Direction J: Service Desk Card */
+.j .chat {
+  background: rgba(238,231,216,0.86);
+}
+.j .chat-head {
+  background: var(--spruce);
+  color: var(--paper);
+}
+.j .chat-title span,
+.j .status { color: #d6cbb8; }
+.j .chat-scroll {
+  gap: 0.7rem;
+}
+.j .bubble {
+  position: relative;
+  max-width: 88%;
+  padding-left: 1.05rem;
+  border-radius: 6px;
+  box-shadow: none;
+}
+.j .bubble::after {
+  content: "";
+  position: absolute;
+  left: 0.45rem;
+  top: 0.8rem;
+  bottom: 0.8rem;
+  width: 3px;
+  background: var(--sage);
+}
+.j .row.user .bubble::after {
+  background: var(--blue);
+}
+.j .input {
+  border-radius: 6px;
+}
+.j .send {
+  border-radius: 6px;
+}
+
+/* Docked family: K through N */
+.docked-family {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.docked-family .resume-preview {
+  border-left: 0;
+  border-top: 1px solid rgba(134,125,108,0.38);
+}
+
+.k .resume-preview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.5fr);
+  gap: 1.25rem;
+}
+.k .chat {
+  min-height: 330px;
+  margin: 1rem;
+  border: 1px solid rgba(134,125,108,0.42);
+  background: rgba(238,231,216,0.78);
+}
+.k .chat-head {
+  background: rgba(215,208,193,0.42);
+}
+.k .chat-scroll {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
+  align-content: start;
+}
+.k .row,
+.k .row.user { display: block; }
+.k .mini { margin-bottom: 0.4rem; }
+.k .bubble {
+  max-width: 100%;
+  min-height: 104px;
+  border-radius: 0;
+}
+.k .resume-card.featured {
+  min-height: 100%;
+  border-left: 6px solid var(--sage);
+}
+
+.l {
+  background: rgba(238,231,216,0.78);
+}
+.l .chat {
+  order: 2;
+  min-height: 250px;
+  margin: 0 1rem 1rem;
+  border: 1px solid rgba(134,125,108,0.38);
+  background: rgba(215,208,193,0.58);
+}
+.l .resume-preview {
+  order: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 0.62fr) minmax(300px, 0.38fr);
+  gap: 1rem;
+  border-top: 0;
+}
+.l .chat-head {
+  display: none;
+}
+.l .chat-scroll {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 0.85rem;
+}
+.l .row,
+.l .row.user { display: block; }
+.l .mini { display: none; }
+.l .bubble {
+  max-width: 100%;
+  min-height: 120px;
+  border-radius: 8px;
+  background: rgba(238,231,216,0.74);
+}
+.l .bubble::before {
+  content: attr(data-label);
+  display: block;
+  margin-bottom: 0.32rem;
+  color: var(--sage);
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.m .resume-preview {
+  min-height: 420px;
+  padding-bottom: 8.5rem;
+}
+.m .chat {
+  position: relative;
+  z-index: 2;
+  min-height: 270px;
+  width: min(860px, calc(100% - 2rem));
+  margin: -7.5rem auto 1rem;
+  border: 1px solid rgba(134,125,108,0.42);
+  background: rgba(238,231,216,0.88);
+  box-shadow: 12px 12px 0 rgba(51,47,40,0.12);
+}
+.m .chat-head {
+  background: rgba(24,37,31,0.92);
+  color: var(--paper);
+}
+.m .chat-title span,
+.m .status { color: #d6cbb8; }
+.m .chat-scroll {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.m .row,
+.m .row.user { display: block; }
+.m .mini { margin-bottom: 0.4rem; }
+.m .bubble { max-width: 100%; border-radius: 8px; }
+
+.n .resume-preview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 1rem;
+}
+.n .chat {
+  min-height: 360px;
+  margin: 1rem;
+  border: 1px solid rgba(134,125,108,0.4);
+  background: rgba(238,231,216,0.76);
+}
+.n .chat-head {
+  padding: 0.9rem 1rem;
+  background: rgba(215,208,193,0.42);
+}
+.n .chat-scroll {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 1rem;
+}
+.n .row:first-child {
+  grid-row: span 2;
+  align-self: stretch;
+}
+.n .row:first-child .bubble {
+  height: 100%;
+  background: rgba(24,37,31,0.9);
+  color: var(--paper);
+  border-color: rgba(24,37,31,0.24);
+}
+.n .row,
+.n .row.user { display: block; }
+.n .mini { margin-bottom: 0.4rem; }
+.n .bubble {
+  max-width: 100%;
+  border-radius: 6px;
+}
+.n .action-stack {
+  display: grid;
+  gap: 0.55rem;
+}
+.n .action-stack .chip {
+  display: block;
+  text-align: center;
+}
+
+@media (max-width: 1100px) {
+  .mockups { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 720px) {
+  .intro { grid-template-columns: 1fr; }
+  .mockup { grid-template-columns: 1fr; }
+  .mock-title { grid-column: auto; }
+  .resume-preview { border-left: 0; border-top: 1px solid rgba(134,125,108,0.38); }
+}
+</style>
+</head>
+<body>
+  <main class="page">
+    <section class="intro">
+      <div>
+        <span class="eyebrow">Chat redesign directions</span>
+        <h1>Make the chat feel like the resume.</h1>
+        <p>These are safe mockups for replacing the terminal-styled chat with something warmer and more consistent with the mushroom/spruce resume. Each keeps the same product idea: chat on the left, resume context on the right, clickable resume items feeding AI Nolan.</p>
+      </div>
+      <div class="palette" aria-label="Palette">
+        <span class="swatch"></span>
+        <span class="swatch"></span>
+        <span class="swatch"></span>
+        <span class="swatch"></span>
+        <span class="swatch"></span>
+      </div>
+    </section>
+
+    <section class="mockups">
+      <article class="mockup a" id="resume-card">
+        <div class="mock-title"><strong>Option A · Resume Card</strong><span>closest to current resume cards</span></div>
+        <section class="chat" aria-label="Resume card chat mockup">
+          <div class="chat-head">
+            <img class="avatar" src="/nolan-avatar.png" alt="">
+            <div class="chat-title"><strong>AI Nolan</strong><span>Resume companion for support, SaaS, IAM, and automation</span></div>
+            <div class="status">online</div>
+          </div>
+          <div class="chat-scroll">
+            <div class="row"><div class="mini">NK</div><div class="bubble">Click anything on the resume and I’ll explain how it connects to Nolan’s real IT work.</div></div>
+            <div class="row user"><div class="bubble">How has Nolan used Okta?</div></div>
+            <div class="row"><div class="mini">NK</div><div class="bubble">At Calbright, I use Okta for lifecycle work: onboarding, offboarding, app access, SSO, SCIM provisioning, MFA, RBAC, and automation with Workflows/API scripts.</div></div>
+          </div>
+          <div class="composer"><div class="input">Ask about a resume item...</div><div class="send">↗</div></div>
+        </section>
+        <section class="resume-preview">
+          <h2>Nolan <span>Kim</span></h2>
+          <div class="role">IT Support Engineer · 6+ years in IT</div>
+          <div class="chips"><span class="chip">Google Workspace</span><span class="chip">Okta</span><span class="chip">Jira Service Management</span><span class="chip">Kandji</span><span class="chip">Microsoft 365</span></div>
+          <div class="resume-card"><strong>Calbright College</strong><p>Remote L2 support, identity lifecycle, SaaS administration, endpoint management, and security/compliance work.</p></div>
+          <div class="resume-card"><strong>AI Nolan</strong><p>Creates Jira cases, logs conversations, captures recruiter leads, and checks ticket status by case key.</p></div>
+          <p class="notes">Best if you want the chat to feel like another resume card rather than a separate app.</p>
+        </section>
+      </article>
+
+      <article class="mockup b" id="helpdesk-pane">
+        <div class="mock-title"><strong>Option B · Helpdesk Pane</strong><span>most IT-support oriented</span></div>
+        <section class="chat" aria-label="Helpdesk pane chat mockup">
+          <div class="chat-head">
+            <img class="avatar" src="/nolan-avatar.png" alt="">
+            <div class="chat-title"><strong>AI Nolan</strong><span>Support triage · recruiter leads · ticket status</span></div>
+            <div class="status">ready</div>
+          </div>
+          <div class="chat-scroll">
+            <div class="row"><div class="mini">NK</div><div class="bubble" data-label="Assistant">I can create Jira support cases, check NAI/REC ticket status, or pass a recruiter lead to Nolan.</div></div>
+            <div class="row user"><div class="bubble" data-label="Visitor">Check REC-4</div></div>
+            <div class="row"><div class="mini">NK</div><div class="bubble" data-label="Ticket lookup">REC-4 is currently To Do. This looks like a recruiter lead, and Nolan has the details to review.</div></div>
+          </div>
+          <div class="composer"><div class="input">Type a ticket key or question...</div><div class="send">↗</div></div>
+        </section>
+        <section class="resume-preview">
+          <h2>Nolan <span>Kim</span></h2>
+          <div class="role">SaaS · Automation · Identity · Endpoint</div>
+          <div class="chips"><span class="chip">Jira</span><span class="chip">Zapier</span><span class="chip">OpenAI API</span><span class="chip">ServiceNow</span></div>
+          <div class="resume-card"><strong>Support systems</strong><p>Jira, Jira Service Management, Salesforce, and ServiceNow across support, lead capture, logging, and case follow-up.</p></div>
+          <div class="resume-card"><strong>Automation</strong><p>Zapier, Jira Automation, Okta Workflows, Slack Workflow Builder, Python, and OpenAI API projects.</p></div>
+          <p class="notes">Best if you want the chat to signal “support ops tool” without looking like a terminal.</p>
+        </section>
+      </article>
+
+      <article class="mockup c" id="soft-messenger">
+        <div class="mock-title"><strong>Option C · Soft Messenger</strong><span>warmest and most conversational</span></div>
+        <section class="chat" aria-label="Soft messenger chat mockup">
+          <div class="chat-head">
+            <img class="avatar" src="/nolan-avatar.png" alt="">
+            <div class="chat-title"><strong>Ask AI Nolan</strong><span>Quick answers about the resume</span></div>
+            <div class="status">live</div>
+          </div>
+          <div class="chat-scroll">
+            <div class="row"><div class="mini">NK</div><div class="bubble">Want the short version or the technical version? I can do either.</div></div>
+            <div class="row user"><div class="bubble">Tell me about Microsoft 365.</div></div>
+            <div class="row"><div class="mini">NK</div><div class="bubble">At Keck, I supported Microsoft 365, Exchange Online, Teams, SharePoint, OneDrive, Outlook, Intune, and identity workflows for a large healthcare environment.</div></div>
+          </div>
+          <div class="composer"><div class="input">Ask naturally...</div><div class="send">↗</div></div>
+        </section>
+        <section class="resume-preview">
+          <h2>Nolan <span>Kim</span></h2>
+          <div class="role">Interactive IT resume</div>
+          <div class="chips"><span class="chip">Microsoft 365</span><span class="chip">Google Workspace</span><span class="chip">Okta</span><span class="chip">Kandji</span></div>
+          <div class="resume-card"><strong>Keck Medical Center of USC</strong><p>10,000+ staff support across Microsoft 365, SSO, Google Workspace, AD, Citrix, Cerner, Intune, and mobile devices.</p></div>
+          <div class="resume-card"><strong>Calbright College</strong><p>L2 support, Google Workspace, Okta, Kandji, Jira, Salesforce, Zoom, Slack, and endpoint/security work.</p></div>
+          <p class="notes">Best if you want the chatbot to feel approachable for recruiters and non-technical visitors.</p>
+        </section>
+      </article>
+
+      <article class="mockup d" id="resume-companion">
+        <div class="mock-title"><strong>Option D · Dark Companion</strong><span>keeps contrast, loses terminal styling</span></div>
+        <section class="chat" aria-label="Dark companion chat mockup">
+          <div class="chat-head">
+            <img class="avatar" src="/nolan-avatar.png" alt="">
+            <div class="chat-title"><strong>AI Nolan</strong><span>Resume, tickets, recruiter handoff</span></div>
+            <div class="status">online</div>
+          </div>
+          <div class="chat-scroll">
+            <div class="row"><div class="mini">NK</div><div class="bubble">I can route support issues, capture recruiter leads, and explain any item in Nolan’s resume.</div></div>
+            <div class="row user"><div class="bubble">Create a ticket?</div></div>
+            <div class="row"><div class="mini">NK</div><div class="bubble">If troubleshooting does not solve it, I’ll collect follow-up details and create a Jira case for Nolan.</div></div>
+          </div>
+          <div class="composer"><div class="input">Ask AI Nolan...</div><div class="send">↗</div></div>
+        </section>
+        <section class="resume-preview">
+          <h2>Nolan <span>Kim</span></h2>
+          <div class="role">Identity · Endpoint · SaaS · Automation</div>
+          <div class="chips"><span class="chip">Okta</span><span class="chip">SCIM</span><span class="chip">SAML/OIDC</span><span class="chip">Intune</span><span class="chip">Splunk</span></div>
+          <div class="resume-card"><strong>Identity & Access</strong><p>Okta, Active Directory, Entra ID, SAML, OAuth/OIDC, SCIM, MFA, RBAC, onboarding, offboarding, and secure deprovisioning.</p></div>
+          <div class="resume-card"><strong>Endpoint & Security</strong><p>Kandji, Iru, Jamf Pro, Intune, Sophos, LastPass, compliance checks, patching, and device lifecycle work.</p></div>
+          <p class="notes">Best if you still like the left rail being dark, but want it to feel designed with the resume rather than pasted on top.</p>
+        </section>
+      </article>
+
+      <article class="mockup e" id="portfolio-sidebar">
+        <div class="mock-title"><strong>Option E · Portfolio Sidebar</strong><span>more editorial, less app chrome</span></div>
+        <section class="chat" aria-label="Portfolio sidebar chat mockup">
+          <div class="chat-head">
+            <img class="avatar" src="/nolan-avatar.png" alt="">
+            <div class="chat-title"><strong>AI Nolan</strong><span>A resume companion that routes tickets, recruiter leads, and questions.</span></div>
+            <div class="status">ready</div>
+          </div>
+          <div class="chat-scroll">
+            <div class="row"><div class="mini">NK</div><div class="bubble">I can explain the resume, create Jira support cases, check ticket status, or pass recruiter leads to Nolan.</div></div>
+            <div class="row user"><div class="bubble">Ask about Kandji.</div></div>
+            <div class="row"><div class="mini">NK</div><div class="bubble">At Calbright, I used Kandji for macOS/iOS provisioning, configuration profiles, app deployment, updates, patching, compliance checks, fleet tracking, and secure deprovisioning.</div></div>
+          </div>
+          <div class="composer"><div class="input">Ask about the resume...</div><div class="send">↗</div></div>
+        </section>
+        <section class="resume-preview">
+          <h2>Nolan <span>Kim</span></h2>
+          <div class="role">IT Support Engineer</div>
+          <div class="chips"><span class="chip">Kandji</span><span class="chip">Jamf Pro</span><span class="chip">Intune</span><span class="chip">Sophos</span></div>
+          <div class="resume-card"><strong>Endpoint lifecycle</strong><p>Remote staff/student device support, Jamf to Kandji migration, compliance checks, app deployment, and secure deprovisioning.</p></div>
+          <p class="notes">Feels like an editorial sidebar attached to a resume rather than a chat product.</p>
+        </section>
+      </article>
+
+      <article class="mockup f" id="intake-sheet">
+        <div class="mock-title"><strong>Option F · Intake Sheet</strong><span>structured support/recruiting flow</span></div>
+        <section class="chat" aria-label="Intake sheet chat mockup">
+          <div class="chat-head">
+            <img class="avatar" src="/nolan-avatar.png" alt="">
+            <div class="chat-title"><strong>AI Nolan Intake</strong><span>Clear, readable, case-note style without feeling like a terminal.</span></div>
+            <div class="status">open</div>
+          </div>
+          <div class="chat-scroll">
+            <div class="row"><div class="bubble" data-label="AI Nolan">What would you like to route: a support issue, recruiter lead, ticket lookup, or resume question?</div></div>
+            <div class="row user"><div class="bubble" data-label="Visitor">Recruiter lead</div></div>
+            <div class="row"><div class="bubble" data-label="AI Nolan">Send the company and role title, and I’ll pass it to Nolan once follow-up details are available.</div></div>
+          </div>
+          <div class="composer"><div class="input">Add details...</div><div class="send">↗</div></div>
+        </section>
+        <section class="resume-preview">
+          <h2>Nolan <span>Kim</span></h2>
+          <div class="role">Support systems · recruiter handoff · ticketing</div>
+          <div class="chips"><span class="chip">Jira</span><span class="chip">Zapier</span><span class="chip">OpenAI API</span><span class="chip">Vercel</span></div>
+          <div class="resume-card"><strong>Best for clarity</strong><p>Good if the chatbot’s support/recruiter routing is the feature you want visitors to understand quickly.</p></div>
+        </section>
+      </article>
+
+      <article class="mockup g" id="docked-assistant">
+        <div class="mock-title"><strong>Option G · Docked Assistant</strong><span>chat as a docked resume tool</span></div>
+        <section class="chat" aria-label="Docked assistant chat mockup">
+          <div class="chat-head">
+            <img class="avatar" src="/nolan-avatar.png" alt="">
+            <div class="chat-title"><strong>Ask AI Nolan</strong><span>Docked below the resume header instead of feeling like a separate left app.</span></div>
+            <div class="status">available</div>
+          </div>
+          <div class="chat-scroll">
+            <div class="row"><div class="mini">NK</div><div class="bubble">Create a Jira case, check a ticket, or ask about any resume item.</div></div>
+            <div class="row"><div class="mini">NK</div><div class="bubble">Useful for recruiters: send company + role title and I’ll route it through Zapier.</div></div>
+            <div class="row user"><div class="bubble">Tell me about automation.</div></div>
+          </div>
+          <div class="composer"><div class="input">Ask from anywhere on the resume...</div><div class="send">↗</div></div>
+        </section>
+        <section class="resume-preview">
+          <div>
+            <h2>Nolan <span>Kim</span></h2>
+            <div class="role">Interactive resume with AI support triage</div>
+            <div class="chips"><span class="chip">Google Workspace</span><span class="chip">Okta</span><span class="chip">Microsoft 365</span><span class="chip">Automation</span></div>
+          </div>
+          <div class="resume-card"><strong>Layout idea</strong><p>Not strictly left-chat, but could solve the “separate app” feeling by making AI Nolan a docked resume tool.</p></div>
+        </section>
+      </article>
+
+      <article class="mockup h" id="warm-split">
+        <div class="mock-title"><strong>Option H · Warm Split</strong><span>soft paper panels, no terminal signals</span></div>
+        <section class="chat" aria-label="Warm split chat mockup">
+          <div class="chat-head">
+            <img class="avatar" src="/nolan-avatar.png" alt="">
+            <div class="chat-title"><strong>AI Nolan</strong><span>Questions, tickets, leads, and resume context</span></div>
+            <div class="status">online</div>
+          </div>
+          <div class="chat-scroll">
+            <div class="row"><div class="mini">NK</div><div class="bubble">I’m here to make the resume easier to inspect, not to look like a code terminal.</div></div>
+            <div class="row user"><div class="bubble">What’s his strongest fit?</div></div>
+            <div class="row"><div class="mini">NK</div><div class="bubble">Internal IT roles that blend support, SaaS administration, identity, endpoint tools, troubleshooting, and automation.</div></div>
+          </div>
+          <div class="composer"><div class="input">Ask a follow-up...</div><div class="send">↗</div></div>
+        </section>
+        <section class="resume-preview">
+          <h2>Nolan <span>Kim</span></h2>
+          <div class="role">Remote IT Support · SaaS · IAM · Endpoint</div>
+          <div class="chips"><span class="chip">Okta</span><span class="chip">Google Admin</span><span class="chip">JSM</span><span class="chip">Kandji</span></div>
+          <div class="resume-card"><strong>Visual personality</strong><p>More homey and readable, matching the paper-based resume direction instead of contrasting it.</p></div>
+        </section>
+      </article>
+
+      <article class="mockup i" id="resume-gutter">
+        <div class="mock-title"><strong>Option I · Resume Gutter</strong><span>minimal annotations beside resume content</span></div>
+        <section class="chat" aria-label="Resume gutter chat mockup">
+          <div class="chat-head">
+            <img class="avatar" src="/nolan-avatar.png" alt="">
+            <div class="chat-title"><strong>AI Nolan</strong><span>Context notes beside the resume</span></div>
+            <div class="status">ready</div>
+          </div>
+          <div class="chat-scroll">
+            <div class="row"><div class="mini">NK</div><div class="bubble">Click a resume item and I’ll add a short contextual note here.</div></div>
+            <div class="row user"><div class="bubble">Splunk Cloud</div></div>
+            <div class="row"><div class="mini">NK</div><div class="bubble">Used for root-cause analysis across access, device, SaaS, and internal platform issues at Calbright.</div></div>
+          </div>
+          <div class="composer"><div class="input">Ask for context...</div><div class="send">↗</div></div>
+        </section>
+        <section class="resume-preview">
+          <h2>Nolan <span>Kim</span></h2>
+          <div class="role">Click resume items for short explanations</div>
+          <div class="chips"><span class="chip">Splunk</span><span class="chip">LogRocket</span><span class="chip">SAML Tracer</span><span class="chip">API logs</span></div>
+          <div class="resume-card"><strong>Subtle direction</strong><p>Least chat-app-like. Better if AI Nolan should feel like resume annotations first, chatbot second.</p></div>
+        </section>
+      </article>
+
+      <article class="mockup j" id="service-desk-card">
+        <div class="mock-title"><strong>Option J · Service Desk Card</strong><span>professional SaaS/admin feel</span></div>
+        <section class="chat" aria-label="Service desk card chat mockup">
+          <div class="chat-head">
+            <img class="avatar" src="/nolan-avatar.png" alt="">
+            <div class="chat-title"><strong>AI Nolan</strong><span>Personal helpdesk + resume assistant</span></div>
+            <div class="status">online</div>
+          </div>
+          <div class="chat-scroll">
+            <div class="row"><div class="mini">NK</div><div class="bubble">I can create support cases, check ticket status, route recruiter details, and explain Nolan’s experience.</div></div>
+            <div class="row user"><div class="bubble">Check NAI-36.</div></div>
+            <div class="row"><div class="mini">NK</div><div class="bubble">NAI-36 is currently To Do. It has been created and is waiting for Nolan to pick it up.</div></div>
+          </div>
+          <div class="composer"><div class="input">Message AI Nolan...</div><div class="send">↗</div></div>
+        </section>
+        <section class="resume-preview">
+          <h2>Nolan <span>Kim</span></h2>
+          <div class="role">Support automation built into a resume</div>
+          <div class="chips"><span class="chip">Ticket lookup</span><span class="chip">Recruiter leads</span><span class="chip">Jira cases</span><span class="chip">Resume Q&A</span></div>
+          <div class="resume-card"><strong>Polished ops style</strong><p>Best if you want a calm professional tool feel without the terminal/window metaphor.</p></div>
+        </section>
+      </article>
+
+      <article class="mockup docked-family k" id="resume-command-deck">
+        <div class="mock-title"><strong>Option K · Resume Command Deck</strong><span>expanded version of G</span></div>
+        <section class="chat" aria-label="Resume command deck mockup">
+          <div class="chat-head">
+            <img class="avatar" src="/nolan-avatar.png" alt="">
+            <div class="chat-title"><strong>Ask AI Nolan</strong><span>Docked as a resume control surface, not a chat sidebar.</span></div>
+            <div class="status">ready</div>
+          </div>
+          <div class="chat-scroll">
+            <div class="row"><div class="mini">NK</div><div class="bubble">Pick a resume topic and I’ll explain how Nolan used it in real work: SaaS, IAM, endpoints, ticketing, or automation.</div></div>
+            <div class="row user"><div class="bubble">Show me the automation angle.</div></div>
+            <div class="row"><div class="mini">NK</div><div class="bubble">Built Python scripts, Okta Workflows, Zapier flows, Jira automations, and OpenAI-powered triage to reduce repetitive support work.</div></div>
+          </div>
+          <div class="composer"><div class="input">Ask about a highlighted area...</div><div class="send">↗</div></div>
+        </section>
+        <section class="resume-preview">
+          <div>
+            <h2>Nolan <span>Kim</span></h2>
+            <div class="role">IT Support Engineer · SaaS · IAM · Endpoint · Automation</div>
+            <div class="chips"><span class="chip">Google Workspace</span><span class="chip">Microsoft 365</span><span class="chip">Okta</span><span class="chip">Kandji</span><span class="chip">Jira</span><span class="chip">Zapier</span></div>
+          </div>
+          <div class="resume-card featured"><strong>AI as resume control surface</strong><p>The chat becomes an active command deck for inspecting the resume, routing recruiter leads, checking tickets, and creating Jira cases.</p></div>
+        </section>
+      </article>
+
+      <article class="mockup docked-family l" id="quick-action-strip">
+        <div class="mock-title"><strong>Option L · Quick Action Strip</strong><span>less chat, more interactive resume tool</span></div>
+        <section class="chat" aria-label="Quick action strip mockup">
+          <div class="chat-head">
+            <img class="avatar" src="/nolan-avatar.png" alt="">
+            <div class="chat-title"><strong>AI Nolan</strong><span>Hidden in this option</span></div>
+            <div class="status">online</div>
+          </div>
+          <div class="chat-scroll">
+            <div class="row"><div class="bubble" data-label="Ask">Explain a clicked resume item in plain language.</div></div>
+            <div class="row"><div class="bubble" data-label="Route">Capture recruiter leads or create Jira support cases.</div></div>
+            <div class="row"><div class="bubble" data-label="Lookup">Check NAI/REC ticket status from confirmation emails.</div></div>
+          </div>
+          <div class="composer"><div class="input">Ask AI Nolan about this resume...</div><div class="send">↗</div></div>
+        </section>
+        <section class="resume-preview">
+          <div>
+            <span class="eyebrow">Interactive resume</span>
+            <h2>Nolan <span>Kim</span></h2>
+            <div class="role">6+ years in remote IT support, systems administration, identity, SaaS, endpoint management, and automation.</div>
+          </div>
+          <div class="resume-card"><strong>Why this one works</strong><p>The AI is presented as an action layer attached to the resume, not a separate messaging app.</p></div>
+        </section>
+      </article>
+
+      <article class="mockup docked-family m" id="floating-resume-assistant">
+        <div class="mock-title"><strong>Option M · Floating Resume Assistant</strong><span>overlaps resume like a feature, not a sidebar</span></div>
+        <section class="resume-preview">
+          <h2>Nolan <span>Kim</span></h2>
+          <div class="role">Support automation built into the portfolio</div>
+          <div class="chips"><span class="chip">Create Jira cases</span><span class="chip">Check tickets</span><span class="chip">Recruiter handoff</span><span class="chip">Resume Q&A</span></div>
+          <div class="resume-card"><strong>Calbright College</strong><p>L2 support, Google Workspace, Okta lifecycle, Kandji/Intune endpoint work, Splunk diagnostics, and security/compliance support.</p></div>
+        </section>
+        <section class="chat" aria-label="Floating resume assistant mockup">
+          <div class="chat-head">
+            <img class="avatar" src="/nolan-avatar.png" alt="">
+            <div class="chat-title"><strong>AI Nolan</strong><span>Ask about anything on this page</span></div>
+            <div class="status">online</div>
+          </div>
+          <div class="chat-scroll">
+            <div class="row"><div class="mini">NK</div><div class="bubble">I sit over the resume because I’m part of the page, not a separate terminal.</div></div>
+            <div class="row user"><div class="bubble">What can you do?</div></div>
+            <div class="row"><div class="mini">NK</div><div class="bubble">Create Jira cases, check ticket status, route recruiter leads, and explain Nolan’s experience.</div></div>
+          </div>
+          <div class="composer"><div class="input">Ask about this page...</div><div class="send">↗</div></div>
+        </section>
+      </article>
+
+      <article class="mockup docked-family n" id="resume-action-hub">
+        <div class="mock-title"><strong>Option N · Resume Action Hub</strong><span>AI Nolan as homepage module</span></div>
+        <section class="chat" aria-label="Resume action hub mockup">
+          <div class="chat-head">
+            <img class="avatar" src="/nolan-avatar.png" alt="">
+            <div class="chat-title"><strong>AI Nolan Action Hub</strong><span>Choose a path or ask freely.</span></div>
+            <div class="status">ready</div>
+          </div>
+          <div class="chat-scroll">
+            <div class="row"><div class="mini">NK</div><div class="bubble">Start here: I can route work to Nolan, check existing tickets, or explain the resume with context.</div></div>
+            <div class="row"><div class="mini">NK</div><div class="bubble">Recruiter? Send company and role title and I’ll collect follow-up info before passing it on.</div></div>
+            <div class="row user"><div class="bubble">What should I click first?</div></div>
+          </div>
+          <div class="composer"><div class="input">Ask or choose an action...</div><div class="send">↗</div></div>
+        </section>
+        <section class="resume-preview">
+          <div>
+            <h2>Nolan <span>Kim</span></h2>
+            <div class="role">Interactive IT resume</div>
+            <div class="chips"><span class="chip">Support</span><span class="chip">SaaS</span><span class="chip">IAM</span><span class="chip">Endpoint</span><span class="chip">Automation</span></div>
+          </div>
+          <div class="action-stack">
+            <span class="chip">Create Jira case</span>
+            <span class="chip">Check NAI/REC ticket</span>
+            <span class="chip">Send recruiter lead</span>
+            <span class="chip">Explain resume item</span>
+          </div>
+        </section>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
