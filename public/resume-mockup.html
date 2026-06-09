@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nolan Kim — Resume Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+:root {
+  --ink: #18251f;
+  --spruce: #223429;
+  --sage: #789482;
+  --mushroom: #d7d0c1;
+  --paper: #eee7d8;
+  --line: #867d6c;
+  --soft: #5c6254;
+  --blue: #506378;
+  --cream: #f3eddf;
+  --shadow: rgba(51, 47, 40, 0.13);
+  --body: 'Atkinson Hyperlegible', sans-serif;
+  --display: 'Fraunces', serif;
+  --mono: 'IBM Plex Mono', monospace;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  background:
+    linear-gradient(rgba(134,125,108,0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(134,125,108,0.12) 1px, transparent 1px),
+    var(--mushroom);
+  background-size: 46px 46px;
+  font-family: var(--body);
+}
+
+button,
+a { font: inherit; }
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  min-height: 58px;
+  padding: 0.65rem clamp(1rem, 3vw, 2.5rem);
+  color: var(--paper);
+  background: rgba(24,37,31,0.94);
+  border-bottom: 1px solid rgba(238,231,216,0.16);
+  backdrop-filter: blur(12px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+}
+
+.brand::before {
+  content: "~";
+  color: var(--sage);
+  font-family: var(--mono);
+}
+
+.nav {
+  display: flex;
+  justify-content: center;
+  gap: clamp(0.8rem, 2vw, 2rem);
+}
+
+.nav a,
+.status {
+  color: #d6cbb8;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.nav a:hover { color: var(--paper); }
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.status::before {
+  content: "";
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--sage);
+}
+
+.page {
+  width: min(1180px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 4.5rem) 0 4rem;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 0.64fr) minmax(280px, 0.36fr);
+  gap: clamp(1rem, 3vw, 2rem);
+  align-items: end;
+  margin-bottom: 1rem;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 1rem;
+  color: var(--sage);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.eyebrow::after {
+  content: "";
+  width: 56px;
+  height: 1px;
+  background: rgba(134,125,108,0.7);
+}
+
+.hero h1 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(4.2rem, 10vw, 9.3rem);
+  line-height: 0.9;
+  letter-spacing: 0;
+}
+
+.hero h1 span { color: var(--sage); }
+
+.role {
+  margin: 1rem 0 0;
+  color: var(--spruce);
+  font-size: clamp(1.15rem, 2.4vw, 1.85rem);
+  font-weight: 700;
+}
+
+.summary {
+  margin: 1rem 0 0;
+  max-width: 700px;
+  color: #423f36;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.hero-card {
+  padding: 1rem;
+  border: 1px solid rgba(134,125,108,0.42);
+  background: rgba(238,231,216,0.66);
+  box-shadow: 8px 8px 0 var(--shadow);
+}
+
+.hero-card strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--spruce);
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.hero-card p {
+  margin: 0;
+  color: #4f493f;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.35rem;
+}
+
+.chip,
+.resume-ask {
+  touch-action: manipulation;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0.34rem 0.62rem;
+  color: #2f3a33;
+  background: rgba(238,231,216,0.74);
+  border: 1px solid rgba(134,125,108,0.46);
+  box-shadow: 4px 4px 0 rgba(51,47,40,0.1);
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.chip.green { color: #506a57; border-color: rgba(120,148,130,0.55); }
+.chip.blue { color: var(--blue); border-color: rgba(80,99,120,0.38); }
+
+.action-strip {
+  position: sticky;
+  top: 58px;
+  z-index: 15;
+  margin: 1.5rem 0 3rem;
+  border: 1px solid rgba(134,125,108,0.44);
+  background: rgba(215,208,193,0.88);
+  box-shadow: 10px 10px 0 rgba(51,47,40,0.11);
+  backdrop-filter: blur(10px);
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+  padding: 0.85rem;
+}
+
+.action-card {
+  min-height: 126px;
+  padding: 0.9rem;
+  color: var(--ink);
+  background: rgba(238,231,216,0.76);
+  border: 1px solid rgba(134,125,108,0.36);
+  box-shadow: 4px 4px 0 rgba(51,47,40,0.08);
+}
+
+.action-card strong {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: var(--sage);
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.action-card p {
+  margin: 0;
+  color: #423f36;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.ask-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.85rem;
+  border-top: 1px solid rgba(134,125,108,0.38);
+  background: rgba(238,231,216,0.55);
+}
+
+.assistant-face {
+  width: 58px;
+  height: 66px;
+  object-fit: contain;
+  object-position: center bottom;
+}
+
+.ask-copy {
+  min-width: 0;
+}
+
+.ask-copy strong {
+  display: block;
+  margin-bottom: 0.15rem;
+  font-size: 0.95rem;
+}
+
+.ask-copy span {
+  display: block;
+  color: var(--soft);
+  font-size: 0.83rem;
+  line-height: 1.35;
+}
+
+.ask-input {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  min-width: 280px;
+  padding: 0 0.85rem;
+  color: var(--soft);
+  background: rgba(238,231,216,0.78);
+  border: 1px solid rgba(134,125,108,0.46);
+  font-size: 0.88rem;
+}
+
+.section {
+  margin-bottom: 4rem;
+}
+
+.section-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 1.2rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 2px solid var(--ink);
+}
+
+.section-label,
+.section-num {
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.section-num { color: var(--sage); }
+
+.section-line { height: 1px; background: transparent; }
+
+.skills-grid,
+.project-grid,
+.education-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.card,
+.job {
+  border: 1px solid rgba(134,125,108,0.42);
+  background: rgba(238,231,216,0.7);
+  box-shadow: 6px 6px 0 rgba(51,47,40,0.1);
+}
+
+.card {
+  padding: 1rem;
+}
+
+.card strong,
+.job-company {
+  display: block;
+  color: var(--spruce);
+  font-weight: 700;
+}
+
+.card strong {
+  margin-bottom: 0.45rem;
+  font-size: 1rem;
+}
+
+.card p {
+  margin: 0;
+  color: #4f493f;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.job {
+  margin-bottom: 1rem;
+  padding: 1rem 1.1rem;
+  border-left: 5px solid var(--sage);
+}
+
+.job-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: start;
+  margin-bottom: 0.8rem;
+}
+
+.job-company {
+  font-size: 1rem;
+}
+
+.job-role {
+  margin-top: 0.15rem;
+  color: #4f493f;
+  font-size: 0.88rem;
+}
+
+.job-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: flex-end;
+}
+
+.job-tag {
+  padding: 0.22rem 0.5rem;
+  color: var(--soft);
+  border: 1px solid rgba(134,125,108,0.42);
+  background: rgba(238,231,216,0.58);
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+}
+
+.job ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.job li {
+  margin-top: 0.55rem;
+  padding: 0.62rem 0.75rem;
+  color: #4f493f;
+  background: linear-gradient(90deg, rgba(120,148,130,0.12), rgba(238,231,216,0.42));
+  border: 1px solid rgba(134,125,108,0.28);
+  border-left: 4px solid rgba(120,148,130,0.76);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.contact {
+  padding: 1rem;
+  border: 1px solid rgba(134,125,108,0.42);
+  background: rgba(24,37,31,0.92);
+  color: var(--paper);
+}
+
+.contact p {
+  margin: 0 0 1rem;
+  color: #d6cbb8;
+  line-height: 1.55;
+}
+
+.contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.contact-links a {
+  padding: 0.5rem 0.7rem;
+  color: var(--paper);
+  text-decoration: none;
+  border: 1px solid rgba(238,231,216,0.22);
+  background: rgba(238,231,216,0.08);
+}
+
+.resume-ask {
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.resume-ask:hover {
+  transform: translate(-2px, -2px);
+  border-color: var(--sage);
+  box-shadow: 8px 8px 0 rgba(51,47,40,0.14);
+}
+
+@media (max-width: 900px) {
+  .site-header {
+    grid-template-columns: 1fr auto;
+  }
+  .nav {
+    display: none;
+  }
+  .hero,
+  .skills-grid,
+  .project-grid,
+  .education-grid,
+  .action-grid {
+    grid-template-columns: 1fr;
+  }
+  .action-strip {
+    position: static;
+  }
+  .ask-row {
+    grid-template-columns: auto 1fr;
+  }
+  .ask-input {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+  .job-header {
+    grid-template-columns: 1fr;
+  }
+  .job-meta {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 560px) {
+  .page {
+    width: min(100% - 1rem, 1180px);
+    padding-top: 1.5rem;
+  }
+  .hero h1 {
+    font-size: clamp(3rem, 17vw, 5rem);
+  }
+  .action-card {
+    min-height: auto;
+  }
+  .assistant-face {
+    width: 46px;
+    height: 54px;
+  }
+}
+</style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">nolan@kim</div>
+    <nav class="nav" aria-label="Resume sections">
+      <a href="#skills">skills</a>
+      <a href="#experience">experience</a>
+      <a href="#education">education</a>
+      <a href="#projects">projects</a>
+      <a href="#contact">contact</a>
+    </nav>
+    <div class="status">open to opportunities</div>
+  </header>
+
+  <main class="page">
+    <section class="hero">
+      <div>
+        <span class="eyebrow">Interactive IT Resume</span>
+        <h1>Nolan <span>Kim</span></h1>
+        <p class="role">IT Support Engineer · 6+ years in remote IT support, SaaS, IAM, endpoint management, systems administration, and automation.</p>
+        <p class="summary">This version treats AI Nolan as a resume action layer instead of a separate terminal-style chat. Use it to route support cases, check ticket status, pass recruiter leads, or ask about any resume item.</p>
+        <div class="chips">
+          <span class="chip green resume-ask">Google Workspace</span>
+          <span class="chip green resume-ask">Microsoft 365</span>
+          <span class="chip green resume-ask">Okta</span>
+          <span class="chip resume-ask">Jira Service Management</span>
+          <span class="chip resume-ask">Kandji</span>
+          <span class="chip resume-ask">Intune</span>
+          <span class="chip blue resume-ask">Zapier</span>
+          <span class="chip blue resume-ask">OpenAI API</span>
+        </div>
+      </div>
+      <aside class="hero-card">
+        <strong>What AI Nolan does</strong>
+        <p>Creates Jira support cases, checks NAI/REC ticket status, captures recruiter leads, and explains Nolan’s IT support, SaaS, IAM, endpoint, and automation experience in context.</p>
+      </aside>
+    </section>
+
+    <section class="action-strip" aria-label="AI Nolan quick actions">
+      <div class="action-grid">
+        <button class="action-card resume-ask" type="button">
+          <strong>Create</strong>
+          <p>Create a Jira support case when troubleshooting needs the real Nolan.</p>
+        </button>
+        <button class="action-card resume-ask" type="button">
+          <strong>Lookup</strong>
+          <p>Check NAI/REC ticket status from a confirmation email case key.</p>
+        </button>
+        <button class="action-card resume-ask" type="button">
+          <strong>Route</strong>
+          <p>Capture recruiter leads and pass role details through Zapier.</p>
+        </button>
+      </div>
+      <div class="ask-row">
+        <img class="assistant-face" src="/nolan-avatar.png" alt="">
+        <div class="ask-copy">
+          <strong>Ask AI Nolan about this resume</strong>
+          <span id="askHint">Click any skill, role, bullet, school, certification, or project to turn it into a focused question.</span>
+        </div>
+        <div class="ask-input" id="askInput">Ask about Google Workspace, Okta, Jira, Kandji, Microsoft 365...</div>
+      </div>
+    </section>
+
+    <section class="section" id="skills">
+      <div class="section-header">
+        <span class="section-label">Skills</span>
+        <div class="section-line"></div>
+        <span class="section-num">01</span>
+      </div>
+      <div class="skills-grid">
+        <div class="card resume-ask"><strong>SaaS & Collaboration</strong><p>Microsoft 365, Exchange, Teams, SharePoint, OneDrive, Google Admin Console, Google Workspace, Azure, Slack, Zoom, Apple Business Manager, Apple School Manager, GitHub, Asana, Atlassian Confluence.</p></div>
+        <div class="card resume-ask"><strong>ITSM & Support Systems</strong><p>Atlassian Jira, Jira Service Management, Salesforce, and ServiceNow across support, ticketing, lead capture, and operational follow-up.</p></div>
+        <div class="card resume-ask"><strong>Identity & Access</strong><p>Okta, Active Directory, Microsoft Entra ID / Azure AD, SAML, OAuth/OIDC, SCIM, MFA, RBAC, onboarding, offboarding, and secure deprovisioning.</p></div>
+        <div class="card resume-ask"><strong>Endpoint & Security</strong><p>Kandji, Iru, Jamf Pro, Microsoft Intune, LastPass, Sophos, patching, compliance checks, fleet tracking, and endpoint lifecycle work.</p></div>
+        <div class="card resume-ask"><strong>Diagnostics & Logging</strong><p>Splunk Cloud, SAML Tracer, LogRocket, API responses, SaaS logs, configuration review, and repeatable root-cause analysis.</p></div>
+        <div class="card resume-ask"><strong>Automation & Scripting</strong><p>Zapier, Okta Workflows, Slack Workflow Builder, Jira Automation, OpenAI API, Python, PowerShell, Bash, JavaScript, Node.js, and SQL.</p></div>
+      </div>
+    </section>
+
+    <section class="section" id="experience">
+      <div class="section-header">
+        <span class="section-label">Experience</span>
+        <div class="section-line"></div>
+        <span class="section-num">02</span>
+      </div>
+
+      <article class="job resume-ask">
+        <div class="job-header">
+          <div>
+            <div class="job-company">Calbright College</div>
+            <div class="job-role">IT Support Engineer</div>
+          </div>
+          <div class="job-meta">
+            <span class="job-tag">July 2024 - Present</span>
+            <span class="job-tag">Full Time</span>
+            <span class="job-tag">Remote</span>
+          </div>
+        </div>
+        <ul>
+          <li class="resume-ask">Owned day-to-day IT support coverage as one of four primary L2 support contacts for ~180 staff and a student user base that grew from 4,000 to ~7,800 users.</li>
+          <li class="resume-ask">Administered Google Workspace at scale, including users, groups, org units, shared drives, calendars, email routing, licensing, account recovery, 2-step verification, Chrome device settings, and security controls.</li>
+          <li class="resume-ask">Managed identity lifecycle with Okta for provisioning, role-based access, onboarding, offboarding, secure deprovisioning, SaaS access, license management, SAML/OIDC SSO, and SCIM provisioning.</li>
+          <li class="resume-ask">Managed endpoint lifecycle across Jamf Pro, Kandji, Iru, Intune, and Google Admin Console, including Jamf-to-Kandji migration support, app deployment, OS updates, patching, compliance checks, fleet tracking, and secure deprovisioning.</li>
+          <li class="resume-ask">Supported cybersecurity and compliance work through privileged superuser activity alerts, SOC 2 vendor security questionnaires, vendor security response reviews, and Sophos/Kandji log analysis.</li>
+        </ul>
+      </article>
+
+      <article class="job resume-ask">
+        <div class="job-header">
+          <div>
+            <div class="job-company">DRI Inc.</div>
+            <div class="job-role">IT Support Specialist & System Administrator Consultant</div>
+          </div>
+          <div class="job-meta">
+            <span class="job-tag">August 2018 - July 2024</span>
+            <span class="job-tag">Contract / Part Time</span>
+          </div>
+        </div>
+        <ul>
+          <li class="resume-ask">Built and owned IT support and systems administration as the sole IT contact for 120+ users across three branches.</li>
+          <li class="resume-ask">Deployed and maintained Windows and Linux servers, laptops, workstations, printers, routers, switches, firewalls, wireless connectivity, Intune-managed Windows endpoints, AWS S3 backup automation, and OpenVPN remote access.</li>
+          <li class="resume-ask">Implemented Jira as the primary ticketing system and turned ticket trends, recurring support issues, and CEO/COO feedback into documentation, tutorials, and workflow improvements that reduced onboarding time by 3 hours per user.</li>
+          <li class="resume-ask">Built an internal AI support agent with OpenAI API and Zapier that automated Jira case creation, generated troubleshooting guidance, and reduced basic troubleshooting ticket volume by 46%.</li>
+        </ul>
+      </article>
+
+      <article class="job resume-ask">
+        <div class="job-header">
+          <div>
+            <div class="job-company">Keck Medical Center of USC</div>
+            <div class="job-role">IT Helpdesk Analyst II</div>
+          </div>
+          <div class="job-meta">
+            <span class="job-tag">May 2021 - July 2023</span>
+            <span class="job-tag">Full Time</span>
+            <span class="job-tag">Remote</span>
+          </div>
+        </div>
+        <ul>
+          <li class="resume-ask">Served as first point of contact for 10,000+ staff in a large-scale healthcare environment.</li>
+          <li class="resume-ask">Resolved issues across Windows and macOS devices, Microsoft 365, Outlook, Exchange Online, Teams, SharePoint Online, OneDrive, SSO, Google Workspace, Active Directory, Citrix, Cerner, Azure Intune, Tailscale VPN, and mobile devices.</li>
+          <li class="resume-ask">Managed incident, request, change, and problem documentation in ServiceNow, handled P2/P3 escalations, monitored ticket queue and call metrics, and maintained internal knowledge base documentation.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="section" id="education">
+      <div class="section-header">
+        <span class="section-label">Education & Certifications</span>
+        <div class="section-line"></div>
+        <span class="section-num">03</span>
+      </div>
+      <div class="education-grid">
+        <div class="card resume-ask"><strong>École 42</strong><p>BASc Computer Science, France RNCP Level 6 equivalent. Project-based work in C, JavaScript, Python, and C# spanning systems programming, algorithms, UNIX/Linux, networking, system administration, OOP, and client-server architecture.</p></div>
+        <div class="card resume-ask"><strong>Certifications</strong><p>CompTIA A+ and Okta Certified Professional.</p></div>
+      </div>
+    </section>
+
+    <section class="section" id="projects">
+      <div class="section-header">
+        <span class="section-label">Projects & Awards</span>
+        <div class="section-line"></div>
+        <span class="section-num">04</span>
+      </div>
+      <div class="project-grid">
+        <div class="card resume-ask"><strong>AI Nolan</strong><p>Recreated the chatbot triage system previously built at DRI as a public resume project using Jira, Zapier, Vercel, and the OpenAI API. It troubleshoots basic IT issues, escalates unresolved cases, creates Jira tickets, logs conversations, captures recruiter leads, sends email notifications, and checks live ticket status by case key.</p></div>
+        <div class="card resume-ask"><strong>2016 FIRST Robotics Competition</strong><p>Placed 3rd out of 50+ competitors while contributing to a collaborative robotics team focused on ownership, peer review, creative problem solving, and fast iteration under pressure.</p></div>
+      </div>
+    </section>
+
+    <section class="section contact" id="contact">
+      <div class="section-header">
+        <span class="section-label">Contact</span>
+        <div class="section-line"></div>
+        <span class="section-num">05</span>
+      </div>
+      <p>Reach out directly or use AI Nolan to pass along recruiter leads, support tickets, or questions that need the real Nolan.</p>
+      <div class="contact-links">
+        <a href="mailto:nk@nolan.kim">nk@nolan.kim</a>
+        <a href="https://linkedin.com/in/no-ki/" target="_blank">linkedin.com/in/no-ki</a>
+      </div>
+    </section>
+  </main>
+
+<script>
+(() => {
+  const input = document.getElementById('askInput');
+  const hint = document.getElementById('askHint');
+  document.querySelectorAll('.resume-ask').forEach((el) => {
+    el.addEventListener('click', () => {
+      const text = el.innerText.replace(/\s+/g, ' ').trim();
+      if (!text || !input) return;
+      const short = text.length > 86 ? `${text.slice(0, 83).trim()}...` : text;
+      input.textContent = `Ask AI Nolan about: ${short}`;
+      if (hint) hint.textContent = 'This mockup shows the Option L interaction pattern. The production page would send this to the chatbot.';
+    });
+  });
+})();
+</script>
+</body>
+</html>
