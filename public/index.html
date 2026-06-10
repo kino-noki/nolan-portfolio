@@ -1748,10 +1748,11 @@ leads, support tickets, and anything that needs the real Nolan.</p>
     chatStarted = true;
     conversationMessages = [];
     const firstName = config.name && config.name !== 'Anonymous' ? config.name.split(' ')[0] : 'there';
-    const greeting = `Hey ${firstName}! I'm AI Nolan: a public recreation of Nolan's DRI triage chatbot, adapted for recruiters and hiring managers. This version does not include DRI's internal knowledge base, but it shows the same support automation idea in a public resume-friendly way.
+    const greeting = `Hey ${firstName}! I'm AI Nolan: a public recreation of Nolan's DRI triage chatbot, adapted for recruiters and hiring managers. This version does not include DRI's internal knowledge base, but it shows the same support automation idea in a public resume-friendly way. It was built with the OpenAI API, Vercel serverless functions, Zapier webhooks, Jira Service Management, and plain JavaScript.
 
 Here are a few useful things I can do:
 
+• Show how the bot works — model prompting, browser-side routing, Zapier handoffs, Jira ticket creation, and ticket-status lookup.
 • Explain any resume item — click skills, roles, bullets, schools, or certs on the page.
 • Talk through Nolan's Google Workspace, Okta, Jira, endpoint, scripting, and automation work.
 • Capture recruiter leads and pass role details to Nolan.

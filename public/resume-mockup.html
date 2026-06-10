@@ -874,7 +874,7 @@ a { font: inherit; }
       conversation.push({ role: 'assistant', content: reply });
     } catch (err) {
       typing.remove();
-      addMessage(`Chat is not available from this server: ${err.message}`, 'bot');
+      addMessage(`Chat request failed: ${err.message}`, 'bot');
     } finally {
       send.disabled = false;
       input.focus();
@@ -895,8 +895,9 @@ a { font: inherit; }
       const prompt = promptForElement(el);
       if (!prompt || !input) return;
       input.value = prompt;
-      if (hint) hint.textContent = 'Press Send to ask AI Nolan, or keep clicking resume items to change the prompt.';
-      input.focus();
+      if (hint) hint.textContent = 'AI Nolan is answering the resume item you clicked.';
+      document.querySelector('.action-strip')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      sendChat(prompt);
     });
   });
 })();
