@@ -7,6 +7,6 @@
     "check": "node --check api/chat.js && node --check api/forward.js && node --check api/ticket-status.js"
   },
   "engines": {
-    "node": "20.x"
+    "node": "24.x"
   }
 }
